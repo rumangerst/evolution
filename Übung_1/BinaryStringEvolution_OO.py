@@ -41,9 +41,14 @@ class Individual:
     """
     def getMutatedVariant(self, p):
         individual_chars = list(self.data); #Strings are immuteable and always recreating strings is expensive
-                                                                                                               
-        for i in range(len (individual_chars)):                                                                
-            if (random.random() <= p):                                                                         
+                                                                                                         
+        for i in range(len (individual_chars)):         
+            
+            rand = 1.0 - random.random(); #random.random() returns number in [0,1), but we want a number in (0,1], so invert it
+            assert rand >= 0 and rand <= 1; #for checking
+            
+                                                                   
+            if (rand <= p):                                                                         
                                                                                                                
                 char = individual_chars[i];                                                                    
                 individual_chars[i] = "0" if  char == "1" else "1"; #swap the bit                              
