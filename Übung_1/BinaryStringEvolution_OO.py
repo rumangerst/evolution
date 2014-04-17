@@ -109,14 +109,14 @@ def evolution(parent, descendants, mutation_rate):
     while bestindividual.score != 40 and iteration < 10000:        
        
         iteration += 1; #count iteration
-       
-        
-        print "iteration " + str(iteration);
+          
         
         #Look for best indidual
         bestindividual = selectbest(population);
         
-        print "best: " + bestindividual.data;
+        if iteration % 50 == 0:
+            print "iteration " + str(iteration);
+            print "best: " + bestindividual.data;
        
         
         #Create a new population with only individual and it's descendants in it
