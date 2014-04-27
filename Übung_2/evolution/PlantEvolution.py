@@ -4,6 +4,7 @@
 Created on 24.04.2014
 
 HINWEIS: Mit Python Version 3.4 geschrieben!
+Anmerkung: Windows ist sehr SCHLECHT zum Entwickeln mit Python -.-
 
 @author: Ruman
 '''
@@ -11,7 +12,7 @@ import random;
 import numpy;
 import matplotlib.pyplot as plt;
 
-EVOLUTION_STRATEGY = ",";
+EVOLUTION_STRATEGY = "+";
 
 def clamp(x,_min,_max):
     #return x;
@@ -123,34 +124,46 @@ class Individual:
 def evolve(population_size, descendants, r, L_zero, R_zero, T, generations):   
   
     best_individuals = [];
+    
     #initialize start population
     population = [Individual(L_zero, R_zero, T)];
+    
+    #grow population (evaluation)
+    for individual in population:
+        individual.grow(r,T);
     
     for generation in range(generations):
         
         print("++++ Generation " + str(generation + 1))
         
-        #grow population
-        for individual in population:
-            individual.grow(r,T);
+       
         
         #select best individual of current population a parent
         parent = max(population, key = lambda x: x.R(T));
-        best_individuals.append(parent);
+        best_individuals.append(parent); #add it to output list for later use
         
         #create descendants
         next_generation = [];
         
-        for _ in range(descendants):
+        for _ in range(descendants - ( 1 if EVOLUTION_STRATEGY == "+" else 0 )): #create lamda desc. or lamda - 1 (if plus strat.)
             next_generation.append(parent.mutate(L_zero, R_zero, T));
+            
+        #grow children (evaluate)
+        for individual in next_generation:
+            individual.grow(r,T);
         
         
+        #Create a new population (using the set strategy)
         if EVOLUTION_STRATEGY == "+":
             #take best individuals of parents or children as new population (plus strategy)
-            population = next_generation[0:population_size-1] + [parent]; 
+            population = next_generation + [parent]; 
         else:
             #take population_size best individuals as new population (comma strategy)
-            population = next_generation[0:population_size]; 
+            population = next_generation; 
+            
+        #environment selection
+        population.sort(key= lambda x: x.R(T), reverse=True);
+        population = population[0:population_size];
         
     #Finished! grow, sort and return   
     print("******** Finished ********");
@@ -172,13 +185,13 @@ def plotdata(TEST_DATA, TEST_DATA_u_r, TEST_DATA_leaf, generations, population_s
     x_axis = range(generations + 1);
     
     ############### Create main plot
-    plt.subplot(2,1,1);
+    fig_fitness = plt.subplot(2,1,1);
     
-    plt.plot(x_axis, data_min, color='black', linestyle='-', label='Minimum');
-    plt.plot(x_axis, data_avg, color='red', linestyle='-', label='Average');
-    plt.plot(x_axis, data_max, color='black', linestyle='-', label='Maximum');   
+    plt.plot(x_axis, data_min, color='black', linestyle='-', label='Minimum R(T)');
+    plt.plot(x_axis, data_avg, color='red', linestyle='-', label='Average R(T)');
+    plt.plot(x_axis, data_max, color='black', linestyle='-', label='Maximum R(T)');   
     
-    plt.plot(x_axis, data_leaf_avg, color='green', linestyle=':', label='Average');   
+    plt.plot(x_axis, data_leaf_avg, color='green', linestyle=':', label='Average L(T)');   
         
     #plt.axis([0,generation])
     plt.xlabel("Generation ($t$)");
@@ -191,17 +204,20 @@ def plotdata(TEST_DATA, TEST_DATA_u_r, TEST_DATA_leaf, generations, population_s
         plt.title("$R(T)$-Entwicklung über die Generation $(\mu, \lambda)\ \mu = {0},\ \lambda = {1}$ (25 Durchläufe)"
               .format(population_size, descendants));
     
-              
+               
     #draw error bars
     data_error = [numpy.std(x) / numpy.sqrt(len(x)) for x in TEST_DATA];
     plt.errorbar(x_axis, data_avg, yerr= data_error);
+    
+    #draw legend
+    fig_fitness.legend(loc = "lower right");
     
     #===========================================================================
     # Create u_r plot
     #===========================================================================
     x_axis = range(1, T + 1);
     
-    plt.subplot(2,1,2);
+    fig_u_r = plt.subplot(2,1,2);
     
     plt.xlabel("Tage ($t$)");
     plt.ylabel("$u_r$");
@@ -214,11 +230,17 @@ def plotdata(TEST_DATA, TEST_DATA_u_r, TEST_DATA_leaf, generations, population_s
         _u_r_source_data = TEST_DATA_u_r[generation]; #get array of u_r(t) for all 25 runs 
         data_u_r_avg = [numpy.mean([ x[day] for x in _u_r_source_data ]) for day in range(T)];
         
-        _color = "red" if generation == generations else "gray";
-        _linestyle = "-" if generation == generations else ":"; 
+        ### Python ist cool!!!!
+        _color, _linestyle, _label = ["red", "-", "Average $u_r$"] if generation == generations else ["gray", ":", ""];      
          
-        plt.plot(x_axis,data_u_r_avg, color=_color, linestyle=_linestyle, label='Average');
+        plt.plot(x_axis,data_u_r_avg, color=_color, linestyle=_linestyle, label = _label);
     
+    #print latest avg u_r
+    print("Latest AVG u_r:")
+    print(str([numpy.mean([ x[day] for x in TEST_DATA_u_r[generations] ]) for day in range(T)]));
+    
+    #draw legend
+    fig_u_r.legend(loc = "lower right");
     
     #show
     plt.show(); 
@@ -264,7 +286,7 @@ def main():
     
 def main_plottest(filename):
     population_size = 10;
-    descendants = 100;
+    descendants = 20;
     energy_production_factor = 0.1; #= r
     L_zero = 0.01;
     R_zero = 0;
@@ -310,5 +332,5 @@ def main_plottest(filename):
     
  
 #main();   
-main_plottest("COMMA_");
-#main_readandplot();
+#main_plottest("PLUS01_");
+main_readandplot("PLUS01_");
