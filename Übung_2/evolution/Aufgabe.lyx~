@@ -88,7 +88,7 @@ e in diesem Fall zu einem besseren Ergebnis führt.
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Float table
@@ -1062,6 +1062,10 @@ ttlich erreichte Fitness pro Generation zeigt.
 Aufgabe 3
 \end_layout
 
+\begin_layout Subsection*
+Algorithmus
+\end_layout
+
 \begin_layout Standard
 Dieser ES-Algorithmus arbeitet mit einer Populationsgröße von 
 \begin_inset Formula $μ=10$
@@ -1072,14 +1076,14 @@ Dieser ES-Algorithmus arbeitet mit einer Populationsgröße von
 \end_inset
 
 .
- Das Programm unterstützt sowohl Komma, als auch Plus-Strategie, um zu überprüfe
-n, welche der beiden Strategien in diesem Fall besser ist.
+ Das Programm unterstützt sowohl Komma-, als auch Plus-Strategie, um zu
+ überprüfen, welche der beiden Strategien in diesem Fall besser ist.
  Die Generationszahl ist 
 \begin_inset Formula $200$
 \end_inset
 
-; eine höhere Generationszahl hat sich als nutzlos erwiesen, da schon deutlich
- sichbar ist, zu welchen Werten die Fitness konvergiert.
+; eine höhere Generationszahl hat sich als nicht mehr sinnvoll erwiesen,
+ da schon deutlich sichbar ist, zu welchen Werten die Fitness konvergiert.
 \end_layout
 
 \begin_layout Standard
@@ -1107,7 +1111,7 @@ Der Algorithmus initialisiert zuerst eine Population mit 20 Individuen mit
 \end_inset
 
  ein mutiertes 
-\begin_inset Formula $u_{r}'(t)=\sigma\cdot N(0,1)$
+\begin_inset Formula $u_{r}'(t)=u_{r}+\sigma\cdot N(0,1)$
 \end_inset
 
  mit 
@@ -1122,7 +1126,7 @@ Der Algorithmus initialisiert zuerst eine Population mit 20 Individuen mit
 \begin_inset Formula $u,v$
 \end_inset
 
-.
+, sonst Standardabweichung.
 \end_layout
 
 \begin_layout Standard
@@ -1131,14 +1135,54 @@ Nach erzeugung der Nachkommen
 \end_inset
 
  ist die neue Population 
-\begin_inset Formula $P'=select(D\cup parent(D),\mu)$
+\begin_inset Formula $P'=select_{\mu}(D\cup parent(D))$
 \end_inset
 
  wenn Plus-Strategie oder 
-\begin_inset Formula $P'=select(D,\mu)$
+\begin_inset Formula $P'=select_{\mu}(D)$
 \end_inset
 
  wenn die Komma-Strategie benutzt wird.
+\end_layout
+
+\begin_layout Subsection*
+Auswertung des Algorithmus
+\end_layout
+
+\begin_layout Standard
+Bei Betrachtung der Plots wird deutlich, dass der Algorithmus bei Benutzung
+ der Plus-Strategie deutlich besser ist, als bei Benutzung der Komma-Strategie.
+ So konvergiert 
+\begin_inset Formula $R(T)$
+\end_inset
+
+ über die Generationen bei Benutzung der Plus-Strategie gegen 
+\begin_inset Formula $\approx0.025$
+\end_inset
+
+, während bei Benutzung der Komma-Strategie nur 
+\begin_inset Formula $\approx0.022$
+\end_inset
+
+ erreicht.
+ Also trifft der Ansatz, dass Kinder eines Individuums immer besser oder
+ gleich gut sind, wie die Eltern, in diesem Fall und bei Benutzung des oben
+ beschriebenen Mutationsalgorithmus wahrscheinlich nicht zu.
+\end_layout
+
+\begin_layout Standard
+An dem Verlauf von 
+\begin_inset Formula $u_{r}$
+\end_inset
+
+ des Plots der Plus-Strategie wird auch deutlich, dass es für die Planze
+ günstiger ist, zuerst fast die gesamte Energie in das Wachstum der Blätter
+ zu investieren und danach (nach ca.
+ 5 Tagen) das Blütenwachstum zu steigern.
+ Gegen Ende des Lebens einer Pflanze ist es für diese sinnvoll, sich komplett
+ auf das Bütenwachstum zu konzentieren, was durch die vorher gesammelte
+ Biomasse an Blättern deutlich besser funktioniert, da nun mehr Energie
+ zur Verfügung steht.
 \end_layout
 
 \end_body
