@@ -12,26 +12,48 @@ import random;
 import numpy;
 import matplotlib.pyplot as plt;
 import pickle;
+from enum import Enum;
 
 def clamp(x,_min,_max):
     #return x;
     return min(max(x, _min), _max);
 
+class EvolutionStrategy(Enum):
+    PLUS = 0;
+    COMMA = 1;
+    
+class EvolutionRecombStrategy(Enum):
+    DISCRETE = 0;
+    INTERMEDIATE = 1;
+
 class Individual:
+    
+    _mass_leaf = 0;
+    _mass_bloom = 0;
+    
+    T = 0;
+    
+    #Object Parameters
+    _growth_bloom = [];
+    
+    #Strategy Parameters
+    _sigma = 0;
     
     #===========================================================================
     # Generate a random individual (if not provided) with age 0 and predefined bloom and leaf mass
     #=========================================================================== 
-    def __init__(self, L_zero, R_zero, T, u_r = None):      
+    def __init__(self, L_zero, R_zero, T, u_r = None, sigma = None):      
+        self.T = T;
         self._mass_leaf = [float(L_zero)];
-        self._mass_bloom = [float(R_zero)];      
+        self._mass_bloom = [float(R_zero)];  
+        
         
         if u_r == None:
             print("Created new random individual!");
         
-                          
-        #self._growth_bloom = u_r if u_r != None else  [1 for _ in range(0,T)]; #nur zum testen      
-        self._growth_bloom = u_r if u_r != None else  [random.uniform(0,1) for _ in range(0,T)];      
+    
+        self._growth_bloom = u_r if u_r != None else  [random.uniform(0,1) for _ in range(0,T)]; 
+        self._sigma = sigma if sigma != None else random.uniform(1,5);     
         
         
     #===========================================================================
@@ -76,26 +98,60 @@ class Individual:
         return self.R(T);
     
     #===========================================================================
-    # Returns a mutated variant of this individual
+    # Creates a new individual with all object- and strategy parameters of this object
     #===========================================================================
-    def mutate(self, L_zero, R_zero, T):
+    def copy(self):
+        return Individual(self.L(0), self.R(0), self.T, self._growth_bloom, self._sigma);
+       
+    #===========================================================================
+    # Sets strategy parameters of individual to recombined strategy parameters of parents
+    #===========================================================================    
+    def recombStrategyParam(self, parents):
+        # recombination by using mean
         
-        sigma = numpy.std(self._growth_bloom);
+        mean =  numpy.mean([x._sigma for x in parents]);
+        self._sigma = mean;
         
-        if sigma == 0:
-            sigma = 1.0;
+    #===========================================================================
+    # Sets object parameters of individual to recombined object parameters of parents    #===========================================================================
+   
+    def recombObjectParam(self, parents,strategy):
         
+        if strategy == EvolutionRecombStrategy.INTERMEDIATE:
+            
+            #recombination using mean of each u_r(t) for each time
+            mean_u_r = [numpy.mean([x.growth_bloom(t) for x in parents]) for t in range(self.T)];
+            self._growth_bloom = mean_u_r;
+            
+        else:
+            
+            #recombination by baking together random explicit values of u_r
+            baked_u_r = [random.choice(parents).growth_bloom(t) for t in range(self.T)];
+            self._growth_bloom = baked_u_r;
+    
+    #===========================================================================
+    # Mutates strategy params
+    #===========================================================================
+    def mutateStrategyParam(self):
+        tau = 1.0 / numpy.sqrt(self.T); # 1 / SQRT(N) mit Suchraum R^N
+        exp = random.gauss(0, tau);
+        
+        self._sigma = self._sigma * numpy.power(numpy.e, exp);        
+    
+    #===========================================================================
+    # Mutates this individual's object parameter
+    #===========================================================================
+    def mutateObjectParam(self):        
+      
         def y_(y):            
                         
-            z = random.gauss(0,1) * sigma;
+            z = random.gauss(0,self._sigma);
             y_ = y + z;
             
-            return clamp(y_, 0, 1);
+            return clamp(y_, 0, 1); #shame on you, NUMPY; no NORMAL CLIP/CLAMP!!!!
       
         
-        u_r = [ y_(x) for x in self._growth_bloom]; 
-                
-        return Individual(L_zero, R_zero, T, u_r)
+        self._growth_bloom = [ y_(x) for x in self._growth_bloom]; 
     
     #===========================================================================
     # Print some data about the individual
@@ -119,10 +175,13 @@ class EvolutionTestResult:
     #===========================================================================
     # Test parameters
     #===========================================================================
-    EVOLUTION_STRATEGY = "+";    
+    evolution_strategy = EvolutionStrategy.PLUS;   
+    evolution_recomb_strategy = EvolutionRecombStrategy.DISCRETE;
+     
     population_size = 20;
+    rho = 1;
     descendants = 40;
-    energy_production_factor = 0.1;
+    r = 0.1;
     L_zero = 0.01;
     R_zero = 0;
     T = 20;
@@ -141,10 +200,13 @@ class EvolutionTestResult:
         result.TEST_DATA_leaf = data["TEST_DATA_leaf"];
         result.TEST_DATA_u_r = data["TEST_DATA_u_r"];
         
-        result.EVOLUTION_STRATEGY = data["EVOLUTION_STRATEGY"];
+        result.evolution_strategy = data["evolution_strategy"];
+        result.evolution_recomb_strategy = data["evolution_recomb_strategy"];
+        
         result.population_size = data["population_size"];
         result.descendants = data["descendants"];
-        result.energy_production_factor = data["energy_production_factor"];
+        result.r = data["r"];
+        result.rho = data["rho"];
         result.L_zero = data["L_zero"];
         result.R_zero = data["R_zero"];
         result.T = data["T"];
@@ -163,10 +225,13 @@ class EvolutionTestResult:
         data["TEST_DATA_leaf"] = self.TEST_DATA_leaf;
         data["TEST_DATA_u_r"] = self.TEST_DATA_u_r;
         
-        data["EVOLUTION_STRATEGY"] = self.EVOLUTION_STRATEGY;
+        data["evolution_strategy"] = self.evolution_strategy;
+        data["evolution_recomb_strategy"] = self.evolution_recomb_strategy;
+        
         data["population_size"] = self.population_size;
+        data["rho"] = self.rho;
         data["descendants"] = self.descendants;
-        data["energy_production_factor"] = self.energy_production_factor;
+        data["r"] = self.r;
         data["L_zero"] = self.L_zero;
         data["R_zero"] = self.R_zero;
         data["T"] = self.T;
@@ -176,11 +241,14 @@ class EvolutionTestResult:
 
         file.close();
         
+   
     #===========================================================================
     # Plot the data, stored in this class
     #===========================================================================
-    def plotdata(self):                                          
+    def plotdata(self, filename=None):                                          
                                                                                                                                                    
+        
+        plt.figure(figsize = (20,14), dpi = 50);
                                                                                                                                                    
         data_min = [min(x) for x in self.TEST_DATA];                                                                                                    
         data_max = [max(x) for x in self.TEST_DATA];                                                                                                    
@@ -199,15 +267,18 @@ class EvolutionTestResult:
         plt.plot(x_axis, data_leaf_avg, color='green', linestyle=':', label='Average L(T)');                                                       
                                                                                                                                                    
         #plt.axis([0,generation])                                                                                                                  
-        plt.xlabel("Generation ($t$)");                                                                                                            
-        plt.ylabel("$R(T)$");                                                                                                                      
+        plt.xlabel("Generation ($n$)");                                                                                                            
+        plt.ylabel("$R(T)$");           
+        
+        recomb_strat = ("Diskret" if self.evolution_recomb_strategy == EvolutionRecombStrategy.DISCRETE else "Intermediär") if self.rho > 1 else "Keine Rekombination";                                                                                                           
+        
                                                                                                                                                    
-        if self.EVOLUTION_STRATEGY == "+":                                                                                                              
-            plt.title("$R(T)$-Entwicklung über die Generation $(\mu + \lambda)\ \mu = {0},\ \lambda = {1}$ (25 Durchläufe)"                        
-                  .format(self.population_size, self.descendants));                                                                                          
+        if self.evolution_strategy == EvolutionStrategy.PLUS:                                                                                                              
+            plt.title("$R(T)$-Entwicklung über die Generation $({0}/{1}+{2})$ {4}  ({3} Durchläufe)"                        
+                  .format(self.population_size,self.rho, self.descendants,self.TEST_RUNS,recomb_strat));                                                                                          
         else:                                                                                                                                      
-            plt.title("$R(T)$-Entwicklung über die Generation $(\mu, \lambda)\ \mu = {0},\ \lambda = {1}$ (25 Durchläufe)"                         
-                  .format(self.population_size, self.descendants));                                                                                          
+            plt.title("$R(T)$-Entwicklung über die Generation $({0}/{1},{2})$ {4}  ({3} Durchläufe)"                         
+                  .format(self.population_size,self.rho, self.descendants,self.TEST_RUNS,recomb_strat));                                                                                          
                                                                                                                                                    
                                                                                                                                                    
         #draw error bars                                                                                                                           
@@ -247,25 +318,31 @@ class EvolutionTestResult:
         #draw legend                                                                                                                               
         fig_u_r.legend(loc = "lower right");                                                                                                       
                                                                                                                                                    
-        #show                                                                                                                                      
+        #show       
+        
+        if filename != None:
+         
+            
+            plt.savefig(filename, dpi=400);
+            print ("Plot saved to file.");
+                                                                                                                                       
         plt.show();    
-    
-        
-        
-    
+  
 class EvolutionTask:   
     
-    EVOLUTION_STRATEGY = "+";
+    evolution_strategy = EvolutionStrategy.PLUS;
+    evolution_recomb_strategy = EvolutionRecombStrategy.DISCRETE;
     
     population_size = 20;
+    rho = 1;
     descendants = 40;
-    energy_production_factor = 0.1;
+    r = 0.1;
     L_zero = 0.01;
     R_zero = 0;
     T = 20;
     generations = 200;
     
-    def __init__(self):
+    def __init__(self):        
         print("Created a new evolution task!");
 
     #===============================================================================                                                  
@@ -280,74 +357,77 @@ class EvolutionTask:
     #                                                                                                                                 
     #will use comma or plus strategy                                                             
     #===============================================================================                                                  
-    def evolve(self):         
-        
-        #Load all variables from class to make everything easier
-        population_size = self.population_size;  
-        descendants = self.descendants;
-        r = self.energy_production_factor;
-        L_zero = self.L_zero;
-        R_zero = self.R_zero;
-        generations = self.generations;
-        T = self.T;        
-        EVOLUTION_STRATEGY = self.EVOLUTION_STRATEGY;                                   
-                                                                                                                                      
+    def evolve(self):                                                                                                              
         best_individuals = [];                                                                                                        
                                                                                                                                       
         #initialize start population                                                                                                  
-        population = [Individual(L_zero, R_zero, T)];                                                                                 
+        population = [Individual(self.L_zero, self.R_zero, self.T) for _ in range(self.population_size)];                                                                                 
                                                                                                                                       
         #grow population (evaluation)                                                                                                 
         for individual in population:                                                                                                 
-            individual.grow(r,T);                                                                                                     
+            individual.grow(self.r,self.T);                                                                                                     
                                                                                                                                       
-        for generation in range(generations):                                                                                         
+        for generation in range(self.generations):                                                                                         
                                                                                                                                       
             print("++++ Generation " + str(generation + 1))                                                                           
                                                                                                                                       
                                                                                                                                       
                                                                                                                                       
-            #select best individual of current population a parent                                                                    
-            parent = max(population, key = lambda x: x.R(T));                                                                         
-            best_individuals.append(parent); #add it to output list for later use                                                     
+            #select best individuals of current population a parents                                                                   
+            population.sort(key= lambda x: x.R(self.T), reverse=True);                                                                            
+            best_individuals.append(population[0]); #add it to output list for later use        
+            
+            parents = population[0:self.rho];                                             
                                                                                                                                       
             #create descendants                                                                                                       
             next_generation = [];                                                                                                     
                                                                                                                                       
-            for _ in range(descendants - ( 1 if EVOLUTION_STRATEGY == "+" else 0 )): #create lamda desc. or lamda - 1 (if plus strat.)
-                next_generation.append(parent.mutate(L_zero, R_zero, T));                                                             
+            for _ in range(self.descendants):
+                
+                #Erzeuge neues Kind = copy(parent) wenn nur ein einziger Elter verfügbar ist
+                #Erzeuge mit RECOMB-Methoden das Kind über Rekombination, wenn es mehrere Eltern gibt
+                individual = parents[0].copy() if len(parents) == 1 else Individual(self.L_zero, self.R_zero, self.T, [0 for _ in range(self.T)], -1);
+                           
+                              
+                #Rekombination
+                if(len(parents) > 1):
+                    individual.recombStrategyParam(parents);
+                    individual.recombObjectParam(parents, self.evolution_recomb_strategy);
+                    
+                #Mutation
+                individual.mutateStrategyParam();
+                individual.mutateObjectParam();
+                
+                next_generation.append(individual);
                                                                                                                                       
             #grow children (evaluate)                                                                                                 
             for individual in next_generation:                                                                                        
-                individual.grow(r,T);                                                                                                 
+                individual.grow(self.r,self.T);                                                                                                 
                                                                                                                                       
                                                                                                                                       
             #Create a new population (using the set strategy)                                                                         
-            if EVOLUTION_STRATEGY == "+":                                                                                             
+            if self.evolution_strategy == EvolutionStrategy.PLUS:                                                                                             
                 #take best individuals of parents or children as new population (plus strategy)                                       
-                population = next_generation + [parent];                                                                              
+                population = next_generation + parents;                                                                              
             else:                                                                                                                     
                 #take population_size best individuals as new population (comma strategy)                                             
                 population = next_generation;                                                                                         
                                                                                                                                       
             #environment selection                                                                                                    
-            population.sort(key= lambda x: x.R(T), reverse=True);                                                                     
-            population = population[0:population_size];                                                                               
+            population.sort(key= lambda x: x.R(self.T), reverse=True);                                                                     
+            population = population[0:self.population_size];                                                                               
                                                                                                                                       
         #Finished! grow, sort and return                                                                                              
-        print("******** Finished ********");                                                                                          
-        for individual in population:                                                                                                 
-            individual.grow(r,T);                                                                                                     
+        print("******** Finished ********");                                               
                                                                                                                                       
-        best_individuals.append(max(population, key = lambda x: x.R(T)));                                                             
+        best_individuals.append(max(population, key = lambda x: x.R(self.T)));                                                             
                                                                                                                                       
         return best_individuals;                                                                                                      
 
     #===========================================================================
     # Run a test for this evolutionary algorithm
     #===========================================================================
-    def evolutiontest(self):
-        TEST_RUNS = 25;                                                                                                                  
+    def evolutiontest(self, TEST_RUNS = 25):                                                                              
                            
         TEST_DATA = [[] for _ in range(self.generations + 1)];                                                                                 
         TEST_DATA_leaf = [[] for _ in range(self.generations + 1)];                                                                            
@@ -365,12 +445,14 @@ class EvolutionTask:
                 
                 
         #generate a result
-        result = EvolutionTestResult();
-        
-        result.EVOLUTION_STRATEGY = self.EVOLUTION_STRATEGY;
+        result = EvolutionTestResult();        
+       
+        result.evolution_strategy = self.evolution_strategy;
+        result.evolution_recomb_strategy = self.evolution_recomb_strategy;
         result.population_size = self.population_size;
+        result.rho = self.rho;
         result.descendants = self.descendants;
-        result.energy_production_factor = self.energy_production_factor;
+        result.r = self.r;
         result.generations = self.generations;
         result.L_zero = self.L_zero;
         result.R_zero = self.R_zero;
@@ -382,28 +464,100 @@ class EvolutionTask:
         result.TEST_RUNS = TEST_RUNS;
         
         return result;                             
-                                                                                                                                          
-    
-    
-def run_test():
-    
+        
+                                                                                                                           
+
+
+#===============================================================================
+# Default run procedure
+#===============================================================================
+def run():
     test_plus = EvolutionTask();
-    test_plus.EVOLUTION_STRATEGY = "+";
-    result_plus = test_plus.evolutiontest();   
-    result_plus.write("TEST_result_plus"); 
-    result_plus.plotdata();
+    test_plus.evolution_strategy = EvolutionStrategy.PLUS;
+    test_plus.evolution_recomb_strategy = EvolutionRecombStrategy.DISCRETE;
+    test_plus.rho = 2;
+    individual = test_plus.evolve();  
     
-    test_comma = EvolutionTask();
-    test_comma.EVOLUTION_STRATEGY = ",";
-    result_comma = test_comma.evolutiontest();   
-    result_comma.write("TEST_result_comma"); 
-    result_comma.plotdata();
+    individual.pop().printData();
     
+    print([x._sigma for x in individual]);
+    print([x.R(20) for x in individual]);
+
+
+#===============================================================================
+# Run a test task and saves it to a file
+#===============================================================================
+def run_test(task,test_runs, filename):
+    result = task.evolutiontest(test_runs);
+    result.write(filename);
+    
+    return result;
+    
+#===============================================================================
+# Tests without recombination (RHO = 1); tests all evo. strategies
+#===============================================================================
+def run_tests():
+    
+    tests = [];   
+    
+    for strategy in [EvolutionStrategy.PLUS, EvolutionStrategy.COMMA]:
+      
+        case = EvolutionTask();
+        case.name = "evolution_test_NORECOMB_" + str(strategy);      
+        case.evolution_strategy = strategy;
+            
+        tests.append(case);
+            
+    #Run the tests
+    results = [run_test(x,25,x.name) for x in tests];
+    
+    #Plot data
+    for x in results: 
+        x.plotdata();    
+
+#===============================================================================
+# Tests with recombination; tests all recombination strategies
+#===============================================================================
+def run_tests_recomb():
+    
+    tests = [];
+    
+    rho = 2;
+    test_runs = 50;
+    
+    for strategy in [EvolutionStrategy.PLUS, EvolutionStrategy.COMMA]:
+        for recomb_strategy in [EvolutionRecombStrategy.DISCRETE, EvolutionRecombStrategy.INTERMEDIATE]:
+            
+            case = EvolutionTask();   
+            case.name = "evolution_test_" + str(strategy) + str(recomb_strategy);
+            case.rho = rho;
+            case.evolution_strategy = strategy;
+            case.evolution_recomb_strategy = recomb_strategy;
+            
+            tests.append(case);
+            
+    #Run the tests
+    results = [run_test(x,test_runs,x.name) for x in tests];
+    
+    #Plot data
+    for x in results: 
+        x.plotdata();
+    
+#===============================================================================
+# Loads a plot from filename, load it and save it to a svg
+#===============================================================================
 def show_plot(filename):
     result = EvolutionTestResult.load(filename);
-    result.plotdata();
+    result.plotdata(filename + ".svg");
 
     
- 
-#run_test();
-show_plot("TEST_result_plus");
+
+#run_tests();
+#run_tests_recomb();
+run();
+# show_plot("evolution_test_EvolutionStrategy.COMMAEvolutionRecombStrategy.INTERMEDIATE");
+# show_plot("evolution_test_EvolutionStrategy.COMMAEvolutionRecombStrategy.DISCRETE");
+# show_plot("evolution_test_EvolutionStrategy.PLUSEvolutionRecombStrategy.INTERMEDIATE");
+# show_plot("evolution_test_EvolutionStrategy.PLUSEvolutionRecombStrategy.DISCRETE");
+# show_plot("evolution_test_NORECOMB_EvolutionStrategy.COMMA");
+# show_plot("evolution_test_NORECOMB_EvolutionStrategy.PLUS");

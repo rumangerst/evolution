@@ -83,8 +83,8 @@ Aufgabe 1
 
 \begin_layout Standard
 Das Problem kann mit einem Algorithmus, der sowohl die Komma-, als auch
- die Plus-Strategie benutzt gelöst werden, wobei bei Benutzung der Plus-Strategi
-e in diesem Fall zu einem besseren Ergebnis führt.
+ die Plus-Strategie benutzt gelöst werden, wobei bei Benutzung der Komma-Strateg
+ie in diesem Fall zu einer etwas höheren Fitness führt.
 \begin_inset Float table
 wide false
 sideways false
@@ -107,7 +107,11 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-Tag
+Tag 
+\begin_inset Formula $t$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -116,7 +120,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $u_{r}$
+\begin_inset Formula $u_{r}(t)$
 \end_inset
 
 
@@ -139,7 +143,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.0053362929352471222
+0.0070397527662064375
 \end_layout
 
 \end_inset
@@ -159,7 +163,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.022120543950332253
+0.040096686832521676
 \end_layout
 
 \end_inset
@@ -179,7 +183,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.019330779153616133
+0.0035844076940676028
 \end_layout
 
 \end_inset
@@ -199,7 +203,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.043496031004327106
+0.005010904010279791
 \end_layout
 
 \end_inset
@@ -219,7 +223,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.031141846081799804
+0.054074489519105942
 \end_layout
 
 \end_inset
@@ -239,7 +243,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.011501058293336136
+0.1534211716271224
 \end_layout
 
 \end_inset
@@ -259,7 +263,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.10433824546573563
+0.26878719937900725
 \end_layout
 
 \end_inset
@@ -279,7 +283,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.27119181517246904
+0.23835970359253722
 \end_layout
 
 \end_inset
@@ -299,7 +303,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.35525517922541183
+0.29372094963493389
 \end_layout
 
 \end_inset
@@ -319,7 +323,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.62913473461814828
+0.36709255357992759
 \end_layout
 
 \end_inset
@@ -339,7 +343,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.67000908883246157
+0.79673843603983496
 \end_layout
 
 \end_inset
@@ -359,7 +363,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.88151328656754968
+0.89792340979224694
 \end_layout
 
 \end_inset
@@ -379,7 +383,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.96072092310599455
+0.89336271425957248
 \end_layout
 
 \end_inset
@@ -399,7 +403,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.97846720431187029
+0.91475919128796956
 \end_layout
 
 \end_inset
@@ -419,7 +423,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.99566842548555801
+0.99350634852816355
 \end_layout
 
 \end_inset
@@ -439,7 +443,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.995778556236948
+0.97283125356571465
 \end_layout
 
 \end_inset
@@ -459,7 +463,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.99767590215606139
+0.97440338849811203
 \end_layout
 
 \end_inset
@@ -479,7 +483,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.99782935225821101
+0.99943485810905086
 \end_layout
 
 \end_inset
@@ -499,7 +503,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-1.0
+0.98871641414083011
 \end_layout
 
 \end_inset
@@ -519,7 +523,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.99540566231499128
+0.99647815580775656
 \end_layout
 
 \end_inset
@@ -533,7 +537,7 @@ Tag
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-\begin_inset Formula $(10+20)$
+\begin_inset Formula $(10/1+20)$
 \end_inset
 
 -Strategie
@@ -563,7 +567,11 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-Tag
+Tag 
+\begin_inset Formula $t$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -572,7 +580,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $u_{r}$
+\begin_inset Formula $u_{r}(t)$
 \end_inset
 
 
@@ -595,7 +603,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.12789664795193473
+0.080017713866178453
 \end_layout
 
 \end_inset
@@ -615,7 +623,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.23530089706873242
+0.040071511674713553
 \end_layout
 
 \end_inset
@@ -635,7 +643,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.26485149800455432
+0.0082604644595898717
 \end_layout
 
 \end_inset
@@ -655,7 +663,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.3049574366449439
+0.040018199784654825
 \end_layout
 
 \end_inset
@@ -675,7 +683,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.19728647679540331
+0.1088626104976021
 \end_layout
 
 \end_inset
@@ -695,7 +703,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.49242172005442919
+0.0059523785254028579
 \end_layout
 
 \end_inset
@@ -715,7 +723,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.46681221942721896
+0.14102652965628829
 \end_layout
 
 \end_inset
@@ -735,7 +743,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.42250427844680433
+0.16883182468789204
 \end_layout
 
 \end_inset
@@ -755,7 +763,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.4748165928283733
+0.27086926605362593
 \end_layout
 
 \end_inset
@@ -775,7 +783,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.6239816777720617
+0.61768598671107844
 \end_layout
 
 \end_inset
@@ -795,7 +803,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.56163103750830057
+0.87185881336433613
 \end_layout
 
 \end_inset
@@ -815,7 +823,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.7321232179707593
+0.96447374155385779
 \end_layout
 
 \end_inset
@@ -835,7 +843,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.79882147869936504
+0.91960406251445104
 \end_layout
 
 \end_inset
@@ -855,7 +863,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.73241096591718702
+0.95997588974907699
 \end_layout
 
 \end_inset
@@ -875,7 +883,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.88260098683990151
+0.95999613329166666
 \end_layout
 
 \end_inset
@@ -895,7 +903,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.90596748694369889
+0.95999896057742529
 \end_layout
 
 \end_inset
@@ -915,7 +923,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.87850167220388098
+0.99999720651691393
 \end_layout
 
 \end_inset
@@ -935,7 +943,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.93183611492496521
+0.95999742030279789
 \end_layout
 
 \end_inset
@@ -955,7 +963,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.91304636853645182
+0.95247756829124752
 \end_layout
 
 \end_inset
@@ -975,7 +983,7 @@ Tag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.92645972413573729
+0.99999010846546232
 \end_layout
 
 \end_inset
@@ -992,7 +1000,7 @@ Tag
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-\begin_inset Formula $(10,20)$
+\begin_inset Formula $(10/1,20)$
 \end_inset
 
 -Strategie
@@ -1017,7 +1025,7 @@ Tag
 
 \begin_layout Plain Layout
 Durchschnittliche 
-\begin_inset Formula $u_{r}$
+\begin_inset Formula $u_{r}(t)$
 \end_inset
 
  über die Lebenszeit einer Pflanze nach 200 Generationen
@@ -1076,19 +1084,28 @@ Dieser ES-Algorithmus arbeitet mit einer Populationsgröße von
 \end_inset
 
 .
+ Jeder Nachkomme hat nur einen Elter (
+\begin_inset Formula $\rho=1$
+\end_inset
+
+ ), sodass in diesem Fall keine Rekombination angewandt wird.
  Das Programm unterstützt sowohl Komma-, als auch Plus-Strategie, um zu
  überprüfen, welche der beiden Strategien in diesem Fall besser ist.
  Die Generationszahl ist 
-\begin_inset Formula $200$
+\begin_inset Formula $n=200$
 \end_inset
 
 ; eine höhere Generationszahl hat sich als nicht mehr sinnvoll erwiesen,
- da schon deutlich sichbar ist, zu welchen Werten die Fitness konvergiert.
+ da sich die Fitness ab einer bestimmten Generationszeit im ungefähr selben
+ Bereich bewegt.
 \end_layout
 
 \begin_layout Standard
-Der Algorithmus initialisiert zuerst eine Population mit 20 Individuen mit
- je zufälligen 
+Der Algorithmus initialisiert zuerst eine Population 
+\begin_inset Formula $P^{(0)}$
+\end_inset
+
+ mit 20 Individuen mit je zufälligen 
 \begin_inset Formula $u_{r}(t)$
 \end_inset
 
@@ -1101,48 +1118,58 @@ Der Algorithmus initialisiert zuerst eine Population mit 20 Individuen mit
 \begin_inset Formula $\lambda$
 \end_inset
 
- (oder 
-\begin_inset Formula $\lambda-1$
-\end_inset
-
- wenn Plus-Strategie) mutierte Nachkommen erzeugt.
+ mutierte Nachkommen erzeugt.
  Die Mutationsfunktion erzeugt für jedes 
 \begin_inset Formula $u_{r}(t)$
 \end_inset
 
  ein mutiertes 
-\begin_inset Formula $u_{r}'(t)=u_{r}(t)+\sigma\cdot N(0,1)$
+\begin_inset Formula $u_{r}'(t)=u_{r}(t)+N(0,\sigma)$
 \end_inset
 
  mit 
-\begin_inset Formula $\sigma=1$
+\begin_inset Formula $\sigma$
 \end_inset
 
- wenn 
-\begin_inset Formula $u_{r}(t)=u_{r}(v)$
+ als Strategieparameter.
+ Da 
+\begin_inset Formula $u_{r}'(t)\in[0,1]$
 \end_inset
 
- für alle 
-\begin_inset Formula $u,v$
-\end_inset
-
-, sonst Standardabweichung.
+, wird der Wert auf diesen Bereich begrenzt.
 \end_layout
 
 \begin_layout Standard
-Nach erzeugung der Nachkommen 
-\begin_inset Formula $D$
+Nach Erzeugung der Nachkommen 
+\begin_inset Formula $D^{(n)}$
 \end_inset
 
- ist die neue Population 
-\begin_inset Formula $P'=select_{\mu}(D\cup parent(D))$
+ werden diese durch 
+\begin_inset Formula $grow()$
+\end_inset
+
+ bewertet.Die neue Population wird nach folgendem Schema ausgewählt: 
+\begin_inset Formula $P'=select_{\mu}(D^{(n)}\cup parent(D^{(n)}))$
 \end_inset
 
  wenn Plus-Strategie oder 
-\begin_inset Formula $P'=select_{\mu}(D)$
+\begin_inset Formula $P'=select_{\mu}(D^{(n)})$
 \end_inset
 
  wenn die Komma-Strategie benutzt wird.
+ Nach Abschluss des Algorithmus werden die 
+\begin_inset Formula $n$
+\end_inset
+
+ besten Elemente 
+\begin_inset Formula $B^{(n')}$
+\end_inset
+
+ aus der einzelnen Generationen zurückgegeben; damit ist 
+\begin_inset Formula $B^{(n)}$
+\end_inset
+
+ das Beste Element, das der Algorithmus in dem Lauf erzeugen konnte.
 \end_layout
 
 \begin_layout Subsection*
@@ -1151,38 +1178,29 @@ Auswertung des Algorithmus
 
 \begin_layout Standard
 Bei Betrachtung der Plots wird deutlich, dass der Algorithmus bei Benutzung
- der Plus-Strategie deutlich besser ist, als bei Benutzung der Komma-Strategie.
- So konvergiert 
-\begin_inset Formula $R(T)$
+ der Komma-Strategie eine etwas bessere Fitness erreicht, wobei der Unterschied
+ zwischen den beiden Ergebnissen sehr klein ist.
+ So erreicht der Algorithmus bei Benutzung der Komma-Strategie die 0.025-Grenze,
+ während sich nach Ablauf der 200 Generationen der Algorithmus auf Basis
+ der Plus-Strategie noch der 0.025 annähert.
+ Dieser hat aber im Gegensatz zum anderen Algorithmus eine deutlich niedrigere
+ Streuung der optimalen Werte (siehe Plot 1).
+ Dies wird dadurch verursacht, dass ein Nachkomme nicht unbedingt besser
+ sein muss, als der Elter - das Ergebnis sind sehr niedrige 
+\begin_inset Quotes eld
 \end_inset
 
- über die Generationen bei Benutzung der Plus-Strategie gegen 
-\begin_inset Formula $\approx0.025$
+optimale
+\begin_inset Quotes erd
 \end_inset
 
-, während bei Benutzung der Komma-Strategie nur 
-\begin_inset Formula $\approx0.022$
-\end_inset
-
- erreicht.
- Also trifft der Ansatz, dass Kinder eines Individuums immer besser oder
- gleich gut sind, wie die Eltern, in diesem Fall und bei Benutzung des oben
- beschriebenen Mutationsalgorithmus wahrscheinlich nicht zu.
-\end_layout
-
-\begin_layout Standard
-An dem Verlauf von 
-\begin_inset Formula $u_{r}$
-\end_inset
-
- des Plots der Plus-Strategie wird auch deutlich, dass es für die Planze
- günstiger ist, zuerst fast die gesamte Energie in das Wachstum der Blätter
- zu investieren und danach (nach ca.
- 5 Tagen) das Blütenwachstum zu steigern.
- Gegen Ende des Lebens einer Pflanze ist es für diese sinnvoll, sich komplett
- auf das Bütenwachstum zu konzentieren, was durch die vorher gesammelte
- Biomasse an Blättern deutlich besser funktioniert, da nun mehr Energie
- zur Verfügung steht.
+ Werte in der Population, die als Minimum auftauchen.
+ Der Anteil dieser Minima ist sehr klein, was an Jedoch erhöht dieses Verhalten
+ die Wahrscheinlichkeit, lokale Maxima zu umgehen - um ein Problem auf eine
+ bessere Weise zu lösen, muss eventuell erste ine neue - schlechtere - Methode
+ entwickelt werden.
+ Dies ist auch wahrscheinlich die Ursache für die bessere durschnittliche
+ Fitness bei Benutzung der Komma-Strategie.
 \end_layout
 
 \end_body
