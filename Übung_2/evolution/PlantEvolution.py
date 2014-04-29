@@ -3,7 +3,7 @@
 '''
 Created on 24.04.2014
 
-HINWEIS: Mit Python Version 3.4 geschrieben!
+HINWEIS: Mit Python Version 3.4 (kompatibel zu 3.3 wegen ohne ENUM) geschrieben!
 Anmerkung: Windows ist sehr SCHLECHT zum Entwickeln mit Python -.-
 
 @author: Ruman
@@ -12,17 +12,16 @@ import random;
 import numpy;
 import matplotlib.pyplot as plt;
 import pickle;
-from enum import Enum;
 
 def clamp(x,_min,_max):
     #return x;
     return min(max(x, _min), _max);
 
-class EvolutionStrategy(Enum):
+class EvolutionStrategy:
     PLUS = 0;
     COMMA = 1;
     
-class EvolutionRecombStrategy(Enum):
+class EvolutionRecombStrategy:
     DISCRETE = 0;
     INTERMEDIATE = 1;
 
