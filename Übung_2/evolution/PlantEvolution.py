@@ -511,6 +511,7 @@ def run_tests():
     results = [run_test(x,25,x.name) for x in tests];
     
     #Plot data
+    print("Plotting data ...");
     for x in results: 
         x.plotdata();    
 
@@ -539,6 +540,7 @@ def run_tests_recomb():
     results = [run_test(x,test_runs,x.name) for x in tests];
     
     #Plot data
+    print("Plotting data ...");
     for x in results: 
         x.plotdata();
     
@@ -551,12 +553,12 @@ def show_plot(filename):
 
     
 
-#run_tests();
+# run_tests();
 #run_tests_recomb();
-run();
-# show_plot("evolution_test_EvolutionStrategy.COMMAEvolutionRecombStrategy.INTERMEDIATE");
-# show_plot("evolution_test_EvolutionStrategy.COMMAEvolutionRecombStrategy.DISCRETE");
-# show_plot("evolution_test_EvolutionStrategy.PLUSEvolutionRecombStrategy.INTERMEDIATE");
-# show_plot("evolution_test_EvolutionStrategy.PLUSEvolutionRecombStrategy.DISCRETE");
-# show_plot("evolution_test_NORECOMB_EvolutionStrategy.COMMA");
-# show_plot("evolution_test_NORECOMB_EvolutionStrategy.PLUS");
+#run();
+show_plot("evolution_test_00");
+show_plot("evolution_test_01");
+show_plot("evolution_test_10");
+show_plot("evolution_test_11");
+# show_plot("evolution_test_NORECOMB_0");
+# show_plot("evolution_test_NORECOMB_1");
