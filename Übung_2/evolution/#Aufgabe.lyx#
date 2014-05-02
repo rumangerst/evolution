@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -52,6 +52,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 2cm
+\bottommargin 3cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation skip
@@ -1131,17 +1135,56 @@ Der Algorithmus initialisiert zuerst eine Population
 \begin_inset Formula $\sigma$
 \end_inset
 
- als Strategieparameter.
+ als Strategieparameter (siehe 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Real Value Search Spaces"
+
+\end_inset
+
+).
  Da 
 \begin_inset Formula $u_{r}'(t)\in[0,1]$
 \end_inset
 
 , wird der Wert auf diesen Bereich begrenzt.
+ Das 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ ist bei Beginn des Algorithmus 
+\begin_inset Formula $\sigma=5$
+\end_inset
+
+ und wird mit der log-normal Methode über die Generationszeit mutiert: 
+\begin_inset Formula $\sigma_{neu}=\sigma_{alt}\cdot e^{N(0,1)\cdot\tau}$
+\end_inset
+
+ mit 
+\begin_inset Formula $\tau=\frac{1}{\sqrt{1\cdot N}}$
+\end_inset
+
+ mit 
+\begin_inset Formula $N=20$
+\end_inset
+
+, da Suchraum 
+\begin_inset Formula $\mathbb{R}^{20}$
+\end_inset
+
+ (siehe 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mutation of Strength parameter"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
 Nach Erzeugung der Nachkommen 
-\begin_inset Formula $D^{(n)}$
+\begin_inset Formula $D^{(n+1)}$
 \end_inset
 
  werden diese durch 
@@ -1149,27 +1192,53 @@ Nach Erzeugung der Nachkommen
 \end_inset
 
  bewertet.Die neue Population wird nach folgendem Schema ausgewählt: 
-\begin_inset Formula $P'=select_{\mu}(D^{(n)}\cup parent(D^{(n)}))$
+\begin_inset Formula $P'=select_{\mu}(D^{(n+1)}\cup parent(D^{(n+1)}))$
 \end_inset
 
  wenn Plus-Strategie oder 
-\begin_inset Formula $P'=select_{\mu}(D^{(n)})$
+\begin_inset Formula $P'=select_{\mu}(D^{(n+1)})$
 \end_inset
 
- wenn die Komma-Strategie benutzt wird.
- Nach Abschluss des Algorithmus werden die 
-\begin_inset Formula $n$
+ wenn die Komma-Strategie benutzt wird.Der Algorithmus arbeitet auf der neu
+ erzeugten Population weiter, bis 200 Generationen erzeugt wurden.
+\end_layout
+
+\begin_layout Subsection*
+Algorithmus für Kugelmodell
+\end_layout
+
+\begin_layout Standard
+Zur Analyse der Leistungsfähigkeit der Mutationsfunktionen wird neben dem
+ eigentlichen Algorithmus ein Algorithmus, der die benutzen Parameter nach
+ dem Kuegelmodell analysiert und plottet.
+ Die Initiale Population 
+\begin_inset Formula $P^{(0)}$
 \end_inset
 
- besten Elemente 
-\begin_inset Formula $B(n')$
+bestehe dazu nur aus Individuen mit Objektparameter der Form 
+\begin_inset Formula $(1,1,1...\,1)$
 \end_inset
 
- aus der einzelnen Generationen zurückgegeben; damit ist 
-\begin_inset Formula $B(n)$
+, die mit der Fitnessfunktion 
+\begin_inset Formula $fitness(I)=\sum x_{i}^{2}$
 \end_inset
 
- das Beste Element, das der Algorithmus erzeugen konnte.
+ für jede Komponente 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ des Objektparameters des Individuums 
+\begin_inset Formula $I$
+\end_inset
+
+ auf eine möglichst kleine Fitness optimiert werden.
+ Der Algorithmus zur Bewertung mit Hilfe des Kugelmodells übernimmt alle
+ Parameter des zu überprüfenden Algorithmus mit Ausnahme der Anzahl der
+ Generationen, nun 
+\begin_inset Formula $n=1000$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection*
@@ -1177,30 +1246,1044 @@ Auswertung des Algorithmus
 \end_layout
 
 \begin_layout Standard
-Bei Betrachtung der Plots wird deutlich, dass der Algorithmus bei Benutzung
- der Komma-Strategie eine etwas bessere Fitness erreicht, wobei der Unterschied
- zwischen den beiden Ergebnissen sehr klein ist.
- So erreicht der Algorithmus bei Benutzung der Komma-Strategie die 0.025-Grenze,
- während sich nach Ablauf der 200 Generationen der Algorithmus auf Basis
- der Plus-Strategie noch der 0.025 annähert.
- Dieser hat aber im Gegensatz zum anderen Algorithmus eine deutlich niedrigere
- Streuung der optimalen Werte (siehe Plot 1).
- Dies wird dadurch verursacht, dass ein Nachkomme nicht unbedingt besser
- sein muss, als der Elter - das Ergebnis sind sehr niedrige 
+Beide Strategien, die der Algorithmus ausführt, finden ein Optimum bei ca.
+ 0.026, wobei sich die average Fitness bei beiden Algorithmen unterscheiden.
+ So nähert sich der Average bei Benutzung der Plus-Strategie einer Fitness
+ von 0.025 an, während der Algorithmus bei Benutzung der Komma-Strategie
+ die 0.025 nach 200 Generationen bereits erreicht hat, wobei der Fehler bei
+ der Komma-Strategie höher ist, als bei der Plus-Strategie; auch ist auffällig,
+ dass einige 
+\begin_inset Formula $R(T)$
+\end_inset
+
+ im Vergleich zum anderen Algorthmus sehr nach unten ausbrechen.
+ Zwar erreicht der Algorithmus eine höhere Fitness nach 200 Generationen,
+ doch ist bei Betrachtung des Plots des Kugelmodells (siehe 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG-UNOPT-SPHERE-+"
+
+\end_inset
+
+ und 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG-UNOPT-SPHERE-,"
+
+\end_inset
+
+) die Plus-Strategie besser, da sie die Null schneller erreicht als der
+ Algorithmus mit Komma-Strategie.
+ 
+\end_layout
+
+\begin_layout Standard
+Da aber der Algorithmus bei Benutzung der Komma-Strategie auch bei Beachtung
+ der Fehlerwerte eine höhere average Fitness erzeugt hat, wird erst einmal
+ angenommen, dass dieser Algorithmus besser funktioniert als der andere.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename results_unoptimized_algorithm/evolution_test_NORECOMB_0.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot des Algorithmus mit 
+\begin_inset Formula $(20/1+40)$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG-UNOPT-+"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename results_unoptimized_algorithm/evolution_test_NORECOMB_1.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot des Algorithmus mit 
+\begin_inset Formula $(20/1,40)$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG-UNOPT-,"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename results_unoptimized_algorithm/sphere_model_plot_evolution_test_NORECOMB_0SPHERE.svg
+	width 100text%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot des Algorithmus mit 
+\begin_inset Formula $(20/1+40)$
+\end_inset
+
+ im Kugelmodell
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG-UNOPT-SPHERE-+"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename results_unoptimized_algorithm/sphere_model_plot_evolution_test_NORECOMB_1SPHERE.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot des Algorithmus mit 
+\begin_inset Formula $(20/1,40)$
+\end_inset
+
+ im Kugelmodell
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG-UNOPT-SPHERE-,"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part*
+Vergleich zweier ES-Algorithmen (Übung 4)
+\end_layout
+
+\begin_layout Standard
+Im Folgenden wird der Algorithmus, der im vorherigen Teil benutzt wurde
+ mit einem anderen Algorithmus verglichen.
+\end_layout
+
+\begin_layout Section*
+Algorithmus 1
+\end_layout
+
+\begin_layout Standard
+Siehe oben für die Implementationd es ersten Algorithmus.
+ Verändert wurden nur die Festlegung der Strategie auf 
+\begin_inset Formula $(10/1,20)$
+\end_inset
+
+.
+ Außerdem wurde die Generationszahl auf 
+\begin_inset Formula $n=1000$
+\end_inset
+
+ erhöht.
+ Der Bewertungsalgorithmus mit Hilfe des Kugelmodells übernimmt alle Parameter
+ des zu übernehmenden Algorithmus.
+\end_layout
+
+\begin_layout Section*
+Finden des Algorithmus 2
+\end_layout
+
+\begin_layout Standard
+Der Algorithmus 1 soll mit einem theoretisch, also nach dem dem Kugelmodell,
+ möglichst guten Algorithmus verglichen werden.
+ Dazu wird für jeden Testcase 
+\begin_inset Formula $T_{i}$
+\end_inset
+
+ ein Test mit dem Kugelmodell-Algorithmus (siehe oben für Spezifikation)
+ mit der Anzahl der Generationen 
+\begin_inset Formula $n=200$
+\end_inset
+
+, einer Populationsgröße von 
+\begin_inset Formula $μ=10$
+\end_inset
+
+ und einer Nachkommenszahl 
+\begin_inset Formula $\lambda=20$
+\end_inset
+
+ durchgeführt.
+\end_layout
+
+\begin_layout Standard
+Sei 
+\begin_inset Formula $T_{i}=(\sigma,c_{\tau},\rho,s^{(P)},s^{(R)})$
+\end_inset
+
+ ein Testcase mit 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\sigma$
+\end_inset
+
+ ...
+ initiale Mutationsstärke
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $c_{T}$
+\end_inset
+
+ ...
+ Parameter des 
+\begin_inset Formula $\tau$
+\end_inset
+
+ bei log-normal-Anpassung mit 
+\begin_inset Formula $\tau=\frac{1}{\sqrt{c_{T}\cdot N}}$
+\end_inset
+
+ wenn 
+\begin_inset Formula $c_{T}>0$
+\end_inset
+
+, sonst 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ über alle Generationen konstant
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\rho$
+\end_inset
+
+ ...
+ Anzahl der Eltern je Kind
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(p)}$
+\end_inset
+
+ ...
+ Strategie (Plus-Strategie 
+\begin_inset Formula $s^{+}$
+\end_inset
+
+ oder Komma-Strategie 
+\begin_inset Formula $s^{,}$
+\end_inset
+
+ )
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(R)}$
+\end_inset
+
+ ...
+ Rekombinationsstrategie (Diskret 
+\begin_inset Formula $s^{D}$
+\end_inset
+
+ oder Intermediär 
+\begin_inset Formula $s^{I}$
+\end_inset
+
+ )
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Grober Test
+\end_layout
+
+\begin_layout Standard
+Für das Finden eines möglichst optimalen Testcases wurde folgende Menge
+ an Testcases benutzt:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\bar{T}=(1,2,5)\times(0,1,1.5,3)\times(1,2,3,4,5)\times(s^{+},s^{,})\times(s^{D},s^{I})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Das Beste Ergebnis wurde mit folgenden Parametern erreicht:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $c_{T}=1$
+\end_inset
+
+, 
+\begin_inset Formula $c_{T}=1.5$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\rho=2$
+\end_inset
+
+ und 
+\begin_inset Formula $\rho=3$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(p)}=s^{+}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(R)}=s^{D}$
+\end_inset
+
+ und 
+\begin_inset Formula $s^{(R)}=s^{I}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsection*
+Feiner Test
+\end_layout
+
+\begin_layout Standard
+Die verbleibenden 
 \begin_inset Quotes eld
 \end_inset
 
-optimale
+optimalen
 \begin_inset Quotes erd
 \end_inset
 
- Werte in der Population, die als Minimum auftauchen.
- Der Anteil dieser Minima ist sehr klein, was an  Jedoch erhöht dieses Verhalten
- die Wahrscheinlichkeit, lokale Maxima zu umgehen - um ein Problem auf eine
- bessere Weise zu lösen, muss eventuell erste ine neue - schlechtere - Methode
- entwickelt werden.
- Dies ist auch wahrscheinlich die Ursache für die bessere durschnittliche
- Fitness bei Benutzung der Komma-Strategie.
+ Parameter wurden in einem weiteren Test mit folgenden Parametern weiter
+ getestet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\bar{T'}=(1)\times(0,0.1,0.2,...5)\times(2,3)\times(s^{+})\times(s^{D},s^{I})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Dieser Test ergab, das folgende Parameter optimal sein müssen (Plot: 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:4-TEST2-SPHERE-BEST"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $c_{T}=2.3$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\rho=2$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(p)}=s^{+}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $s^{(R)}=s^{D}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename results_spheremodel_phase2/sphere_model_best_plot.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Bestes Ergebnis des zweiten Tests (Kugelmodell)
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:4-TEST2-SPHERE-BEST"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Algorithmus 2
+\end_layout
+
+\begin_layout Standard
+Der zweite Algorithmus arbeitet ebenfalls mit einer Populationsgröße von
+ 
+\begin_inset Formula $μ=10$
+\end_inset
+
+ und einer Nachkommenszahl 
+\begin_inset Formula $\lambda=20$
+\end_inset
+
+.
+ Jeder Nachkomme hat nur hier aber zwei Eltern (
+\begin_inset Formula $\rho=2$
+\end_inset
+
+ ).
+\end_layout
+
+\begin_layout Standard
+Der Algorithmus initialisiert zuerst eine Population 
+\begin_inset Formula $P^{(0)}$
+\end_inset
+
+ mit 20 Individuen mit je zufälligen 
+\begin_inset Formula $u_{r}(t)$
+\end_inset
+
+, für die die Bewertungsfunktion 
+\begin_inset Formula $grow()$
+\end_inset
+
+ ausgeführt wird.
+ Es werden die 
+\begin_inset Formula $\rho=2$
+\end_inset
+
+ besten Individuen 
+\begin_inset Formula $I_{1}^{(g)}$
+\end_inset
+
+ und 
+\begin_inset Formula $I_{2}^{(g)}$
+\end_inset
+
+ aus der Population ausgewählt und 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ Nachkommen erzeugt.
+ Jeder Nachkomme 
+\begin_inset Formula $I_{i}^{(g+1)}$
+\end_inset
+
+ wird durch die Funktion 
+\begin_inset Formula $descendant(I_{1}^{(g)},I_{2}^{(g)})$
+\end_inset
+
+ erzeugt.
+ Bei der Erstellung des neuen Individuums werden die Objektparameter und
+ die Strategieparameter aus der Rekombination der jeweiligen Parameter der
+ Eltern erzeugt: 
+\begin_inset Formula $I_{i}^{(g+1)}=descendant(I_{1}^{(g)},I_{2}^{(g)})=(recombObjectParam(I_{1}^{(g)},I_{2}^{(g)}),recombStrategyParam(I_{1}^{(g)},I_{2}^{(g)}),0)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Als Rekombinationsmethode wird bei dem Strategieparameter der Mittelwert
+ der 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ der Eltern benutzt (Intermediär, vgl.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Recombination of Strat. Params"
+
+\end_inset
+
+), bei den Objektparametern wird diskret rekombiniert (siehe 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Recombination (Discrete)"
+
+\end_inset
+
+).
+ Die rekombinanten Individuen werden darauf hin mutiert: 
+\begin_inset Formula $I_{i}^{(g+1)'}=mutateStrategyParam(I_{i}^{(g+1)})$
+\end_inset
+
+ und 
+\begin_inset Formula $I_{i}^{(g+1)''}=mutateObjectParam(I_{i}^{(g+1)'})$
+\end_inset
+
+.Die Methode 
+\begin_inset Formula $mutateStrategyParam(I)$
+\end_inset
+
+ verändert unter Benutzung der log-normal-Methode (siehe 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mutation of Strength parameter"
+
+\end_inset
+
+) den Strategieparameter 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ des Individuums 
+\begin_inset Formula $I$
+\end_inset
+
+.
+ Der mutierte Strategieparameter des Individuums ist 
+\begin_inset Formula $\sigma_{neu}=\sigma_{alt}\cdot e^{N(0,1)\cdot\tau}$
+\end_inset
+
+ mit 
+\begin_inset Formula $\tau=\frac{1}{\sqrt{1\cdot N}}$
+\end_inset
+
+ und 
+\begin_inset Formula $N=20$
+\end_inset
+
+ (Größe des Suchraums).
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Die Funktion 
+\begin_inset Formula $mutateObjectParam(I)$
+\end_inset
+
+ erzeugt für jedes 
+\begin_inset Formula $u_{r}(t)$
+\end_inset
+
+ im Individdum ein mutiertes 
+\begin_inset Formula $u_{r}'(t)=u_{r}(t)+N(0,\sigma)$
+\end_inset
+
+ mit 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ als Strategieparameter, der vorher mutiert wurde.
+ Da 
+\begin_inset Formula $u_{r}'(t)\in[0,1]$
+\end_inset
+
+, wird der Wert auf diesen Bereich begrenzt.
+ 
+\end_layout
+
+\begin_layout Standard
+Sei 
+\begin_inset Formula $D^{(n+1)}$
+\end_inset
+
+ die Menge aller mit der oberen Methode erzeugten Nachkommen und 
+\begin_inset Formula $P^{(n)}$
+\end_inset
+
+ die Menge der Eltern der Nachkommen, dann ist die neue Population 
+\begin_inset Formula $\bar{P}^{(n+1)}=D^{(n+1)}\cup P^{(n)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Diese Population wird durch 
+\begin_inset Formula $grow()$
+\end_inset
+
+ bewertet und die 
+\begin_inset Formula $\mu=10$
+\end_inset
+
+ besten Elemente als neue Population 
+\begin_inset Formula $P^{(n+1)}$
+\end_inset
+
+ ausgewählt.
+ Der Algorithmus wird mit der neu erzeugten Population so lange durchgeführt,
+ bis 1000 Generation erzeugt wurden.
+\end_layout
+
+\begin_layout Section*
+Vergleich zwischen Algorithmus 1 und Algorithmus 2
+\end_layout
+
+\begin_layout Standard
+Die beiden Algorithmen werden, um bessere Ergebnisse zu bekommen, mit 5000
+ Generationen ausgeführt, wobei alle anderen Parameter übernommen werden.
+ An den Plots 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG1-PLOT"
+
+\end_inset
+
+ und 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG2-PLOT"
+
+\end_inset
+
+ lässt sich erkennen, dass zwar beide Algorithmen (wie bereits schon bei
+ einer niedrigeren Generationszahl) ein wahrscheinliches Optimum bei 0.026
+ finden, der Average bei Algorithmus 2 aber deutlich höher ist und einen
+ viel niedrigeren Fehler hat (erkennbar am blauen Fehlerbalken).
+ Auch bei Betrachtung der Plots des Tests mit Kugelmodell (Minimierung der
+ Fitness) ist deutlich zu sehen, dass der Algorithmus 2 schneller einen
+ kleinen Wert erreicht, während der Algorithmus 1 zwar gleich in den ersten
+ Generationen eine relativ kleine Fitness erreicht, aber bei ca.
+ 3000 Generationen von Algorithmus 2 
+\begin_inset Quotes eld
+\end_inset
+
+überholt
+\begin_inset Quotes erd
+\end_inset
+
+ wird.
+ Und auch hier fällt bei Algorithmus 1 eine hohe Schwankung der Werte gegenüber
+ Algorithmus 2 auf.
+ Diese Schwankung wird nicht durch die Implementation verursacht (siehe
+ Zeile 564
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename final_optimized/evolution_test_x2_UNOPT.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot der erreichten Fitness des Algorithmus 1 mit 
+\begin_inset Formula $n=5000$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG1-PLOT"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename final_optimized/evolution_test_x2_--OPT--.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot der erreichten Fitness des Algorithmus 2 mit 
+\begin_inset Formula $n=5000$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG2-PLOT"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename final_optimized/sphere_model_plot_evolution_test_x2_UNOPTSPHERE.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot der minimierten Fitness des Algorithmus 1 (Kugelmodell) mit 
+\begin_inset Formula $n=5000$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG1-SPHERE"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename final_optimized/sphere_model_plot_evolution_test_x2_--OPT--SPHERE.svg
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plot der minimierten Fitness des Algorithmus 2 (Kugelmodell) mit 
+\begin_inset Formula $n=5000$
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:ALG2-SPHERE"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "1"
+key "Real Value Search Spaces"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 3.3.2.1
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "2"
+key "Mutation of Strength parameter"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 4.2.2.1
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "3"
+key "Sphere Model Finess Functions"
+
+\end_inset
+
+Implementierung von Beyer https://homepages.fhv.at/hgb/downloads/mu_mu_I_lambda-ES.
+oct
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "4"
+key "Recombination (Discrete)"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 3.4.1 (Figure 6)
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "5"
+key "Recombination of Strat. Params"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 4.2.2.3 und 3.4.1 (Figure 6)
 \end_layout
 
 \end_body

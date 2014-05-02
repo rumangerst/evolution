@@ -633,6 +633,78 @@ def run():
     print([x.R(20) for x in individual]);
 
 
+#===============================================================================
+# Compares two strategies by running a large test + sphere model test
+#===============================================================================
+def run_tests_ubung_4():
+    
+    #===============================================================================
+    # Run a test task and saves it to a file
+    #===============================================================================
+    def run_test(task,test_runs, filename):
+        result = task.evolutiontest(test_runs);
+        result.write(filename);
+    
+        return result;  
+    
+    
+    #===========================================================================
+    # Define test cases
+    #===========================================================================
+    
+    # Case: old rho = 1, sigma = 5, comma strategy
+    case_unopt = EvolutionTask();
+    case_unopt.name = "evolution_test_x2_UNOPT";   
+    case_unopt.test_parameters = EvolutionTaskParameters();   
+    case_unopt.test_parameters.evolution_strategy = EvolutionStrategy.COMMA;
+    case_unopt.test_parameters.generations = 5000;        
+    case_unopt.test_parameters.test_runs = 25;
+    case_unopt.test_parameters.rho = 1;
+    case_unopt.test_parameters.sigma = 5;
+    case_unopt.test_parameters.sigma_tau_parameter = 1;
+    
+    #Case: optimized values: sigma=1, sigma_tau_param=2.3, rho=2, plus strategy
+    case_opt = EvolutionTask();
+    case_opt.test_parameters = EvolutionTaskParameters();   
+    case_opt.name = "evolution_test_x2_--OPT--";      
+    case_opt.test_parameters.evolution_strategy = EvolutionStrategy.PLUS;
+    case_opt.test_parameters.evolution_recomb_strategy = EvolutionRecombStrategy.DISCRETE;
+    case_opt.test_parameters.generations = 5000;        
+    case_opt.test_parameters.test_runs = 25;
+    case_opt.test_parameters.rho = 2;
+    case_opt.test_parameters.sigma = 1;
+    case_opt.test_parameters.sigma_tau_parameter = 2.3;
+    
+    #===========================================================================
+    # Run the test
+    #===========================================================================
+    
+    result_unopt = run_test(case_unopt, 25, case_unopt.name);
+    result_opt = run_test(case_opt, 25, case_opt.name);
+    
+    result_unopt.plotdata(case_unopt.name);
+    result_opt.plotdata(case_opt.name);
+    
+    run_tests_sphere(case_unopt.name + "SPHERE", case_unopt.test_parameters);
+    run_tests_sphere(case_opt.name + "SPHERE", case_opt.test_parameters);
+   
+#     for strategy in [EvolutionStrategy.PLUS, EvolutionStrategy.COMMA]:
+#       
+#         case_unopt = EvolutionTask();
+#         case_unopt.name = "evolution_test_NORECOMB_" + str(strategy);      
+#         case_unopt.test_parameters.evolution_strategy = strategy;
+#         case_unopt.test_parameters.generations = 200;        
+#         case_unopt.test_parameters.test_runs = 25;
+#         case_unopt.test_parameters.rho = 1;
+#         case_unopt.test_parameters.sigma = 5;
+#         case_unopt.test_parameters.sigma_tau_parameter = 1;
+#             
+#         result = run_test(case_unopt, 25, case_unopt.name);
+#         result.plotdata(case_unopt.name);       
+#             
+#         #run spheremodel test
+#         case_unopt.test_parameters.generations = 1000;        
+#         run_tests_sphere(case_unopt.name + "SPHERE", case_unopt.test_parameters);
 
     
 #===============================================================================
@@ -756,7 +828,7 @@ def run_tests_sphere(name,testparameters):
                                                                                                       parameters.generations,
                                                                                                       parameters.sigma,                                                                                                     
                                                                                                       ("$({0}/{1}+{2})$" if parameters.evolution_strategy == EvolutionStrategy.PLUS else "$({0}/{1},{2})$").format(parameters.population_size, parameters.rho, parameters.descendants),
-                                                                                                      "Keine Anpassung" if parameters.sigma_tau_parameter == 0 else "log-normal $\\tau=1/SQRT({0}*N)$".format(parameters.sigma_tau_parameter) ));                                                                                                                                                  
+                                                                                                      "Keine Anpassung" if parameters.sigma_tau_parameter == 0 else "log-normal $\\frac{{1}}{{\sqrt{{{0}\cdot N}}}}$".format(parameters.sigma_tau_parameter) ));                                                                                                                                                  
                                                                                                                                                    
                                                                                       
         #draw legend                                                                                                                               
@@ -778,20 +850,28 @@ def test_spheremodels():
     bestparams = None;
     bestfitness = float("Infinity");
     
+    #prior tests
     #define tests
-    test_sigma = [1,2,5];    
-    test_sigma_tau = [0,1,1.5,2,3,5,10];
-    test_rho = [1,2,3,4,5];
-    test_strat = [EvolutionStrategy.COMMA, EvolutionStrategy.PLUS];
+#     test_sigma = [1,2,5];    
+#     test_sigma_tau = [0,1,1.5,2,3];
+#     test_rho = [1,2,3,4,5];
+#     test_strat = [EvolutionStrategy.COMMA, EvolutionStrategy.PLUS];
+#     test_strat_recomb = [EvolutionRecombStrategy.DISCRETE, EvolutionRecombStrategy.INTERMEDIATE];
+    
+    #filter tests (2nd step)
+    test_sigma = [1];    #testing only with sig=1
+    test_sigma_tau = [x for x in numpy.arange(0,5.1,0.1)];
+    test_rho = [2,3]; #rho=2,3 were superior
+    test_strat = [ EvolutionStrategy.PLUS]; #PLUS strategy was superior
     test_strat_recomb = [EvolutionRecombStrategy.DISCRETE, EvolutionRecombStrategy.INTERMEDIATE];
     
     for sigma in test_sigma:
         for sigma_tau in test_sigma_tau:
-            for strat in test_strat:
+            for rho in test_rho:
                 for rc_strat in test_strat_recomb:
-                    for rho in test_rho:
+                    for strat in test_strat:
                         param = EvolutionTaskParameters();
-                        param.generations = 300;           
+                        param.generations = 200;           
                         param.test_runs=25;            
                         param.sigma = sigma;
                         param.sigma_tau_parameter = sigma_tau;
@@ -809,6 +889,9 @@ def test_spheremodels():
                             
                             bestparams = param;
                             bestfitness = indiv;
+                            
+                        if rho == 1: #cancel recomb strat testing if rho is 1 (recomb strat is ignored)
+                            break;
                         
                         
     
@@ -829,9 +912,10 @@ def show_plot(filename):
 
     
 
+run_tests_ubung_4();
 #test_spheremodels();
 #run_tests_sphere();
-run_tests();
+#run_tests();
 #run_tests_recomb();
 #run();
 # show_plot("evolution_test_00");
