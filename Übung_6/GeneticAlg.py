@@ -66,15 +66,15 @@ def normalize(bitstring, length):
     return "0"*(length - len(bitstring)) + bitstring;
 
 #===============================================================================
-# Mutiert Bitstring mit entsprechenden Pm
+# Mutiert Bitstring mit entsprechenden Pm und gegebenen u
 #===============================================================================
-def mutate(bitstring, pm):
+def mutate(bitstring, pm, us):
     
     s = list(bitstring);
-    
+        
     for i in range(len(s)):
         
-        u = random.random(); #returns umber in [0,1) |=| [0,1[
+        u = us[i];        
         
         if u<= pm:
             s[i] = "1" if s[i] == "0" else "0"; #invert bit
@@ -82,43 +82,66 @@ def mutate(bitstring, pm):
     return "".join(s);
     
 
-def compareencodings():
+def compareencodings(pm):
     
+    #===========================================================================
+    # Hamming-Distanz zwischen den Bitstrings
+    #===========================================================================
     def diff_genotype(s1, s2):
         return sum(1 if s1[i] != s2[i] else 0 for i in range(len(s1)));
     
+    #===========================================================================
+    # Normaler abstand
+    #===========================================================================
     def diff_phentotype(n1, n2):
         return numpy.abs(n1 - n2);
     
+    #===========================================================================
+    # Berechnet diff(phenotype)/diff(genotype)
+    #===========================================================================
     def diff_phentotype_per_genotype(s1, s2, n1, n2):
         
         geno = diff_genotype(s1, s2);
         pheno = diff_phentotype(n1, n2);
         
-        if geno == 0 or pheno == 0:
+        print("Genotype: " + str(geno) + ", Phenotype: " + str(pheno));
+        
+        if geno == 0:
             return 0;
         
-        return float(pheno) / geno;
+        return float(pheno) / float(geno);
     
     print("Comparing mutation default and gray");
-    P = 500;
-    pm = 0.1;
-    generations = 100;
-    runs = 25; 
+    Width = len(encode(10000)); #normalized string width, binary = gray
+      
     
-    genotypes_default = [[encode(P) for _ in range(runs)]];
-    genotypes_gray = [[encode_gray(P) for _ in range(runs)]];
+    P = 0;   
+    generations = 100;
+    runs = 50; 
+    
+    genotypes_default = [[normalize(encode(P), Width) for _ in range(runs)]]; #important: normalize encoded string here to set search space
+    genotypes_gray = [[normalize(encode_gray(P), Width) for _ in range(runs)]];
+   
     phenotypes_default = [[P for _ in range(runs)]];
     phenotypes_gray = [[P for _ in range(runs)]];
     
     #Mutate
     for gen in range(generations):
-        
+                   
         #Mutate genomes
+        genotypes_default.append([]);
+        genotypes_gray.append([]);
         
-        genotypes_default.append([mutate(genotypes_default[gen][run], pm) for run in range(runs)]);
-        genotypes_gray.append([mutate(genotypes_gray[gen][run], pm) for run in range(runs)]);
-        
+        for run in range(runs):
+            
+            #Generiere u's
+            us = [random.random() for _ in range(Width)];
+            
+            #übergebe u's an Mutationsfunktion, um die gleichen Bits zu mutieren!
+            genotypes_default[gen+1].append(mutate(genotypes_default[gen][run], pm, us));
+            genotypes_gray[gen+1].append(mutate(genotypes_gray[gen][run], pm, us));
+            
+             
         phenotypes_default.append([decode(genotypes_default[gen+1][run]) for run in range(runs)]);
         phenotypes_gray.append([decode_gray(genotypes_gray[gen+1][run]) for run in range(runs)]);
         
@@ -127,22 +150,25 @@ def compareencodings():
             
     # Evaluate data
     # will calculate average PHENOTYPE-CHANGES / GENOTYPE-CHANGES
+    print(str(genotypes_gray[10]));
+    print(str(genotypes_default[10]));
     
     changes_default = [ [ diff_phentotype_per_genotype(genotypes_default[generation][run], genotypes_default[generation - 1][run], phenotypes_default[generation][run], phenotypes_default[generation - 1][run])  for run in range(runs)]  for generation in range(1, generations) ];
     changes_gray = [ [ diff_phentotype_per_genotype(genotypes_gray[generation][run], genotypes_gray[generation - 1][run], phenotypes_gray[generation][run], phenotypes_gray[generation - 1][run])  for run in range(runs)]  for generation in range(1, generations) ];
     
     #Plot data
     def plot(generations, runs, pm, P, changes_default, changes_gray):
-        plt.figure(figsize = (20,14), dpi = 50);                                                                                                                                                   
+        plt.figure(figsize = (15,10), dpi = 70);         
+                                                                                                                                                 
                                                                      
         x_axis = range(1, generations);       
         
         default_min = [min(x) for x in changes_default]; 
         gray_min = [min(x) for x in changes_gray];   
-        default_max = [min(x) for x in changes_default]; 
-        gray_max = [min(x) for x in changes_gray];   
-        default_avg = [min(x) for x in changes_default]; 
-        gray_avg = [min(x) for x in changes_gray];   
+        default_max = [max(x) for x in changes_default]; 
+        gray_max = [max(x) for x in changes_gray];   
+        default_avg = [numpy.mean(x) for x in changes_default]; 
+        gray_avg = [numpy.mean(x) for x in changes_gray];   
         
         default_error = [numpy.std(x) / numpy.sqrt(len(x)) for x in changes_default];
         gray_error = [numpy.std(x) / numpy.sqrt(len(x)) for x in changes_gray];
@@ -155,9 +181,9 @@ def compareencodings():
         plt.ylabel("$\\frac{\\Delta phenotype(t,t-1)}{\\Delta genotype(t,t-1)}$");
         
         #Plot default data
-        plt.plot(x_axis, default_min, color="#f24a4a", linestyle=":", label="Minimum value for binaray");
-        plt.plot(x_axis, default_avg, color="red", linestyle="-", linewidth="2.0", label="Average value for binaray");
-        plt.plot(x_axis, default_max, color="#f24a4a", linestyle=":", label="Maximum value for binaray");
+        plt.plot(x_axis, default_min, color="#f24a4a", linestyle=":", label="Minimum value for binary");
+        plt.plot(x_axis, default_avg, color="red", linestyle="-", linewidth="2.0", label="Average value for binary");
+        plt.plot(x_axis, default_max, color="#f24a4a", linestyle=":", label="Maximum value for binary");
         plt.errorbar(x_axis, default_avg, yerr = default_error);
         
         #Plot gray data
@@ -166,11 +192,18 @@ def compareencodings():
         plt.plot(x_axis, gray_max, color="#61c14a", linestyle=":", label="Maximum value for gray code");
         plt.errorbar(x_axis, gray_avg, yerr = gray_error);
         
-        plt.show();
+        plt.subplot(1,1,1).legend(loc = "upper right") 
+        #plt.show();
+        plt.savefig("result_pm_{0}.svg".format(pm));
         
     plot(generations, runs, pm, P, changes_default, changes_gray);
 
-compareencodings();
+for pm in numpy.arange(0.1,1,0.1):
+    compareencodings(numpy.round(pm, decimals=2));
+for pm in numpy.arange(0,0.1,0.01):
+    compareencodings(numpy.round(pm, decimals=2));
+for pm in numpy.arange(0.9,1.01,0.01):
+    compareencodings(numpy.round(pm, decimals=2));
 
-        
+       
     
