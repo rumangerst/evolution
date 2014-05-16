@@ -1203,6 +1203,17 @@ Nach Erzeugung der Nachkommen
  erzeugten Population weiter, bis 200 Generationen erzeugt wurden.
 \end_layout
 
+\begin_layout Standard
+Siehe 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Algorithm"
+
+\end_inset
+
+ für den allgemeinen Ablauf des Algorithmus.
+\end_layout
+
 \begin_layout Subsection*
 Algorithmus für Kugelmodell
 \end_layout
@@ -2284,6 +2295,18 @@ key "Recombination of Strat. Params"
 
 Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
  4.2.2.3 und 3.4.1 (Figure 6)
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "6"
+key "Algorithm"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 3 (Figure 1)
 \end_layout
 
 \end_body

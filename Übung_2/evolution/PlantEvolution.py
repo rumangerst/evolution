@@ -122,6 +122,8 @@ class Individual:
         mean =  numpy.mean([x._sigma for x in parents]);
         self._sigma = mean;
         
+        print("Recomb sigma:" + str(self._sigma));
+        
     #===========================================================================
     # Sets object parameters of individual to recombined object parameters of parents    #===========================================================================
    
@@ -149,9 +151,11 @@ class Individual:
         if self._sigma_tau_parameter == 0: return;
         
         tau = 1.0 / numpy.sqrt(self._sigma_tau_parameter * self.test_parameters.T); # 1 / SQRT(N) mit Suchraum R^N
-        exp = random.gauss(0, 1) * tau;
+        p2 = numpy.exp(random.normalvariate(0, 1) * tau);
         
-        self._sigma = self._sigma * numpy.power(numpy.e, exp);        
+        self._sigma = self._sigma * p2;     
+        
+        print("New sigma: " + str(self._sigma) + " p2:" + str(p2));   
     
     #===========================================================================
     # Mutates this individual's object parameter
@@ -910,9 +914,32 @@ def show_plot(filename):
     result = EvolutionTestResult.load(filename);
     result.plotdata(filename + ".svg");
 
+def spheremodel_compare_beyer():
     
+    param = EvolutionTaskParameters();
+    
+    param.population_size = 3;
+    param.rho = 3;
+    param.descendants = 12;
+    
+    param.generations = 200;           
+    param.test_runs=1;            
+    param.sigma = 1;
+    param.sigma_tau_parameter = 2;    
+    
+    param.evolution_strategy = EvolutionStrategy.COMMA;
+    param.evolution_recomb_strategy = EvolutionRecombStrategy.INTERMEDIATE;
+    
+    case = EvolutionTask();   
+    case.name = "test_beyer";
+    case.test_parameters = param;
+    
+    print(str(case.spheremodel()));
+    
+    
+spheremodel_compare_beyer();
 
-run_tests_ubung_4();
+#run_tests_ubung_4();
 #test_spheremodels();
 #run_tests_sphere();
 #run_tests();

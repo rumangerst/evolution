@@ -1203,6 +1203,10 @@ Nach Erzeugung der Nachkommen
  erzeugten Population weiter, bis 200 Generationen erzeugt wurden.
 \end_layout
 
+\begin_layout Standard
+Siehe 
+\end_layout
+
 \begin_layout Subsection*
 Algorithmus für Kugelmodell
 \end_layout
@@ -2010,6 +2014,40 @@ Vergleich zwischen Algorithmus 1 und Algorithmus 2
 Die beiden Algorithmen werden, um bessere Ergebnisse zu bekommen, mit 5000
  Generationen ausgeführt, wobei alle anderen Parameter übernommen werden.
  An den Plots 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG1-PLOT"
+
+\end_inset
+
+ und 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:ALG2-PLOT"
+
+\end_inset
+
+ lässt sich erkennen, dass zwar beide Algorithmen (wie bereits schon bei
+ einer niedrigeren Generationszahl) ein wahrscheinliches Optimum bei 0.026
+ finden, der Average bei Algorithmus 2 aber deutlich höher ist und einen
+ viel niedrigeren Fehler hat (erkennbar am blauen Fehlerbalken).
+ Auch bei Betrachtung der Plots des Tests mit Kugelmodell (Minimierung der
+ Fitness) ist deutlich zu sehen, dass der Algorithmus 2 schneller einen
+ kleinen Wert erreicht, während der Algorithmus 1 zwar gleich in den ersten
+ Generationen eine relativ kleine Fitness erreicht, aber bei ca.
+ 3000 Generationen von Algorithmus 2 
+\begin_inset Quotes eld
+\end_inset
+
+überholt
+\begin_inset Quotes erd
+\end_inset
+
+ wird.
+ Und auch hier fällt bei Algorithmus 1 eine hohe Schwankung der Werte gegenüber
+ Algorithmus 2 auf.
+ Diese Schwankung wird nicht durch die Implementation verursacht (siehe
+ Zeile 564 im Quellcode).
 \end_layout
 
 \begin_layout Standard
@@ -2250,6 +2288,18 @@ key "Recombination of Strat. Params"
 
 Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
  4.2.2.3 und 3.4.1 (Figure 6)
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "6"
+key "Algorithm"
+
+\end_inset
+
+Beyer-Schwefel, Evolution strategies A comprehensive introduction ; Sektion
+ 3 (Figure 1)
 \end_layout
 
 \end_body
