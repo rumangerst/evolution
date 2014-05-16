@@ -1,6 +1,7 @@
 '''
 
     Tests für genetische Algorithmen
+    Alle Ergebnisse und Code im Repository git clone https://github.com/rumangerst/evolution.git
 
 '''
 
