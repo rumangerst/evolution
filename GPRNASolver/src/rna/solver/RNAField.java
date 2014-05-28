@@ -181,11 +181,42 @@ public class RNAField
 		set(nuc.x, nuc.y, nuc);
 
 		// handle bonding:
-		if (nuc.previous != null)
-			bond(nuc.previous);
-		bond(nuc);
+		/*
+		 * if (nuc.previous != null) bond(nuc.previous); bond(nuc);
+		 */
+		/**
+		 * TEST: Update all bondings
+		 */
+		// {
+		// Nucleotide n = nuc;
+		//
+		// do
+		// {
+		// bond(n);
+		// n = n.previous;
+		// }
+		// while(n.previous != null);
+		// }
+
+		updateBondsInRadius(nuc);
 
 		return true;
+	}
+
+	private void updateBondsInRadius(Nucleotide nuc)
+	{
+		bond(nuc);
+
+		for (int x = nuc.x - 2; x <= nuc.x + 2; x++)
+		{
+			for (int y = nuc.y - 2; y <= nuc.y + 2; y++)
+			{
+				Nucleotide toupdate = get(x, y);
+
+				if (toupdate != null)
+					bond(toupdate);
+			}
+		}
 	}
 
 	/**
@@ -432,5 +463,20 @@ public class RNAField
 		}
 
 		return e;
+	}
+
+	public Nucleotide getByIndex(int index)
+	{
+		if (index < 0 || index >= structureLength)
+			return null;
+
+		Nucleotide nuc = current;
+
+		for (int i = 0; i < index; i++)
+		{
+			nuc = nuc.next;
+		}
+
+		return nuc;
 	}
 }

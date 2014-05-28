@@ -119,4 +119,24 @@ public class Nucleotide
 		// Strange 'bond': +8 (no bond at all!)
 		return 8;
 	}
+	
+	public Nucleotide getPrevious(int n)
+	{
+		if(n == 0 || previous== null)
+			return this;
+		
+		return previous.getPrevious(n - 1);
+	}
+	
+	/**
+	 * Index in sequence
+	 * @return
+	 */
+	public int getIndex()
+	{
+		if(previous== null)
+			return 0;
+		
+		return 1 + previous.getIndex();
+	}
 }

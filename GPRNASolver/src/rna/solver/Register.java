@@ -21,14 +21,14 @@ public class Register
 	public static final String[] TERMINALS = new String[] { "NUMBER",
 			"REGISTER_VALUE", "PUT_STRAIGHT", "PUT_LEFT", "PUT_RIGHT",
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "UNDO",
-			"ENERGY","LENGTH","STACK" }; //GOTO entfernt
+			"ENERGY", "LENGTH", "STACK" }; // GOTO entfernt
 	/**
 	 * Funktionen für Variablenabfragen ...
 	 */
 	public static final String[] FUNCTIONS = new String[] { "TERMINAL",
 			"IF_LESS", "IF_GREATER", "IF_EQUALS", "ADD", "SUBTRACT",
 			"MULTIPLY", "DIVIDE", "LOOK_BACK", "LOOK_FORWARD",
-			"CALCULATE_ENERGY", "UPDATE_BONDING" };
+			"CALCULATE_ENERGY", "GETBOND" }; // UPDATE_BONDING entfernt
 
 	public String label;
 	public String[] parameters;
@@ -119,7 +119,7 @@ public class Register
 			return individual.structure.energy();
 
 		}
-		
+
 		/**
 		 * LENGTH - current structure length
 		 */
@@ -128,7 +128,7 @@ public class Register
 			return individual.structure.structureLength;
 
 		}
-		
+
 		/**
 		 * STACK - nucleotides to put
 		 */
@@ -309,34 +309,30 @@ public class Register
 			return;
 		}
 
-		if (label.equals("UPDATE_BONDING"))
+		if (label.equals("GETBOND"))
 		{
 			int r1 = executeTerminal(individual, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.structure.structureLength)
-				value = -1;
+				value = 0;
 			else
 			{
-				Nucleotide current = individual.structure.current;
+				Nucleotide current = individual.structure.current
+						.getPrevious(r1);
 
-				// Search previous nucleotide
-				for (int i = 0; i < r1; i++)
+				if (!current.isBond())
+					value = 0;
+				else
 				{
-					current = current.previous;
+					value = current.getIndex() - current.bond.getIndex();
 				}
-
-				// Save bonding
-				int energy = current.energy();
-
-				// Update bonding
-				individual.structure.bond(current);
-
-				// return new energy
-				value = energy;
 			}
 
 			return;
 		}
+		
+		if(label.equals("GOTO") || label.equals("UPDATE_BOUNDING"))
+			value = 0;
 
 		// Unknown Function, must be a TERMINAL
 		value = executeTerminal(individual, label);
@@ -376,13 +372,13 @@ public class Register
 		{
 			return ("R" + RANDOM.nextInt(Individual.REGISTERS));
 		}
-		
-		//GOTO entfernt, hat nur probleme gemacht!
-//		// A goto register command
-//		if (label.equals("GOTO"))
-//		{
-//			return ("GOTO" + RANDOM.nextInt(Individual.REGISTERS));
-//		}
+
+		// GOTO entfernt, hat nur probleme gemacht!
+		// // A goto register command
+		// if (label.equals("GOTO"))
+		// {
+		// return ("GOTO" + RANDOM.nextInt(Individual.REGISTERS));
+		// }
 
 		return label;
 	}
@@ -459,11 +455,11 @@ public class Register
 		}
 
 		/**
-		 * Energy between nucleotides
+		 * Nucleotide, given one one is bond to
 		 */
-		if (label.equals("UPDATE_BONDING"))
+		if (label.equals("GETBOND"))
 		{
-			return new Register("UPDATE_BONDING", randomTerminal());
+			return new Register("GETBOND", randomTerminal());
 		}
 
 		return new Register(randomTerminal());
