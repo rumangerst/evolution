@@ -1,31 +1,30 @@
 package rna.solver;
 
 import java.awt.Point;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class RNAField
 {
-	public Nucleotide[][] structure;
-
+	public HashMap<Point, Nucleotide> structure;
 	public int structureLength;
 	public Nucleotide current;
 	public Nucleotide initial;
 
 	public RNAField(int size)
 	{
-		structure = new Nucleotide[size][size];
+		structure = new HashMap<>();
 		structureLength = 0;
 	}
 
 	public boolean occupied(int x, int y)
 	{
-		if (x < 0 || y < 0 || x >= structure.length || y >= structure.length)
-			return true;
-
-		return structure[x][y] != null;
+		return get(x, y) != null;
 	}
-	
+
 	/**
 	 * Checks if adding a nucleotide would cross diagonal structure (evil shit!)
+	 * 
 	 * @param currentx
 	 * @param currenty
 	 * @param dir
@@ -33,23 +32,25 @@ public class RNAField
 	 */
 	public boolean crosses(int currentx, int currenty, NucleotideDirection dir)
 	{
-		Point pleft = NucleotideDirection.shiftByDir(currentx, currenty, dir.rotateLeft());
-		Point pright = NucleotideDirection.shiftByDir(currentx, currenty, dir.rotateRight());
-		
+		Point pleft = NucleotideDirection.shiftByDir(currentx, currenty,
+				dir.rotateLeft());
+		Point pright = NucleotideDirection.shiftByDir(currentx, currenty,
+				dir.rotateRight());
+
 		Nucleotide nucleft = get(pleft.x, pleft.y);
 		Nucleotide nucright = get(pright.x, pright.y);
-		
-		if(nucleft != null)
+
+		if (nucleft != null)
 		{
-			if(nucleft.dir.is90DegreeTo(dir))
+			if (nucleft.dir.is90DegreeTo(dir))
 				return true;
 		}
-		if(nucright != null)
+		if (nucright != null)
 		{
-			if(nucright.dir.is90DegreeTo(dir))
+			if (nucright.dir.is90DegreeTo(dir))
 				return true;
 		}
-		
+
 		return false;
 	}
 
@@ -62,52 +63,47 @@ public class RNAField
 	 */
 	public boolean disturbsBonding(int xi, int yi)
 	{
-		if (xi < 0 || yi < 0 || xi >= structure.length || yi >= structure.length)
-			return true;
+		/*
+		 * Nucleotide east = get(x + 1, y); Nucleotide west = get(x - 1, y);
+		 * Nucleotide north = get(x, y - 1); Nucleotide south = get(x, y + 1);
+		 * 
+		 * if (east != null && east.bond != null) return true; if (west != null
+		 * && west.bond != null) return true; if (north != null && north.bond !=
+		 * null) return true; if (south != null && south.bond != null) return
+		 * true;
+		 * 
+		 * return false;
+		 */
 
-		/*Nucleotide east = get(x + 1, y);
-		Nucleotide west = get(x - 1, y);
-		Nucleotide north = get(x, y - 1);
-		Nucleotide south = get(x, y + 1);
-
-		if (east != null && east.bond != null)
-			return true;
-		if (west != null && west.bond != null)
-			return true;
-		if (north != null && north.bond != null)
-			return true;
-		if (south != null && south.bond != null)
-			return true;
-
-		return false;*/
-		
 		Nucleotide nuc = get(xi, yi);
-		
-		if(nuc == null)
+
+		if (nuc == null)
 			return false;
-		
-		for(int x = nuc.x - 1; x <= nuc.x + 1; x++)
+
+		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
 		{
-			for(int y = nuc.y - 1; y <= nuc.y; y++)
+			for (int y = nuc.y - 1; y <= nuc.y; y++)
 			{
-				Nucleotide other = get(x,y);
-				
-				if(other != null && other != nuc && other.isBond())
+				Nucleotide other = get(x, y);
+
+				if (other != null && other != nuc && other.isBond())
 				{
 					return true;
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
 	public Nucleotide get(int x, int y)
 	{
-		if (x < 0 || y < 0 || x >= structure.length || y >= structure.length)
-			return null;
+		return structure.get(new Point(x, y));
+	}
 
-		return structure[x][y];
+	public void set(int x, int y, Nucleotide nuc)
+	{
+		structure.put(new Point(x, y), nuc);
 	}
 
 	/**
@@ -130,7 +126,7 @@ public class RNAField
 		this.current = n;
 		structureLength++;
 
-		structure[x][y] = n;
+		set(x, y, n);
 	}
 
 	/**
@@ -148,13 +144,19 @@ public class RNAField
 				ndir);
 
 		// Test x,y
-		if(occupied(cursor.x, cursor.y))
+		if (occupied(cursor.x, cursor.y))
 			return false;
-		if(disturbsBonding(cursor.x, cursor.y))
+		if (disturbsBonding(cursor.x, cursor.y))
 			return false;
-		if(ndir.isDiagonal() && crosses(current.x, current.y, ndir))// Diagonal directions may cross structures => prevent this!
+		if (ndir.isDiagonal() && crosses(current.x, current.y, ndir))// Diagonal
+																		// directions
+																		// may
+																		// cross
+																		// structures
+																		// =>
+																		// prevent
+																		// this!
 			return false;
-			
 
 		if (testOnly)
 		{
@@ -176,12 +178,130 @@ public class RNAField
 
 		structureLength++;
 
-		structure[nuc.x][nuc.y] = nuc;
+		set(nuc.x, nuc.y, nuc);
 
-		// handle bonding:				
+		// handle bonding:
+		if (nuc.previous != null)
+			bond(nuc.previous);
 		bond(nuc);
 
 		return true;
+	}
+
+	/**
+	 * Aktualisiert Bindungen des Nukleotids
+	 * 
+	 * Regeln: I) Gerade Bindungen haben Vorrang gegenüber diagonalen => Erst
+	 * WENN keine GERADEN Bindungen gefunden werden, wird diagonal gebunden!
+	 * 
+	 * II) Eine Bindung kommt nur zustande, wenn die Richtungen invers
+	 * zueinander sind III) Die Inverse Richtung der Nukleotide kann auch vom
+	 * NÄCHSTEN Element übernommen werden, wenn es passt (*** Noch nicht IMPL)
+	 * 
+	 * @param nuc
+	 * @return
+	 */
+	public boolean bond(Nucleotide nuc)
+	{
+		LinkedList<Nucleotide> straights = new LinkedList<>();
+		LinkedList<Nucleotide> diagonals = new LinkedList<>();
+
+		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
+		{
+			for (int y = nuc.y - 1; y <= nuc.y; y++)
+			{
+				if (x == nuc.x && y == nuc.y)
+					continue;
+
+				Nucleotide other = get(x, y);
+
+				if (other != null)
+				{
+					if (x == nuc.x || y == nuc.y)
+					{
+						straights.add(other);
+					}
+					else
+					{
+						diagonals.add(other);
+					}
+				}
+			}
+		}
+
+		Nucleotide best = null;
+		int currentenergy = Integer.MAX_VALUE;
+
+		if (nuc.isBond())
+			currentenergy = nuc.energy();
+
+		/**
+		 * If NO straights => try diagonals
+		 */
+		if (straights.size() == 0)
+		{
+			straights = diagonals;
+		}
+
+		for (Nucleotide candidate : straights)
+		{
+			/**
+			 * Check if conditions are met
+			 */
+			/*
+			 * if(nuc.dir != candidate.dir.reverse()) continue;
+			 */
+
+			NucleotideDirection nucdir = nuc.dir;
+			NucleotideDirection canddir = candidate.dir;
+
+			if (nucdir != canddir.reverse())
+			{
+				if (nuc.previous != null)
+					nucdir = nuc.previous.dir;
+				if (candidate.previous != null)
+					canddir = candidate.previous.dir;
+
+				if (nucdir != canddir.reverse())
+					continue;
+			}
+
+			int energy = Nucleotide.calculateEnergy(candidate, nuc);
+
+			/**
+			 * Check if energy is better
+			 */
+			if (currentenergy < energy)
+				continue;
+
+			/**
+			 * Check if this bond is better
+			 */
+			if (candidate.isBond())
+			{
+				if (candidate.energy() < energy)
+					continue;
+			}
+
+			/**
+			 * Set as best
+			 */
+			best = candidate;
+			currentenergy = energy;
+
+		}
+
+		if (best != null)
+		{
+			nuc.bondTo(best);
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
 	}
 
 	/**
@@ -191,57 +311,84 @@ public class RNAField
 	 * @param nuc
 	 * @return
 	 */
-	public boolean bond(Nucleotide nuc)
-	{
-		// Bonding mechanism
-		// Look for (unbound) nucleotide next to it with reversed direction
-		// Bond each other to it
-		Nucleotide best = null;
-		int currentenergy = Integer.MAX_VALUE;
-
-		for(int x = nuc.x - 1; x <= nuc.x + 1; x++)
-		{
-			for(int y = nuc.y - 1; y <= nuc.y; y++)
-			{
-				Nucleotide other = get(x,y);
-				
-				if(other != null && other != nuc && NucleotideDirection.difference(nuc.dir, other.dir.reverse()) <= 0)
-				{
-					if(best == null)
-					{
-						best = other;
-					}
-					else
-					{
-						int testedenergy = Nucleotide.calculateEnergy(best, nuc);
-						int otherexisitingbond = Integer.MAX_VALUE;
-						
-						if(other.isBond())
-						{
-							otherexisitingbond = Nucleotide.calculateEnergy(other, other.bond);
-						}
-						
-						if(testedenergy < otherexisitingbond && testedenergy < currentenergy)
-						{
-							best = other;
-							currentenergy = testedenergy;
-						}
-					}
-				}
-			}
-		}
-		
-		if(best != null)
-		{			
-			nuc.bondTo(best);
-			
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+	// public boolean bond(Nucleotide nuc)
+	// {
+	// // Bonding mechanism
+	// // Look for (unbound) nucleotide next to it with reversed direction
+	// // Bond each other to it
+	// Nucleotide best = null;
+	// int currentenergy = Integer.MAX_VALUE;
+	//
+	// for(int x = nuc.x - 1; x <= nuc.x + 1; x++)
+	// {
+	// for(int y = nuc.y - 1; y <= nuc.y; y++)
+	// {
+	// /**
+	// * Überprüfe x,y uns überspringe, je nachdem ob nuc gerade oder diagonal
+	// ist
+	// */
+	// if(nuc.dir.isDiagonal())
+	// {
+	// /*//Eigenschaft ungerader Verbindungen ist, dass weder x,y noch y mit
+	// center übereinsimmen
+	// if(x == nuc.x || y == nuc.y)
+	// continue;*/
+	//
+	// /**
+	// * Diagonale können mit allen Partnern interagieren; Gerade Nukleotide nur
+	// mit geraden
+	// */
+	// }
+	// else
+	// {
+	// if(x != nuc.x && y != nuc.y)
+	// continue;
+	// }
+	//
+	//
+	// Nucleotide other = get(x,y);
+	//
+	// /**
+	// * Anderer nicht null usw, und Richting zur reversen nicht
+	// Unterschiedlich!
+	// */
+	// if(other != null && other != nuc && nuc.dir == other.dir.reverse())
+	// {
+	// if(best == null)
+	// {
+	// best = other;
+	// }
+	// else
+	// {
+	// int testedenergy = Nucleotide.calculateEnergy(best, nuc);
+	// int otherexisitingbond = Integer.MAX_VALUE;
+	//
+	// if(other.isBond())
+	// {
+	// otherexisitingbond = Nucleotide.calculateEnergy(other, other.bond);
+	// }
+	//
+	// if(testedenergy < otherexisitingbond && testedenergy < currentenergy)
+	// {
+	// best = other;
+	// currentenergy = testedenergy;
+	// }
+	// }
+	// }
+	// }
+	// }
+	//
+	// if(best != null)
+	// {
+	// nuc.bondTo(best);
+	//
+	// return true;
+	// }
+	// else
+	// {
+	// return false;
+	// }
+	// }
 
 	/**
 	 * Removes last nucleotide from structure
@@ -255,7 +402,7 @@ public class RNAField
 		if (initial == current)
 			return false;
 
-		structure[current.x][current.y] = null;
+		structure.remove(new Point(current.x, current.y));
 
 		// Reset bonds
 		current.unBond();
@@ -279,15 +426,9 @@ public class RNAField
 	{
 		int e = 0;
 
-		for (int x = 0; x < structure.length; x++)
+		for (Nucleotide nuc : structure.values())
 		{
-			for (int y = 0; y < structure.length; y++)
-			{
-				Nucleotide n = structure[x][y];
-
-				if (n != null)
-					e += n.energy();
-			}
+			e += nuc.energy();
 		}
 
 		return e;

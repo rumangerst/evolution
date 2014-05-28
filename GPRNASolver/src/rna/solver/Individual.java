@@ -125,7 +125,7 @@ public class Individual implements Comparable
 		{
 			for (int x = 0; x < FIELD_SIZE; x++)
 			{
-				Nucleotide nuc = structure.structure[x][y];
+				Nucleotide nuc = structure.get(x,y);
 
 				System.out.print(nuc != null ? nuc.type.name() : " ");
 			}

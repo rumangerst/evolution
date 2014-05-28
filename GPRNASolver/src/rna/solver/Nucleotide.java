@@ -63,8 +63,11 @@ public class Nucleotide
 			return;
 //		if(nuc.dir != this.dir.reverse())
 //			return;
-		if(NucleotideDirection.difference(nuc.dir, this.dir.reverse()) > 0)
-			return;
+		/**
+		 * Prüfung durch RNAField.bond
+		 */
+//		if(nuc.dir != this.dir.reverse())
+//			return;
 		
 		bond = nuc;
 		nuc.bond = this;		
