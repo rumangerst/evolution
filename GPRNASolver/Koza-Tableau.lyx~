@@ -110,7 +110,7 @@ Terminal set
 
 \begin_layout Plain Layout
 PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT, COLLIDE_STRAIGHT, COLLIDE_LEFT, COLLIDE_RIGHT
-, UNDO,ENERGY,GOTO
+, UNDO,ENERGY,LENGTH,STACK
 \end_layout
 
 \end_inset

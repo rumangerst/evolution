@@ -11,7 +11,7 @@ public class RNAField
 	public Nucleotide current;
 	public Nucleotide initial;
 
-	public RNAField(int size)
+	public RNAField()
 	{
 		structure = new HashMap<>();
 		structureLength = 0;

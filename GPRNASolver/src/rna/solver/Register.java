@@ -358,7 +358,7 @@ public class Register
 	 * 
 	 * @return
 	 */
-	public static String randomTerminal()
+	public static String randomTerminal(int registerCount)
 	{
 		String label = TERMINALS[RANDOM.nextInt(TERMINALS.length)];
 
@@ -370,7 +370,7 @@ public class Register
 		// A register Rx reference
 		if (label.equals("REGISTER_VALUE"))
 		{
-			return ("R" + RANDOM.nextInt(Individual.REGISTERS));
+			return ("R" + RANDOM.nextInt(registerCount));
 		}
 
 		// GOTO entfernt, hat nur probleme gemacht!
@@ -383,13 +383,13 @@ public class Register
 		return label;
 	}
 
-	public static Register random()
+	public static Register random(int registerCount)
 	{
 		String label = FUNCTIONS[RANDOM.nextInt(FUNCTIONS.length)];
 
 		if (label.equals("TERMINAL"))
 		{
-			return new Register(randomTerminal());
+			return new Register(randomTerminal(registerCount));
 		}
 
 		/**
@@ -399,18 +399,18 @@ public class Register
 		 */
 		if (label.equals("IF_LESS"))
 		{
-			return new Register("IF_LESS", randomTerminal(), randomTerminal(),
-					randomTerminal(), randomTerminal());
+			return new Register("IF_LESS", randomTerminal(registerCount), randomTerminal(registerCount),
+					randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 		if (label.equals("IF_GREATER"))
 		{
-			return new Register("IF_GREATER", randomTerminal(),
-					randomTerminal(), randomTerminal(), randomTerminal());
+			return new Register("IF_GREATER", randomTerminal(registerCount),
+					randomTerminal(registerCount), randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 		if (label.equals("IF_EQUAL"))
 		{
-			return new Register("IF_EQUAL", randomTerminal(), randomTerminal(),
-					randomTerminal(), randomTerminal());
+			return new Register("IF_EQUAL", randomTerminal(registerCount), randomTerminal(registerCount),
+					randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 
 		/**
@@ -418,19 +418,19 @@ public class Register
 		 */
 		if (label.equals("ADD"))
 		{
-			return new Register("ADD", randomTerminal(), randomTerminal());
+			return new Register("ADD", randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 		if (label.equals("SUBTRACT"))
 		{
-			return new Register("SUBTRACT", randomTerminal(), randomTerminal());
+			return new Register("SUBTRACT", randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 		if (label.equals("MULTIPLY"))
 		{
-			return new Register("MULTIPLY", randomTerminal(), randomTerminal());
+			return new Register("MULTIPLY", randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 		if (label.equals("DIVIDE"))
 		{
-			return new Register("DIVIDE", randomTerminal(), randomTerminal());
+			return new Register("DIVIDE", randomTerminal(registerCount), randomTerminal(registerCount));
 		}
 
 		/**
@@ -438,11 +438,11 @@ public class Register
 		 */
 		if (label.equals("LOOK_BACK"))
 		{
-			return new Register("LOOK_BACK", randomTerminal());
+			return new Register("LOOK_BACK", randomTerminal(registerCount));
 		}
 		if (label.equals("LOOK_FORWARD"))
 		{
-			return new Register("LOOK_FORWARD", randomTerminal());
+			return new Register("LOOK_FORWARD", randomTerminal(registerCount));
 		}
 
 		/**
@@ -450,8 +450,8 @@ public class Register
 		 */
 		if (label.equals("CALCULATE_ENERGY"))
 		{
-			return new Register("CALCULATE_ENERGY", randomTerminal(),
-					randomTerminal());
+			return new Register("CALCULATE_ENERGY", randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 
 		/**
@@ -459,10 +459,10 @@ public class Register
 		 */
 		if (label.equals("GETBOND"))
 		{
-			return new Register("GETBOND", randomTerminal());
+			return new Register("GETBOND", randomTerminal(registerCount));
 		}
 
-		return new Register(randomTerminal());
+		return new Register(randomTerminal(registerCount));
 	}
 
 }

@@ -61,13 +61,6 @@ public class Nucleotide
 			return;		
 		if(nuc.isBond())
 			return;
-//		if(nuc.dir != this.dir.reverse())
-//			return;
-		/**
-		 * Prüfung durch RNAField.bond
-		 */
-//		if(nuc.dir != this.dir.reverse())
-//			return;
 		
 		bond = nuc;
 		nuc.bond = this;		
@@ -89,10 +82,11 @@ public class Nucleotide
 	 */
 	public int energy()
 	{
-		// No bond: +1
+		// Keine Bindung zählt +2
 		if (bond == null)
-			return 1;
+			return 2;
 
+		//Energiefunktionen
 		return calculateEnergy(this.type, bond.type);
 	}
 	
@@ -101,8 +95,21 @@ public class Nucleotide
 		return calculateEnergy(n1.type, n2.type);
 	}
 
+	/**
+	 * Energiefunktionen nach Energieminimum-Methode
+	 * 
+	 * Major:
+	 * A-U: -2
+	 * G-C: -3
+	 * G-U: -1
+	 * 
+	 * @param n1
+	 * @param n2
+	 * @return
+	 */
 	public static int calculateEnergy(NucleotideType n1, NucleotideType n2)
-	{
+	{	
+		
 		// Loop Bonding => Spannungen
 //		if (isCurve)
 //			return 2;
@@ -110,14 +117,19 @@ public class Nucleotide
 		// A - U: -2
 		if (n1 == NucleotideType.A && n2 == NucleotideType.U
 				|| n1 == NucleotideType.U && n2 == NucleotideType.A)
-			return -2;
+			return -4;
 		// G - C: -3
 		if (n1 == NucleotideType.G && n2 == NucleotideType.C
 				|| n1 == NucleotideType.C && n2 == NucleotideType.G)
-			return -3;
+			return -6;
+		
+		//Wobble G - U: -1
+		if (n1 == NucleotideType.G && n2 == NucleotideType.U
+				|| n1 == NucleotideType.U && n2 == NucleotideType.G)
+			return -2;
 
-		// Strange 'bond': +8 (no bond at all!)
-		return 8;
+		//Strange 'bond' counts + 1, where no bond counts +2, because the nucleotide is element of a structure!
+		return 1;
 	}
 	
 	public Nucleotide getPrevious(int n)

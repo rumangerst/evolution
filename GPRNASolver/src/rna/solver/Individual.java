@@ -10,9 +10,6 @@ import java.util.LinkedList;
 
 public class Individual implements Comparable
 {
-	public static final int REGISTERS = 40;
-	public static final int FIELD_SIZE = 100;
-	
 	public String rna;
 	public double fitness;
 	
@@ -38,7 +35,7 @@ public class Individual implements Comparable
 	public Individual()
 	{
 		sequence = new LinkedList<Integer>();
-		structure = new RNAField(FIELD_SIZE);
+		structure = new RNAField();
 		registers = new ArrayList<Register>();
 	}
 
@@ -119,21 +116,6 @@ public class Individual implements Comparable
 		return structure.structureLength;
 	}
 
-	public void printStructure()
-	{
-		for (int y = 0; y < FIELD_SIZE; y++)
-		{
-			for (int x = 0; x < FIELD_SIZE; x++)
-			{
-				Nucleotide nuc = structure.get(x,y);
-
-				System.out.print(nuc != null ? nuc.type.name() : " ");
-			}
-
-			System.out.println();
-		}
-	}
-
 	public void printRegisters()
 	{
 		for (Register reg : registers)
@@ -145,13 +127,13 @@ public class Individual implements Comparable
 	/**
 	 * Clears registers and creates a new random one
 	 */
-	public void createRandomRegister()
+	public void createRandomRegister(int reg)
 	{
 		registers.clear();
 
-		for (int i = 0; i < REGISTERS; i++)
+		for (int i = 0; i < reg; i++)
 		{
-			registers.add(Register.random());
+			registers.add(Register.random(reg));
 		}
 	}
 	
@@ -198,7 +180,7 @@ public class Individual implements Comparable
 		}
 
 		// Initialize values (set cursor, direction and initial nucleotide
-		structure.initial(FIELD_SIZE / 2, FIELD_SIZE / 2,
+		structure.initial(0, 0,
 				NucleotideType.fromInteger(sequence.remove()),
 				NucleotideDirection.EAST);
 
@@ -227,6 +209,37 @@ public class Individual implements Comparable
 
 		this.fitness = fitness();
 	}
+	
+//	/**
+//	 * Bewertet lange gerade Strecken negativ, außer wenn eine Bindung besteht
+//	 * 
+//	 * 
+//	 * @return
+//	 */
+//	public double compactness()
+//	{
+//		double score = 0;
+//		
+//		for(Nucleotide nuc : structure.structure.values())
+//		{
+//			if(nuc.previous != null && !nuc.isBond())
+//			{
+//				if(nuc.dir == nuc.previous.dir)
+//				{					
+//					score += 1.5;
+//				}
+//				/**
+//				 * Update 1 - prevent diagonal straight lines
+//				 */
+////				else if(nuc.previous.previous != null && !nuc.previous.previous.isBond() && nuc.previous.previous.dir == nuc.dir)
+////				{
+////					score += 1;
+////				}
+//			}
+//		}
+//		
+//		return score;
+//	}
 
 	/**
 	 * Calculates fitness of this object
@@ -239,7 +252,8 @@ public class Individual implements Comparable
 		double leftover_sequence = rna.length() - structure.structureLength;
 		double energy = structure.energy();
 
-		return energy + leftover_sequence * leftover_sequence;
+		//return energy + leftover_sequence * leftover_sequence;
+		return energy + 8*leftover_sequence;
 	}
 
 	/**
@@ -251,6 +265,8 @@ public class Individual implements Comparable
 	 */
 	public void mutate(float p1, float p2)
 	{
+		int regCount = this.registers.size();
+		
 		/**
 		 * Register mutation replace whole register by random one
 		 */
@@ -258,7 +274,7 @@ public class Individual implements Comparable
 		{
 			if (1 - Register.RANDOM.nextFloat() <= p1)
 			{
-				this.registers.set(i, Register.random());
+				this.registers.set(i, Register.random(regCount));
 			}
 		}
 
@@ -273,7 +289,7 @@ public class Individual implements Comparable
 			{
 				if (1 - Register.RANDOM.nextFloat() <= p2)
 				{
-					reg.parameters[pindex] = Register.randomTerminal();
+					reg.parameters[pindex] = Register.randomTerminal(regCount);
 				}
 			}
 		}
@@ -289,11 +305,13 @@ public class Individual implements Comparable
 	 */
 	public static void recombine(Individual indiv1, Individual indiv2, float px)
 	{
+		int reg = indiv1.registers.size();
+		
 		if (1 - Register.RANDOM.nextFloat() <= px)
 		{
-			int index = Register.RANDOM.nextInt(REGISTERS);
+			int index = Register.RANDOM.nextInt(reg);
 
-			if (index == 0 || index == REGISTERS - 1)
+			if (index == 0 || index == reg - 1)
 				return;
 
 			// X-Over
@@ -301,7 +319,7 @@ public class Individual implements Comparable
 			{
 				indiv1.registers.set(i, indiv2.registers.get(i));
 			}
-			for (int i = index; i < REGISTERS; i++)
+			for (int i = index; i < reg; i++)
 			{
 				indiv2.registers.set(i, indiv1.registers.get(i));
 			}

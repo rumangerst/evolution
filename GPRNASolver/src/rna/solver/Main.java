@@ -15,8 +15,15 @@ public class Main
 	private static void easyTopoplogyTest1()
 	{
 		GPRunner runner = new GPRunner("GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC"); //6 C's fehlen am Ende
-		runner.evolve();
 		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 5;
+		
+		
+		
+		runner.evolve();
 		openResult("best_individual_0.RNASLV");
 	}
 	
@@ -28,6 +35,31 @@ public class Main
 	private static void easyTopoplogyTest2()
 	{
 		GPRunner runner = new GPRunner("ACUCGGUUACGAG"); 
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 5;
+		
+		runner.evolve();
+		
+		openResult("best_individual_0.RNASLV");
+	}
+	
+	/**
+	 * Test mit einer sehr einfachen RNA
+	 * 
+	 * GCAUACCCAAGUGC
+	 */
+	private static void easyTopoplogyTest3()
+	{
+		GPRunner runner = new GPRunner("GAUGCAUACCCAAGUGCCUGA"); 
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 5;
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -41,6 +73,9 @@ public class Main
 	private static void evilTopoplogyTest1()
 	{
 		GPRunner runner = new GPRunner("UGUGUGGAUGAAAUGUAAUCACAGAACCGGUUUUCAUUUUCGAUCUGACUUAUUUUUUUCACAAACAAGUGAGAUCACUUUGAAAGCUGAUUUUGUACAAUUAAUUCAACG"); //Evil!
+		
+		
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -80,6 +115,19 @@ public class Main
 	private static void evilTopoplogyTest4()
 	{
 		GPRunner runner = new GPRunner("UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAUACAAUCUACUGUCUUUCCUA"); //Evil!
+		runner.evolve();
+		
+		openResult("best_individual_0.RNASLV");
+	}
+	
+	/**
+	 * Test mit einer RNA mit Pseudoknoten
+	 * 
+	 * ACGUCCCACGUAAAAAGGGACGUUUUUACGU
+	 */
+	private static void pseudoKnotTest1()
+	{
+		GPRunner runner = new GPRunner("ACGUCCCACGUAAAAAGGGACGUUUUUACGU"); //Evil!
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -153,8 +201,10 @@ public class Main
 //		GPRunner runner = new GPRunner("UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA");
 //		runner.evolve();
 		
-		evilTopoplogyTest2();
-		//easyTopoplogyTest2();
+		pseudoKnotTest1();
+		//easyTopoplogyTest1();
+		
+		//openResult("best_individual_0.RNASLV");
 		
 		//openResult("Results/Evil tRNA/Result5.RNASLV");
 	}

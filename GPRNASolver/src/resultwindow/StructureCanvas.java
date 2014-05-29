@@ -80,9 +80,9 @@ public class StructureCanvas extends Canvas
 		g.translate(-trstart.x, -trstart.y);
 		
 		//Draw grid
-		for(int x = 0; x < end.x; x++)
+		for(int x = start.x - 10; x < end.x; x++)
 		{
-			for(int y= 0; y < end.y; y++)
+			for(int y= start.y - 10; y < end.y; y++)
 			{
 				Point pos = transformPoint(x + 5, y + 5);
 				g.setColor(Color.lightGray);
@@ -140,7 +140,14 @@ public class StructureCanvas extends Canvas
 				// Draw bond
 				if (nuc.isBond())
 				{
-					g.setColor(Color.decode("#ab0000"));
+					if(Nucleotide.calculateEnergy(nuc, nuc.bond) < 0)
+					{
+						g.setColor(Color.decode("#ab0000"));
+					}
+					else
+					{
+						g.setColor(Color.LIGHT_GRAY);
+					}
 					g2.setStroke(new BasicStroke(3));
 
 					Point otherpos = transformPoint(nuc.bond.x, nuc.bond.y);

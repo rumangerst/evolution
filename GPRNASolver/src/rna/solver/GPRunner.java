@@ -22,6 +22,7 @@ public class GPRunner
 	public float recombProbability;
 	public float paramMutateProbability;
 	public float registerMutateProbability;
+	public int registerCount;
 
 	public LinkedList<Individual> population = new LinkedList<>();
 
@@ -31,7 +32,8 @@ public class GPRunner
 
 		this.populationSize = 400;
 		this.children = 100;
-		this.parents = 6;
+		this.parents = 10;
+		this.registerCount = 40;
 
 		recombProbability = 0.2f;
 		paramMutateProbability = 0.03f;
@@ -46,7 +48,7 @@ public class GPRunner
 		for (int i = 0; i < populationSize; i++)
 		{
 			Individual indiv = new Individual();
-			indiv.createRandomRegister();
+			indiv.createRandomRegister(registerCount);
 
 			population.add(indiv);
 		}
@@ -54,7 +56,7 @@ public class GPRunner
 		/**
 		 * Evolution loop
 		 */
-		for (int generation = 0; generation < 100; generation++)
+		for (int generation = 0; generation < 200; generation++)
 		{
 			System.out.println("Generation " + (generation + 1));
 
