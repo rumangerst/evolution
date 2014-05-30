@@ -20,8 +20,8 @@ public class GPRunner
 	public int children;
 
 	public float recombProbability;
-	public float paramMutateProbability;
-	public float registerMutateProbability;
+	public float mutateProbability;
+	
 	public int registerCount;
 
 	public LinkedList<Individual> population = new LinkedList<>();
@@ -36,11 +36,10 @@ public class GPRunner
 		this.registerCount = 40;
 
 		recombProbability = 0.2f;
-		paramMutateProbability = 0.03f;
-		registerMutateProbability = 0.05f;
+		mutateProbability = 1.0f / this.registerCount;
 	}
 
-	public void evolve()
+	public Individual evolve()
 	{
 		/**
 		 * Create inital population
@@ -112,7 +111,7 @@ public class GPRunner
 						Individual child2 = new Individual(mother);
 
 						Individual.recombine(child1, child2, recombProbability);
-						child1.mutate(registerMutateProbability, paramMutateProbability);
+						child1.mutate(mutateProbability);
 						
 						population.add(child1);
 						population.add(child2);
@@ -155,6 +154,8 @@ public class GPRunner
 				e.printStackTrace();
 			}
 		}
+		
+		return population.getFirst();
 		
 	}
 }

@@ -2,7 +2,8 @@ package rna.solver;
 
 import java.io.IOException;
 
-import resultwindow.ResultDialog;
+import resultwindow.BasePairResultDialog;
+import resultwindow.StructureResultDialog;
 
 public class Main
 {
@@ -20,6 +21,7 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 5;
+		runner.mutateProbability = 1.0f / 5.0f;
 		
 		
 		
@@ -40,6 +42,7 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 5;
+		runner.mutateProbability = 1.0f / 5.0f;
 		
 		runner.evolve();
 		
@@ -59,6 +62,7 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 5;
+		runner.mutateProbability = 1.0f / 5.0f;
 		
 		runner.evolve();
 		
@@ -74,7 +78,11 @@ public class Main
 	{
 		GPRunner runner = new GPRunner("UGUGUGGAUGAAAUGUAAUCACAGAACCGGUUUUCAUUUUCGAUCUGACUUAUUUUUUUCACAAACAAGUGAGAUCACUUUGAAAGCUGAUUUUGUACAAUUAAUUCAACG"); //Evil!
 		
-		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 40;
+		runner.mutateProbability = 2.0f / 40.0f;
 		
 		runner.evolve();
 		
@@ -89,6 +97,13 @@ public class Main
 	private static void evilTopoplogyTest2()
 	{
 		GPRunner runner = new GPRunner("GGGGGUAUAGCUCAGUUGGUAGAGCGCUGCCUUUGCACGGCAGAUGUCAGGGGUUCGAGUCCCCUUACCUCCA"); //Evil!
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 40;
+		runner.mutateProbability = 2.0f / 40.0f;
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -102,6 +117,13 @@ public class Main
 	private static void evilTopoplogyTest3()
 	{
 		GPRunner runner = new GPRunner("ACUCAUAUAAUCGCGUGGAUAUGGCACGCAAGUUUCUACCGGGCACCGUAAAUGUCCGACUAUGGGUG"); //Evil!
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 40;
+		runner.mutateProbability = 2.0f / 40.0f;
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -115,6 +137,13 @@ public class Main
 	private static void evilTopoplogyTest4()
 	{
 		GPRunner runner = new GPRunner("UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAUACAAUCUACUGUCUUUCCUA"); //Evil!
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 40;
+		runner.mutateProbability = 2.0f / 40.0f;
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -128,6 +157,13 @@ public class Main
 	private static void pseudoKnotTest1()
 	{
 		GPRunner runner = new GPRunner("ACGUCCCACGUAAAAAGGGACGUUUUUACGU"); //Evil!
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = 5;
+		runner.mutateProbability = 1.0f / 5.0f;
+		
 		runner.evolve();
 		
 		openResult("best_individual_0.RNASLV");
@@ -138,7 +174,10 @@ public class Main
 	{
 		try
 		{
-			ResultDialog.showResults(Individual.load(filename));
+			Individual indiv = Individual.load(filename);
+			
+			StructureResultDialog.showResults(indiv);
+			BasePairResultDialog.showResults(indiv);
 		}
 		catch (IOException e)
 		{
@@ -176,7 +215,7 @@ public class Main
 		
 		indiv.run("AAAAAAAAAAAAAAA");
 		
-		ResultDialog.showResults(indiv);
+		StructureResultDialog.showResults(indiv);
 	}
 
 	public static void main(String[] args)
@@ -201,12 +240,16 @@ public class Main
 //		GPRunner runner = new GPRunner("UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA");
 //		runner.evolve();
 		
-		pseudoKnotTest1();
-		//easyTopoplogyTest1();
+		//evilTopoplogyTest1();
+		//evilTopoplogyTest2();
+		//pseudoKnotTest1();
+		easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
 		
 		//openResult("Results/Evil tRNA/Result5.RNASLV");
+		
+		//openResult("best_individual_0.RNASLV");
 	}
 
 }

@@ -569,7 +569,7 @@ Wie bereits oben beschrieben, gibt es neben PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Tabular
@@ -577,7 +577,7 @@ status open
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
-<column alignment="center" valignment="top" width="5cm">
+<column alignment="center" valignment="top" width="15cm">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -879,15 +879,7 @@ ELSE:
 \end_layout
 
 \begin_layout Section*
-Allgemeiner Ablauf
-\end_layout
-
-\begin_layout Standard
-Das Programm beginnt mit einer Initialpopulation, die Bewertet wird.
- Es werden die 10 Besten Eltern ausgewählt und paarweise 100 mal rekombiniert
- (Also 200 Kinder pro Paarung).
- Die Kinder werden als neue Population gesetzt (vgl.
- Komma-Strategie).
+Allgemeine Ablauf
 \end_layout
 
 \begin_layout Standard
@@ -935,22 +927,7 @@ DO 200 TIMES:
 
 \begin_layout Plain Layout
 
-		DO 100 TIMES: //jedes Paar erzeugt 200 = 100*2 Kinder
-\end_layout
-
-\begin_layout Plain Layout
-
-			newpop.add(MUTATE(RECOMB(p1, p2)))
-\end_layout
-
-\begin_layout Plain Layout
-
-	population <- newpop
-\end_layout
-
-\begin_layout Plain Layout
-
-	
+		
 \end_layout
 
 \begin_layout Plain Layout

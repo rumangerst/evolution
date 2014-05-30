@@ -331,8 +331,11 @@ public class Register
 			return;
 		}
 		
-		if(label.equals("GOTO") || label.equals("UPDATE_BOUNDING"))
+		if(label.equals("GOTO") || label.equals("UPDATE_BONDING"))
+		{
 			value = 0;
+			return;
+		}
 
 		// Unknown Function, must be a TERMINAL
 		value = executeTerminal(individual, label);

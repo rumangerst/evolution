@@ -10,10 +10,10 @@ import rna.solver.Individual;
 import rna.solver.Nucleotide;
 import rna.solver.RNAField;
 
-public class ResultDialog extends Frame
+public class BasePairResultDialog extends Frame
 {	
 	
-	public ResultDialog(Individual indiv)
+	public BasePairResultDialog(Individual indiv)
 	{	
 		this.setSize(1024, 768);
 		this.setBackground(Color.WHITE);
@@ -27,13 +27,13 @@ public class ResultDialog extends Frame
 		});
 		
 		
-		this.setTitle("Energy: " + indiv.structure.energy() + ", Fitness: " + indiv.fitness());
-		this.add( new StructureCanvas(indiv.structure));
+		this.setTitle("Basenpaarung | Energy: " + indiv.structure.energy() + ", Fitness: " + indiv.fitness());
+		this.add( new BasePairCanvas(indiv.structure, indiv.rna));
 	}
 	
 	public static void showResults(Individual indiv)
 	{
-		ResultDialog dlg = new ResultDialog(indiv);
+		BasePairResultDialog dlg = new BasePairResultDialog(indiv);
 		
 		dlg.setVisible(true);
 	}

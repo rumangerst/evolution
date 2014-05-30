@@ -260,23 +260,11 @@ public class Individual implements Comparable
 	 * Two cases of mutation: I) Parameter mutation (mutate parameter of
 	 * register) II) Register mutation (new random register)
 	 * 
-	 * @param p1 Register mutation
-	 * @param p2 Param mutation
+	 * @param p1 Register mutation - Probability to select the register	 *
 	 */
-	public void mutate(float p1, float p2)
+	public void mutate(float p)
 	{
 		int regCount = this.registers.size();
-		
-		/**
-		 * Register mutation replace whole register by random one
-		 */
-		for (int i = 0; i < registers.size(); i++)
-		{
-			if (1 - Register.RANDOM.nextFloat() <= p1)
-			{
-				this.registers.set(i, Register.random(regCount));
-			}
-		}
 
 		/**
 		 * Parameter mutation replace parameters by random terminals
@@ -284,12 +272,24 @@ public class Individual implements Comparable
 		for (int i = 0; i < registers.size(); i++)
 		{
 			Register reg = this.registers.get(i);
-
-			for (int pindex = 0; pindex < reg.parameters.length; pindex++)
+			
+			if (1 - Register.RANDOM.nextFloat() <= p)
 			{
-				if (1 - Register.RANDOM.nextFloat() <= p2)
+				int parameter = Register.RANDOM.nextInt(reg.parameters.length + 1);
+				
+				if(parameter == 0)
 				{
-					reg.parameters[pindex] = Register.randomTerminal(regCount);
+					/**
+					 * Mutate whole register
+					 */
+					this.registers.set(i, Register.random(regCount));
+				}
+				else
+				{
+					/**
+					 * Mutate parameter
+					 */
+					reg.parameters[parameter - 1] = Register.randomTerminal(regCount);
 				}
 			}
 		}

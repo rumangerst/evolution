@@ -470,7 +470,7 @@ public class RNAField
 		if (index < 0 || index >= structureLength)
 			return null;
 
-		Nucleotide nuc = current;
+		Nucleotide nuc = initial;
 
 		for (int i = 0; i < index; i++)
 		{
