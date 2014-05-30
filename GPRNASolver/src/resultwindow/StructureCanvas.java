@@ -14,9 +14,16 @@ public class StructureCanvas extends Canvas
 {
 	private RNAField structure;
 
-	public StructureCanvas(RNAField structure)
+	public StructureCanvas()
+	{
+		
+	}
+	
+	public void setData(RNAField structure)
 	{
 		this.structure = structure;
+		
+		this.repaint();
 	}
 
 	private Point transformPoint(int x, int y)
@@ -69,6 +76,9 @@ public class StructureCanvas extends Canvas
 	{
 		// TODO Auto-generated method stub
 		super.paint(g);
+		
+		if(structure == null)
+			return;
 
 		Graphics2D g2 = (Graphics2D) g;
 
@@ -78,6 +88,9 @@ public class StructureCanvas extends Canvas
 		Point trstart = transformPoint(start.x - 5, start.y - 5);		
 
 		g.translate(-trstart.x, -trstart.y);
+		
+		//set size of canvas
+		this.setSize((end.x - start.x + 10) * 16, (end.y - start.y + 10) * 16);
 		
 		//Draw grid
 		for(int x = start.x - 10; x < end.x; x++)

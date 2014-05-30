@@ -123,6 +123,18 @@ public class Individual implements Comparable
 			System.out.println(reg.toString());
 		}
 	}
+	
+	public String[] getRegisterCommands()
+	{
+		String[] output = new String[registers.size()];
+		
+		for(int i = 0; i < registers.size(); i++)
+		{
+			output[i] = registers.get(i).toString();
+		}
+		
+		return output;
+	}
 
 	/**
 	 * Clears registers and creates a new random one

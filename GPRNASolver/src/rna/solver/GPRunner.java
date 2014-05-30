@@ -21,7 +21,7 @@ public class GPRunner
 
 	public float recombProbability;
 	public float mutateProbability;
-	
+
 	public int registerCount;
 
 	public LinkedList<Individual> population = new LinkedList<>();
@@ -71,9 +71,10 @@ public class GPRunner
 			 * Sort population by fitness
 			 */
 			Collections.sort(population);
-			
-			//Just some text
-			System.out.println("Best fitness: " + population.getFirst().fitness);
+
+			// Just some text
+			System.out
+					.println("Best fitness: " + population.getFirst().fitness);
 
 			/**
 			 * Select parents
@@ -84,16 +85,16 @@ public class GPRunner
 			 * Create new population *
 			 */
 			LinkedList<Individual> newpop = new LinkedList<Individual>();
-			
+
 			/**
 			 * OPTINAL: Plus strat selection type
 			 * 
 			 */
-//			for(Individual indiv : parents)
-//			{
-//				newpop.add(new Individual(indiv));
-//			}
-			
+			// for(Individual indiv : parents)
+			// {
+			// newpop.add(new Individual(indiv));
+			// }
+
 			this.population = newpop;
 
 			/**
@@ -112,22 +113,21 @@ public class GPRunner
 
 						Individual.recombine(child1, child2, recombProbability);
 						child1.mutate(mutateProbability);
-						
+
 						population.add(child1);
 						population.add(child2);
 					}
 				}
 			}
 
-			
 		}
-		
+
 		System.out.println("Evolution loop finished.");
-		
+
 		/**
 		 * Auswertung
 		 */
-		
+
 		/**
 		 * Run programs (will also calculate fitness)
 		 */
@@ -140,22 +140,18 @@ public class GPRunner
 		 * Sort population by fitness
 		 */
 		Collections.sort(population);
-		
-		
-		for(int i = 0; i < 10; i++)
+
+		try
 		{
-			try
-			{
-				population.get(i).write("best_individual_" + i + ".RNASLV");
-			}
-			catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			population.getFirst().write("best_individual.RNASLV");
 		}
-		
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return population.getFirst();
-		
+
 	}
 }

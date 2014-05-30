@@ -15,15 +15,21 @@ public class BasePairCanvas extends Canvas
 	private RNAField structure;
 	private String rna;
 
-	public BasePairCanvas(RNAField structure, String rna)
-	{
-		this.structure = structure;
-		this.rna = rna;
+	public BasePairCanvas()
+	{	
 	}
 
 	private Point transformPoint(int x, int y)
 	{
 		return new Point(x * 16 + 4, y * 16 + 4);
+	}
+	
+	public void setData(RNAField structure, String rna)
+	{
+		this.structure = structure;
+		this.rna = rna;
+		
+		this.repaint();
 	}
 
 	@Override
@@ -31,8 +37,14 @@ public class BasePairCanvas extends Canvas
 	{		
 		// TODO Auto-generated method stub
 		super.paint(g);
+		
+		if(structure == null)
+			return;
 
 		Graphics2D g2 = (Graphics2D) g;
+		
+		//set canvas size
+		this.setSize(16 * (rna.length() + 5), 16 * (rna.length() + 5));
 
 		for (int x = 1; x < rna.length() + 1; x++)
 		{

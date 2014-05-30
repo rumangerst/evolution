@@ -1,9 +1,7 @@
 package rna.solver;
 
 import java.io.IOException;
-
-import resultwindow.BasePairResultDialog;
-import resultwindow.StructureResultDialog;
+import resultwindow.ResultViewer;
 
 public class Main
 {
@@ -25,8 +23,7 @@ public class Main
 		
 		
 		
-		runner.evolve();
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -44,9 +41,7 @@ public class Main
 		runner.registerCount = 5;
 		runner.mutateProbability = 1.0f / 5.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -64,9 +59,7 @@ public class Main
 		runner.registerCount = 5;
 		runner.mutateProbability = 1.0f / 5.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -84,9 +77,7 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 2.0f / 40.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -104,9 +95,7 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 2.0f / 40.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	 
 	/**
@@ -124,9 +113,7 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 2.0f / 40.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -144,9 +131,7 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 2.0f / 40.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	/**
@@ -164,9 +149,7 @@ public class Main
 		runner.registerCount = 5;
 		runner.mutateProbability = 1.0f / 5.0f;
 		
-		runner.evolve();
-		
-		openResult("best_individual_0.RNASLV");
+		ResultViewer.showResults(runner.evolve());
 	}
 	
 	
@@ -176,8 +159,9 @@ public class Main
 		{
 			Individual indiv = Individual.load(filename);
 			
-			StructureResultDialog.showResults(indiv);
-			BasePairResultDialog.showResults(indiv);
+			/*StructureResultDialog.showResults(indiv);
+			BasePairResultDialog.showResults(indiv);*/
+			ResultViewer.showResults(indiv);
 		}
 		catch (IOException e)
 		{
@@ -215,7 +199,7 @@ public class Main
 		
 		indiv.run("AAAAAAAAAAAAAAA");
 		
-		StructureResultDialog.showResults(indiv);
+		ResultViewer.showResults(indiv);
 	}
 
 	public static void main(String[] args)
@@ -241,9 +225,9 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		//evilTopoplogyTest2();
+		evilTopoplogyTest2();
 		//pseudoKnotTest1();
-		easyTopoplogyTest1();
+		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
 		
