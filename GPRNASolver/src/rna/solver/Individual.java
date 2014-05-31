@@ -13,8 +13,7 @@ public class Individual implements Comparable
 	public String rna;
 	public double fitness;
 	
-	public int bzr;
-	public int goto_count;
+	public int bzr;	
 	public boolean infinite_loop;
 
 	/**
@@ -148,25 +147,6 @@ public class Individual implements Comparable
 			registers.add(Register.random(reg));
 		}
 	}
-	
-	/**
-	 * Set BZR to register, called by GOTO
-	 * @param register
-	 * @return
-	 */
-	public int gotoRegister(int register)
-	{
-		if(register < 0 || register >= registers.size())
-		{
-			return -1;
-		}
-		
-		bzr = register - 1;
-		
-		goto_count++;
-		
-		return bzr;
-	}
 
 	/**
 	 * Run program, using given RNA string
@@ -198,22 +178,14 @@ public class Individual implements Comparable
 
 		// Ok, ready. Run registers for each character in RNA string
 		// Cancel if stack is empty		
-		
-		infinite_loop = false;
 
 		for (int run = 0; run < rna.length() && !sequence.isEmpty(); run++)
 		{
 			bzr = 0;
-			goto_count = 0;
+			
 			
 			while(bzr < registers.size())
 			{
-				if(goto_count >= 1000)
-				{
-					infinite_loop = true;
-					return;
-				}
-				
 				registers.get(bzr).execute(this);
 				bzr++;
 			}

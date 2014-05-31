@@ -16,19 +16,20 @@ public class Register
 {
 	public static final Random RANDOM = new Random();
 	/**
-	 * Terminale kommunizieren mit der Sekundärstruktur
+	 * Terminale Funktionen ohne Parameter
 	 */
 	public static final String[] TERMINALS = new String[] { "NUMBER",
 			"REGISTER_VALUE", "PUT_STRAIGHT", "PUT_LEFT", "PUT_RIGHT",
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "UNDO",
-			"ENERGY", "LENGTH", "STACK" }; // GOTO entfernt
+			"ENERGY", "LENGTH", "STACK", "PREV", "NEXT", "SKIP" }; // GOTO
+																	// entfernt
 	/**
 	 * Funktionen für Variablenabfragen ...
 	 */
 	public static final String[] FUNCTIONS = new String[] { "TERMINAL",
 			"IF_LESS", "IF_GREATER", "IF_EQUALS", "ADD", "SUBTRACT",
 			"MULTIPLY", "DIVIDE", "LOOK_BACK", "LOOK_FORWARD",
-			"CALCULATE_ENERGY", "GETBOND" }; // UPDATE_BONDING entfernt
+			"CALCULATE_ENERGY", "GETBOND", "PURINE", "PYRIMIDINE", "DO", "PRG5" }; // UPDATE_BONDING entfernt
 
 	public String label;
 	public String[] parameters;
@@ -139,16 +140,43 @@ public class Register
 		}
 
 		/**
+		 * A,C,U,G
+		 */
+		/*
+		 * if (label.equals("A")) { return 0; } if (label.equals("C")) { return
+		 * 1; } if (label.equals("U")) { return 2; } if (label.equals("G")) {
+		 * return 3; }
+		 */
+
+		/**
+		 * PREV (Zuletzt hinzugefügter) NEXT (neu zu hinzufügendes Nuc)
+		 */
+		if (label.equals("PREV"))
+		{
+			return individual.structure.current.type.toInteger();
+		}
+		if (label.equals("NEXT"))
+		{
+			if (individual.sequence.isEmpty())
+				return -1;
+			return individual.sequence.get(0);
+		}
+
+		/**
+		 * Indicate that next register will be skipped
+		 */
+		if (label.equals("SKIP"))
+		{
+			individual.bzr++;
+			return 0;
+		}
+
+		/**
 		 * No known label => must be a number or a Rx reference
 		 */
 		if (label.startsWith("R"))
 		{
 			return Integer.parseInt(label.substring(1));
-		}
-		else if (label.startsWith("GOTO"))
-		{
-			return individual
-					.gotoRegister(Integer.parseInt(label.substring(4)));
 		}
 		else
 		{
@@ -330,8 +358,70 @@ public class Register
 
 			return;
 		}
+
+		if (label.equals("PURINE"))
+		{
+			int r1 = executeTerminal(individual, parameters[0]);
+
+			NucleotideType nuc = NucleotideType.fromInteger(r1);
+
+			if (nuc == NucleotideType.A || nuc == NucleotideType.G)
+				value = individual.structure.structureLength;
+			else
+				value = -1;
+
+			return;
+		}
+
+		if (label.equals("PYRIMIDINE"))
+		{
+			int r1 = executeTerminal(individual, parameters[0]);
+
+			NucleotideType nuc = NucleotideType.fromInteger(r1);
+
+			if (nuc == NucleotideType.U || nuc == NucleotideType.C)
+				value = individual.structure.structureLength;
+			else
+				value = -1;
+
+			return;
+		}
+
+		if (label.equals("DO"))
+		{
+			int r1 = executeTerminal(individual, parameters[0]);
+
+			if (r1 < 0 || r1 > 100)
+			{
+				value = -1;
+				return;
+			}
+			else
+			{
+				value = 0;
+				
+				for (int i = 0; i < r1; i++)
+				{
+					value += executeTerminal(individual, parameters[1]);
+				}
+			}
+
+			return;
+		}
 		
-		if(label.equals("GOTO") || label.equals("UPDATE_BONDING"))
+		if (label.equals("PRG5") )
+		{
+			value = 0;
+			
+			for(int i = 0; i < parameters.length;i++)
+			{
+				value += executeTerminal(individual, parameters[i]);
+			}
+			
+			return;
+		}
+
+		if (label.equals("GOTO") || label.equals("UPDATE_BONDING"))
 		{
 			value = 0;
 			return;
@@ -402,18 +492,24 @@ public class Register
 		 */
 		if (label.equals("IF_LESS"))
 		{
-			return new Register("IF_LESS", randomTerminal(registerCount), randomTerminal(registerCount),
-					randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("IF_LESS", randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 		if (label.equals("IF_GREATER"))
 		{
 			return new Register("IF_GREATER", randomTerminal(registerCount),
-					randomTerminal(registerCount), randomTerminal(registerCount), randomTerminal(registerCount));
+					randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 		if (label.equals("IF_EQUAL"))
 		{
-			return new Register("IF_EQUAL", randomTerminal(registerCount), randomTerminal(registerCount),
-					randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("IF_EQUAL", randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 
 		/**
@@ -421,19 +517,23 @@ public class Register
 		 */
 		if (label.equals("ADD"))
 		{
-			return new Register("ADD", randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("ADD", randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 		if (label.equals("SUBTRACT"))
 		{
-			return new Register("SUBTRACT", randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("SUBTRACT", randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 		if (label.equals("MULTIPLY"))
 		{
-			return new Register("MULTIPLY", randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("MULTIPLY", randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 		if (label.equals("DIVIDE"))
 		{
-			return new Register("DIVIDE", randomTerminal(registerCount), randomTerminal(registerCount));
+			return new Register("DIVIDE", randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 
 		/**
@@ -449,13 +549,17 @@ public class Register
 		}
 
 		/**
-		 * Energy between nucleotides
+		 * Entfernt aus Random Generierung
 		 */
-		if (label.equals("CALCULATE_ENERGY"))
-		{
-			return new Register("CALCULATE_ENERGY", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
+		// /**
+		// * Energy between nucleotides
+		// */
+		// if (label.equals("CALCULATE_ENERGY"))
+		// {
+		// return new Register("CALCULATE_ENERGY",
+		// randomTerminal(registerCount),
+		// randomTerminal(registerCount));
+		// }
 
 		/**
 		 * Nucleotide, given one one is bond to
@@ -463,6 +567,39 @@ public class Register
 		if (label.equals("GETBOND"))
 		{
 			return new Register("GETBOND", randomTerminal(registerCount));
+		}
+
+		/**
+		 * PURINE, PYRIMIDINE
+		 */
+		if (label.equals("PURINE"))
+		{
+			return new Register("PURINE", randomTerminal(registerCount));
+		}
+		if (label.equals("PYRIMIDINE"))
+		{
+			return new Register("PYRIMIDINE", randomTerminal(registerCount));
+		}
+
+		/**
+		 * DO P1 P2
+		 */
+		if (label.equals("DO"))
+		{
+			return new Register("DO", randomTerminal(registerCount),
+					randomTerminal(registerCount));
+		}
+
+		/**
+		 * PRG5 P1 P2 P3 P4 P5
+		 */
+		if (label.equals("PRG5"))
+		{
+			return new Register("PRG5", randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount),
+					randomTerminal(registerCount));
 		}
 
 		return new Register(randomTerminal(registerCount));

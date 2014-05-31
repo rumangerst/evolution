@@ -128,8 +128,14 @@ public class Nucleotide
 				|| n1 == NucleotideType.U && n2 == NucleotideType.G)
 			return -2;
 
-		//Strange 'bond' counts + 1, where no bond counts +2, because the nucleotide is element of a structure!
-		return 1;
+		/**
+		 * Mehrere Ansätze
+		 * 
+		 * I) Return +1 Bewertet solche "Bindungen" besser als keine Bindung -> Struktur bleibt Kompakt
+		 * II) Return +5 o.Ä. Abbildung der schlechten Eigenschaften dieser "Bindung" -> Programm weicht diesen Bindungen aus
+		 * III) Return +2 - Keine Bindung - Kein Einfluss auf Energie 
+		 */
+		return 5;
 	}
 	
 	public Nucleotide getPrevious(int n)

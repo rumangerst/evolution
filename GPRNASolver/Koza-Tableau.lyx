@@ -674,7 +674,7 @@ Gibt gegenwärtige Energie zurück
 \begin_inset Text
 
 \begin_layout Plain Layout
-CALCULATE_ENERGY P1 P2
+SKIP
 \end_layout
 
 \end_inset
@@ -683,7 +683,7 @@ CALCULATE_ENERGY P1 P2
 \begin_inset Text
 
 \begin_layout Plain Layout
-Nicht-Terminal
+Terminal
 \end_layout
 
 \end_inset
@@ -692,9 +692,8 @@ Nicht-Terminal
 \begin_inset Text
 
 \begin_layout Plain Layout
-Energie zwischen zwei Nukleotiden.
- Es wird dabei die zyklische Zahlenrepräsentation eines Nukleotids benutzt
- (A=0, C=1, ..., A=5, C=2, ...)
+Addiert 1 zum bzr, sodass das nächste Register geskippt wird.
+ Akkumuliert sich bei mehreren Aufrufen.
 \end_layout
 
 \end_inset
@@ -1035,10 +1034,9 @@ Function set
 
 \begin_layout Plain Layout
 IF_LESS, IF_GREATER, IF_EQUAL, ADD, SUBTRACT, MULTIPLY, DIVIDE, LOOK_BACK,
- LOOK_FORWARD, CALCULATE_ENERGY, GETBOND,PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT,
- COLLIDE_STRAIGHT, COLLIDE_LEFT, COLLIDE_RIGHT, UNDO,ENERGY,LENGTH,STACK,R0
- ...
- Ri (Verweise auf Register)
+ LOOK_FORWARD, GETBOND,PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT, COLLIDE_STRAIGHT,
+ COLLIDE_LEFT, COLLIDE_RIGHT, UNDO,ENERGY,LENGTH,STACK,R0 ...
+ Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, DO, SKIP, PRG5
 \end_layout
 
 \end_inset
