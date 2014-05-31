@@ -54,47 +54,47 @@ public class RNAField
 		return false;
 	}
 
-	/**
-	 * Checks if it's next to a bonded nucleotide or a curve
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public boolean disturbsBonding(int xi, int yi)
-	{
-		/*
-		 * Nucleotide east = get(x + 1, y); Nucleotide west = get(x - 1, y);
-		 * Nucleotide north = get(x, y - 1); Nucleotide south = get(x, y + 1);
-		 * 
-		 * if (east != null && east.bond != null) return true; if (west != null
-		 * && west.bond != null) return true; if (north != null && north.bond !=
-		 * null) return true; if (south != null && south.bond != null) return
-		 * true;
-		 * 
-		 * return false;
-		 */
-
-		Nucleotide nuc = get(xi, yi);
-
-		if (nuc == null)
-			return false;
-
-		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
-		{
-			for (int y = nuc.y - 1; y <= nuc.y; y++)
-			{
-				Nucleotide other = get(x, y);
-
-				if (other != null && other != nuc && other.isBond())
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
+//	/**
+//	 * Checks if it's next to a bonded nucleotide or a curve
+//	 * 
+//	 * @param x
+//	 * @param y
+//	 * @return
+//	 */
+//	public boolean disturbsBonding(int xi, int yi)
+//	{
+//		/*
+//		 * Nucleotide east = get(x + 1, y); Nucleotide west = get(x - 1, y);
+//		 * Nucleotide north = get(x, y - 1); Nucleotide south = get(x, y + 1);
+//		 * 
+//		 * if (east != null && east.bond != null) return true; if (west != null
+//		 * && west.bond != null) return true; if (north != null && north.bond !=
+//		 * null) return true; if (south != null && south.bond != null) return
+//		 * true;
+//		 * 
+//		 * return false;
+//		 */
+//
+//		Nucleotide nuc = get(xi, yi);
+//
+//		if (nuc == null)
+//			return false;
+//
+//		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
+//		{
+//			for (int y = nuc.y - 1; y <= nuc.y; y++)
+//			{
+//				Nucleotide other = get(x, y);
+//
+//				if (other != null && other != nuc && other.isBond())
+//				{
+//					return true;
+//				}
+//			}
+//		}
+//
+//		return false;
+//	}
 
 	public Nucleotide get(int x, int y)
 	{
@@ -146,8 +146,8 @@ public class RNAField
 		// Test x,y
 		if (occupied(cursor.x, cursor.y))
 			return false;
-		if (disturbsBonding(cursor.x, cursor.y))
-			return false;
+//		if (disturbsBonding(cursor.x, cursor.y))
+//			return false;
 		if (ndir.isDiagonal() && crosses(current.x, current.y, ndir))// Diagonal
 																		// directions
 																		// may
@@ -198,142 +198,384 @@ public class RNAField
 		// while(n.previous != null);
 		// }
 
-		updateBondsInRadius(nuc);
+		// updateBondsInRadius(nuc);
+
+		bond(nuc, new LinkedList<Integer>());
 
 		return true;
 	}
 
-	private void updateBondsInRadius(Nucleotide nuc)
-	{
-		bond(nuc);
-
-		for (int x = nuc.x - 2; x <= nuc.x + 2; x++)
-		{
-			for (int y = nuc.y - 2; y <= nuc.y + 2; y++)
-			{
-				Nucleotide toupdate = get(x, y);
-
-				if (toupdate != null)
-					bond(toupdate);
-			}
-		}
-	}
-
+	// private void updateBondsInRadius(Nucleotide nuc)
+	// {
+	// bond(nuc);
+	//
+	// for (int x = nuc.x - 2; x <= nuc.x + 2; x++)
+	// {
+	// for (int y = nuc.y - 2; y <= nuc.y + 2; y++)
+	// {
+	// Nucleotide toupdate = get(x, y);
+	//
+	// if (toupdate != null)
+	// bond(toupdate);
+	// }
+	// }
+	// }
+	
 	/**
-	 * Aktualisiert Bindungen des Nukleotids
+	 * Veränderter Bond-Algorithmus
 	 * 
-	 * Regeln: I) Gerade Bindungen haben Vorrang gegenüber diagonalen => Erst
-	 * WENN keine GERADEN Bindungen gefunden werden, wird diagonal gebunden!
+	 * Betrachte alle Nukleotide, die nicht prev oder next sind und wähle die
+	 * SCHLECHTESTE Bindung aus
 	 * 
-	 * II) Eine Bindung kommt nur zustande, wenn die Richtungen invers
-	 * zueinander sind III) Die Inverse Richtung der Nukleotide kann auch vom
-	 * NÄCHSTEN Element übernommen werden, wenn es passt (*** Noch nicht IMPL)
+	 * Gibt bond rekursiv an ein verändertes Nukleotid weiter, damit dieses die
+	 * Bindung aktualisieren kann.
 	 * 
 	 * @param nuc
 	 * @return
 	 */
-	public boolean bond(Nucleotide nuc)
+	public boolean bond(Nucleotide nuc, LinkedList<Integer> watcher)
 	{
-		LinkedList<Nucleotide> straights = new LinkedList<>();
-		LinkedList<Nucleotide> diagonals = new LinkedList<>();
+		if (watcher.contains(nuc.getIndex()))
+		{
+			return false;
+		}
+		else
+		{
+			watcher.add(nuc.getIndex());
+		}
+
+		Nucleotide best = null;
+		int bestenergy = Integer.MIN_VALUE;
+
+		if (nuc.isBond())
+			bestenergy = nuc.energy(this);
 
 		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
 		{
 			for (int y = nuc.y - 1; y <= nuc.y; y++)
 			{
-				if (x == nuc.x && y == nuc.y)
-					continue;
+//				/**
+//				 * Wenn selber diagonal => kann mit allen binden
+//				 * Wenn gerade => Kann nur mit geraden binden
+//				 */
+//				if(!nuc.dir.isDiagonal())
+//				{
+//					if(nuc.x != x  && nuc.y != y)
+//						continue;
+//				}		
+				
+				
+				Nucleotide candidate = get(x, y);
 
-				Nucleotide other = get(x, y);
-
-				if (other != null)
+				if (candidate != null && candidate != nuc
+						&& candidate != nuc.next && candidate != nuc.previous)
 				{
-					if (x == nuc.x || y == nuc.y)
+					/**
+					 * Sind die Nukleotide gegeneinander?
+					 * 
+					 * Mit kleinem Spielraum
+					 */
+//					if (NucleotideDirection.difference(nuc.dir, candidate.dir.reverse()) > 2)
+//						continue;
+					if(!nuc.dir.intersectsWith(candidate.dir.reverse()))
+						continue;
+					
+					/**
+					 * Spezialfall: Wenn noch kein Candidat gefunden wurde,
+					 * force it
+					 */
+					if (best == null)
 					{
-						straights.add(other);
+						best = candidate;
+						bestenergy = Nucleotide.calculateEnergy(nuc.type,
+								candidate.type);
+						continue;
 					}
-					else
+
+					int candidateEnergy = Nucleotide.calculateEnergy(nuc.type,
+							candidate.type);
+
+					/**
+					 * Ist neue Energie schlechter?
+					 */
+					if (candidateEnergy > candidate.energy(this))
 					{
-						diagonals.add(other);
+						/**
+						 * Ist die Energie besser als die aktuelle Energie?
+						 */
+						if (candidateEnergy > bestenergy)
+						{
+							best = candidate;
+							bestenergy = candidateEnergy;
+						}
 					}
 				}
 			}
 		}
 
-		Nucleotide best = null;
-		int currentenergy = Integer.MAX_VALUE;
-
-		if (nuc.isBond())
-			currentenergy = nuc.energy();
+		/**
+		 * Gibt es einen besten? *
+		 */
+		if (best == null)
+			return false;
 
 		/**
-		 * If NO straights => try diagonals
+		 * Ist best = aktueller? oder ist best überhaupt besser?
 		 */
-		if (straights.size() == 0)
-		{
-			straights = diagonals;
-		}
+		if (nuc.bond == best)
+			return false; // Keine Änderung
 
-		for (Nucleotide candidate : straights)
-		{
-			/**
-			 * Check if conditions are met
-			 */
-			/*
-			 * if(nuc.dir != candidate.dir.reverse()) continue;
-			 */
+		/**
+		 * Bonding ausführen
+		 */
+		Nucleotide stolen = best.bond; // Wenn best gebunden war
 
-			NucleotideDirection nucdir = nuc.dir;
-			NucleotideDirection canddir = candidate.dir;
+		best.unBond();
+		nuc.unBond();
 
-			if (nucdir != canddir.reverse())
-			{
-				if (nuc.previous != null)
-					nucdir = nuc.previous.dir;
-				if (candidate.previous != null)
-					canddir = candidate.previous.dir;
+		nuc.bondTo(best);
 
-				if (nucdir != canddir.reverse())
-					continue;
-			}
+		if (stolen != null)
+			bond(stolen, watcher);
 
-			int energy = Nucleotide.calculateEnergy(candidate, nuc);
-
-			/**
-			 * Check if energy is better
-			 */
-			if (currentenergy < energy)
-				continue;
-
-			/**
-			 * Check if this bond is better
-			 */
-			if (candidate.isBond())
-			{
-				if (candidate.energy() < energy)
-					continue;
-			}
-
-			/**
-			 * Set as best
-			 */
-			best = candidate;
-			currentenergy = energy;
-
-		}
-
-		if (best != null)
-		{
-			nuc.bondTo(best);
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-
+		return true;
 	}
+
+//	/**
+//	 * Veränderter Bond-Algorithmus
+//	 * 
+//	 * Betrachte alle Nukleotide, die nicht prev oder next sind und wähle die
+//	 * Beste Bindung aus
+//	 * 
+//	 * Gibt bond rekursiv an ein verändertes Nukleotid weiter, damit dieses die
+//	 * Bindung aktualisieren kann.
+//	 * 
+//	 * @param nuc
+//	 * @return
+//	 */
+//	public boolean bond(Nucleotide nuc, LinkedList<Integer> watcher)
+//	{
+//		if (watcher.contains(nuc.getIndex()))
+//		{
+//			return false;
+//		}
+//		else
+//		{
+//			watcher.add(nuc.getIndex());
+//		}
+//
+//		Nucleotide best = null;
+//		int bestenergy = Integer.MAX_VALUE;
+//
+//		if (nuc.isBond())
+//			bestenergy = nuc.energy(this);
+//
+//		for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
+//		{
+//			for (int y = nuc.y - 1; y <= nuc.y; y++)
+//			{
+//				/**
+//				 * Wenn selber diagonal => kann mit allen binden
+//				 * Wenn gerade => Kann nur mit geraden binden
+//				 */
+//				if(!nuc.dir.isDiagonal())
+//				{
+//					if(nuc.x != x  && nuc.y != y)
+//						continue;
+//				}		
+//				
+//				
+//				Nucleotide candidate = get(x, y);
+//
+//				if (candidate != null && candidate != nuc
+//						&& candidate != nuc.next && candidate != nuc.previous)
+//				{
+//					/**
+//					 * Sind die Nukleotide gegeneinander?
+//					 * 
+//					 * Mit kleinem Spielraum
+//					 */
+////					if (NucleotideDirection.difference(nuc.dir, candidate.dir.reverse()) > 2)
+////						continue;
+//					if(!nuc.dir.intersectsWith(candidate.dir.reverse()))
+//						continue;
+//					
+//					/**
+//					 * Spezialfall: Wenn noch kein Candidat gefunden wurde,
+//					 * force it
+//					 */
+//					if (best == null)
+//					{
+//						best = candidate;
+//						bestenergy = Nucleotide.calculateEnergy(nuc.type,
+//								candidate.type);
+//						continue;
+//					}
+//
+//					int candidateEnergy = Nucleotide.calculateEnergy(nuc.type,
+//							candidate.type);
+//
+//					/**
+//					 * Ist neue Energie besser?
+//					 */
+//					if (candidateEnergy < candidate.energy(this))
+//					{
+//						/**
+//						 * Ist die Energie besser als die aktuelle Energie?
+//						 */
+//						if (candidateEnergy < bestenergy)
+//						{
+//							best = candidate;
+//							bestenergy = candidateEnergy;
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		/**
+//		 * Gibt es einen besten? *
+//		 */
+//		if (best == null)
+//			return false;
+//
+//		/**
+//		 * Ist best = aktueller? oder ist best überhaupt besser?
+//		 */
+//		if (nuc.bond == best || nuc.energy(this) <= bestenergy)
+//			return false; // Keine Änderung
+//
+//		/**
+//		 * Bonding ausführen
+//		 */
+//		Nucleotide stolen = best.bond; // Wenn best gebunden war
+//
+//		best.unBond();
+//		nuc.unBond();
+//
+//		nuc.bondTo(best);
+//
+//		if (stolen != null)
+//			bond(stolen, watcher);
+//
+//		return true;
+//	}
+
+	// /**
+	// * Aktualisiert Bindungen des Nukleotids
+	// *
+	// * Regeln: I) Gerade Bindungen haben Vorrang gegenüber diagonalen => Erst
+	// * WENN keine GERADEN Bindungen gefunden werden, wird diagonal gebunden!
+	// *
+	// * II) Eine Bindung kommt nur zustande, wenn die Richtungen invers
+	// * zueinander sind III) Die Inverse Richtung der Nukleotide kann auch vom
+	// * NÄCHSTEN Element übernommen werden, wenn es passt (*** Noch nicht IMPL)
+	// *
+	// * @param nuc
+	// * @return
+	// */
+	// public boolean bond(Nucleotide nuc)
+	// {
+	// LinkedList<Nucleotide> straights = new LinkedList<>();
+	// LinkedList<Nucleotide> diagonals = new LinkedList<>();
+	//
+	// for (int x = nuc.x - 1; x <= nuc.x + 1; x++)
+	// {
+	// for (int y = nuc.y - 1; y <= nuc.y; y++)
+	// {
+	// if (x == nuc.x && y == nuc.y)
+	// continue;
+	//
+	// Nucleotide other = get(x, y);
+	//
+	// if (other != null)
+	// {
+	// if (x == nuc.x || y == nuc.y)
+	// {
+	// straights.add(other);
+	// }
+	// else
+	// {
+	// diagonals.add(other);
+	// }
+	// }
+	// }
+	// }
+	//
+	// Nucleotide best = null;
+	// int currentenergy = Integer.MAX_VALUE;
+	//
+	// if (nuc.isBond())
+	// currentenergy = nuc.energy();
+	//
+	// /**
+	// * If NO straights => try diagonals
+	// */
+	// if (straights.size() == 0)
+	// {
+	// straights = diagonals;
+	// }
+	//
+	// for (Nucleotide candidate : straights)
+	// {
+	// /**
+	// * Check if conditions are met
+	// */
+	// /*
+	// * if(nuc.dir != candidate.dir.reverse()) continue;
+	// */
+	//
+	// NucleotideDirection nucdir = nuc.dir;
+	// NucleotideDirection canddir = candidate.dir;
+	//
+	// if (nucdir != canddir.reverse())
+	// {
+	// if (nuc.previous != null)
+	// nucdir = nuc.previous.dir;
+	// if (candidate.previous != null)
+	// canddir = candidate.previous.dir;
+	//
+	// if (nucdir != canddir.reverse())
+	// continue;
+	// }
+	//
+	// int energy = Nucleotide.calculateEnergy(candidate, nuc);
+	//
+	// /**
+	// * Check if energy is better
+	// */
+	// if (currentenergy < energy)
+	// continue;
+	//
+	// /**
+	// * Check if this bond is better
+	// */
+	// if (candidate.isBond())
+	// {
+	// if (candidate.energy() < energy)
+	// continue;
+	// }
+	//
+	// /**
+	// * Set as best
+	// */
+	// best = candidate;
+	// currentenergy = energy;
+	//
+	// }
+	//
+	// if (best != null)
+	// {
+	// nuc.bondTo(best);
+	//
+	// return true;
+	// }
+	// else
+	// {
+	// return false;
+	// }
+	//
+	// }
 
 	/**
 	 * handles 'aligning' bonding mechanism; loop "bonding" is handled by
@@ -459,7 +701,7 @@ public class RNAField
 
 		for (Nucleotide nuc : structure.values())
 		{
-			e += nuc.energy();
+			e += nuc.energy(this);
 		}
 
 		return e;

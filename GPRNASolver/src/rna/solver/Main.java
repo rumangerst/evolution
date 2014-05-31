@@ -18,8 +18,8 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 5;
-		runner.mutateProbability = 1.0f / 5.0f;
+		runner.registerCount = 20;
+		runner.mutateProbability = 1.0f / 20.0f;
 		
 		
 		
@@ -38,8 +38,8 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 5;
-		runner.mutateProbability = 1.0f / 5.0f;
+		runner.registerCount = 10;
+		runner.mutateProbability = 1.0f / 10.0f;
 		runner.recombProbability = 0.1f;
 		
 		ResultViewer.showResults(runner.evolve());
@@ -57,8 +57,8 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 5;
-		runner.mutateProbability = 1.0f / 5.0f;
+		runner.registerCount = 10;
+		runner.mutateProbability = 1.0f / 10.0f;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -93,8 +93,8 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 40;
-		runner.mutateProbability = 1.0f / 40.0f;
+		runner.registerCount = 100;
+		runner.mutateProbability = 1.0f / 100.0f;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -147,8 +147,25 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 5;
-		runner.mutateProbability = 1.0f / 5.0f;
+		runner.registerCount = 15;
+		runner.mutateProbability = 1.0f / 15.0f;
+		
+		ResultViewer.showResults(runner.evolve());
+	}
+	
+	/**
+	 *Testet RNA und gibt Result aus
+	 */
+	private static void test(String rna, int registers, float mutate, float recomb)
+	{
+		GPRunner runner = new GPRunner(rna);
+		
+		/**
+		 * Settings
+		 */
+		runner.registerCount = registers;
+		runner.mutateProbability = mutate;
+		runner.recombProbability = recomb;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -171,47 +188,10 @@ public class Main
 		}
 	}
 	
-	/**
-	 * Zur Überprüfung des BOND-Mechanismus
-	 */
-	private static void test()
+	private static void bondingTest(String rna, String instructions)
 	{
 		Individual indiv = new Individual();
-		
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_LEFT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_RIGHT"));
-//		indiv.registers.add(new Register("PUT_LEFT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-//		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		indiv.registers.add(new Register("PUT_RIGHT"));
-		indiv.registers.add(new Register("PUT_LEFT"));
-		indiv.registers.add(new Register("PUT_LEFT"));
-		indiv.registers.add(new Register("PUT_RIGHT"));
-		//indiv.registers.add(new Register("PUT_RIGHT"));
-		//indiv.registers.add(new Register("PUT_RIGHT"));
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		indiv.registers.add(new Register("PUT_STRAIGHT"));
-		
-		
-		//indiv.registers.add(new Register("PUT_RIGHT"));
-		//indiv.registers.add(new Register("PUT_RIGHT"));
-		
-		indiv.run("AAAAAAAAAAAAAAA");
+		indiv.runBondingTest(rna, instructions);
 		
 		ResultViewer.showResults(indiv);
 	}
@@ -239,18 +219,21 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		evilTopoplogyTest2();
-		//pseudoKnotTest1();
+		//evilTopoplogyTest2();
+		pseudoKnotTest1();
 		//easyTopoplogyTest2();
 		//easyTopoplogyTest1();
-		//easyTopoplogyTest3();
+		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
 		
 		//openResult("Results/Evil tRNA/Result5.RNASLV");
 		
-		//openResult("best_individual_0.RNASLV");
+		//openResult("best_individual.RNASLV");
 		//test();
+		
+		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
+		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);
 	}
 
 }

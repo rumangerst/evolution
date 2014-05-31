@@ -1,10 +1,18 @@
 package rna.solver;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 public enum NucleotideDirection
 {
-	NORTH, SOUTH, EAST, WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST;
+	NORTH, SOUTH, EAST, WEST, NORTH_EAST(NORTH, EAST), SOUTH_EAST(SOUTH, EAST), SOUTH_WEST(SOUTH, WEST), NORTH_WEST(NORTH,WEST);
+	
+	public NucleotideDirection[] components;
+	
+	private NucleotideDirection(NucleotideDirection... components)
+	{
+		this.components = components;
+	}
 	
 	/**
 	 * Returns if direction is diagonal
@@ -24,6 +32,23 @@ public enum NucleotideDirection
 			return true;
 		}
 
+		return false;
+	}
+	
+	public boolean intersectsWith(NucleotideDirection dir)
+	{
+		if(dir == this)
+			return true;
+		
+		for(int i = 0; i < components.length;i++)
+		{
+			for(int j = 0; j < dir.components.length; j++)
+			{
+				if(components[i] == dir.components[j])
+					return true;
+			}
+		}
+		
 		return false;
 	}
 	

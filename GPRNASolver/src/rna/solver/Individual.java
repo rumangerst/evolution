@@ -12,8 +12,8 @@ public class Individual implements Comparable
 {
 	public String rna;
 	public double fitness;
-	
-	public int bzr;	
+
+	public int bzr;
 	public boolean infinite_loop;
 
 	/**
@@ -122,16 +122,16 @@ public class Individual implements Comparable
 			System.out.println(reg.toString());
 		}
 	}
-	
+
 	public String[] getRegisterCommands()
 	{
 		String[] output = new String[registers.size()];
-		
-		for(int i = 0; i < registers.size(); i++)
+
+		for (int i = 0; i < registers.size(); i++)
 		{
 			output[i] = registers.get(i).toString();
 		}
-		
+
 		return output;
 	}
 
@@ -146,6 +146,58 @@ public class Individual implements Comparable
 		{
 			registers.add(Register.random(reg));
 		}
+	}
+
+	public void runBondingTest(String rna, String instructions)
+	{
+		// Truncate
+		rna = rna.substring(0,
+				Math.min(rna.length(), instructions.length()) - 1);
+
+		// Prepare RNA data representation
+		this.rna = rna = rna.toUpperCase();
+
+		// Fill stack with A=0, C=1, U=2, G=3
+		for (char c : rna.toCharArray())
+		{
+			if (c == 'A')
+				sequence.add(0);
+			else if (c == 'C')
+				sequence.add(1);
+			else if (c == 'U')
+				sequence.add(2);
+			else
+				sequence.add(3);
+		}
+
+		// Initialize values (set cursor, direction and initial nucleotide
+		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
+				NucleotideDirection.EAST);
+
+		// Ok, ready. Run registers for each character in RNA string
+		// Cancel if stack is empty
+
+		for (int ins = 0; ins < Math.min(rna.length(), instructions.length()); ins++)
+		{
+			RelativeDirection dir = RelativeDirection.STRAIGHT;
+
+			if (instructions.charAt(ins) == 'L')
+			{
+				dir = RelativeDirection.LEFT;
+			}
+			else if (instructions.charAt(ins) == 'S')
+			{
+				dir = RelativeDirection.STRAIGHT;
+			}
+			else
+			{
+				dir = RelativeDirection.RIGHT;
+			}
+
+			put(dir);
+		}
+
+		this.fitness = fitness();
 	}
 
 	/**
@@ -172,58 +224,71 @@ public class Individual implements Comparable
 		}
 
 		// Initialize values (set cursor, direction and initial nucleotide
-		structure.initial(0, 0,
-				NucleotideType.fromInteger(sequence.remove()),
+		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
 				NucleotideDirection.EAST);
 
 		// Ok, ready. Run registers for each character in RNA string
-		// Cancel if stack is empty		
+		// Cancel if stack is empty
 
-		for (int run = 0; run < rna.length() && !sequence.isEmpty(); run++)
+		for (int run = 0; run < rna.length(); run++)
 		{
+			if (sequence.isEmpty())
+				break;
+
 			bzr = 0;
-			
-			
-			while(bzr < registers.size())
+
+			while (bzr < registers.size())
 			{
 				registers.get(bzr).execute(this);
 				bzr++;
+			}
+
+			/**
+			 * Wert von Ausgaberegister ROUT wird in relative richtung
+			 * umgewandelt
+			 */
+			{
+				int value = registers.get(registers.size() - 1).value;
+				RelativeDirection dir = RelativeDirection.fromInteger(value);
+
+				put(dir);
 			}
 		}
 
 		this.fitness = fitness();
 	}
-	
-//	/**
-//	 * Bewertet lange gerade Strecken negativ, außer wenn eine Bindung besteht
-//	 * 
-//	 * 
-//	 * @return
-//	 */
-//	public double compactness()
-//	{
-//		double score = 0;
-//		
-//		for(Nucleotide nuc : structure.structure.values())
-//		{
-//			if(nuc.previous != null && !nuc.isBond())
-//			{
-//				if(nuc.dir == nuc.previous.dir)
-//				{					
-//					score += 1.5;
-//				}
-//				/**
-//				 * Update 1 - prevent diagonal straight lines
-//				 */
-////				else if(nuc.previous.previous != null && !nuc.previous.previous.isBond() && nuc.previous.previous.dir == nuc.dir)
-////				{
-////					score += 1;
-////				}
-//			}
-//		}
-//		
-//		return score;
-//	}
+
+	// /**
+	// * Bewertet lange gerade Strecken negativ, außer wenn eine Bindung besteht
+	// *
+	// *
+	// * @return
+	// */
+	// public double compactness()
+	// {
+	// double score = 0;
+	//
+	// for(Nucleotide nuc : structure.structure.values())
+	// {
+	// if(nuc.previous != null && !nuc.isBond())
+	// {
+	// if(nuc.dir == nuc.previous.dir)
+	// {
+	// score += 1.5;
+	// }
+	// /**
+	// * Update 1 - prevent diagonal straight lines
+	// */
+	// // else if(nuc.previous.previous != null &&
+	// !nuc.previous.previous.isBond() && nuc.previous.previous.dir == nuc.dir)
+	// // {
+	// // score += 1;
+	// // }
+	// }
+	// }
+	//
+	// return score;
+	// }
 
 	/**
 	 * Calculates fitness of this object
@@ -232,19 +297,20 @@ public class Individual implements Comparable
 	 * @return
 	 */
 	public double fitness()
-	{		
+	{
 		double leftover_sequence = rna.length() - structure.structureLength;
 		double energy = structure.energy();
 
-		//return energy + leftover_sequence * leftover_sequence;
-		return energy + 8*leftover_sequence;
+		// return energy + leftover_sequence * leftover_sequence;
+		return energy + 8 * leftover_sequence;
 	}
 
 	/**
 	 * Two cases of mutation: I) Parameter mutation (mutate parameter of
 	 * register) II) Register mutation (new random register)
 	 * 
-	 * @param p1 Register mutation - Probability to select the register	 *
+	 * @param p1
+	 *            Register mutation - Probability to select the register *
 	 */
 	public void mutate(float p)
 	{
@@ -256,12 +322,13 @@ public class Individual implements Comparable
 		for (int i = 0; i < registers.size(); i++)
 		{
 			Register reg = this.registers.get(i);
-			
+
 			if (1 - Register.RANDOM.nextFloat() <= p)
 			{
-				int parameter = Register.RANDOM.nextInt(reg.parameters.length + 1);
-				
-				if(parameter == 0)
+				int parameter = Register.RANDOM
+						.nextInt(reg.parameters.length + 1);
+
+				if (parameter == 0)
 				{
 					/**
 					 * Mutate whole register
@@ -273,7 +340,8 @@ public class Individual implements Comparable
 					/**
 					 * Mutate parameter
 					 */
-					reg.parameters[parameter - 1] = Register.randomTerminal(regCount);
+					reg.parameters[parameter - 1] = Register
+							.randomTerminal(regCount);
 				}
 			}
 		}
@@ -290,7 +358,7 @@ public class Individual implements Comparable
 	public static void recombine(Individual indiv1, Individual indiv2, float px)
 	{
 		int reg = indiv1.registers.size();
-		
+
 		if (1 - Register.RANDOM.nextFloat() <= px)
 		{
 			int index = Register.RANDOM.nextInt(reg);
@@ -313,67 +381,67 @@ public class Individual implements Comparable
 	@Override
 	public int compareTo(Object arg0)
 	{
-		Individual other = (Individual)arg0;
-		
-		if(other.fitness < fitness)
+		Individual other = (Individual) arg0;
+
+		if (other.fitness < fitness)
 			return 1;
-		if(fitness < other.fitness)
+		if (fitness < other.fitness)
 			return -1;
-		
+
 		return 0;
 	}
-	
+
 	public void write(String file) throws IOException
 	{
 		FileWriter wr = new FileWriter(file);
-		
+
 		wr.write(">Individual with Fitness " + fitness + "\n");
 		wr.write(rna + "\n");
-		
-		for(Register reg : registers)
+
+		for (Register reg : registers)
 		{
 			wr.write(reg.label);
-			
-			for(int i = 0; i < reg.parameters.length; i++)
+
+			for (int i = 0; i < reg.parameters.length; i++)
 			{
 				wr.write(" " + reg.parameters[i]);
 			}
-			
+
 			wr.write("\n");
 		}
-		
+
 		wr.close();
 	}
-	
+
 	public static Individual load(String file) throws IOException
 	{
 		BufferedReader rd = new BufferedReader(new FileReader(file));
-		
-		rd.readLine(); //ignore
-		
+
+		rd.readLine(); // ignore
+
 		String rna = rd.readLine();
 		ArrayList<Register> registers = new ArrayList<Register>();
-		
+
 		String buffer = null;
-		
-		while((buffer = rd.readLine()) != null)
+
+		while ((buffer = rd.readLine()) != null)
 		{
 			String[] cmd = buffer.split(" ");
-			
-			if(cmd.length == 0)
+
+			if (cmd.length == 0)
 				break;
-			
+
 			String label = cmd[0];
 			String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
-			
+
 			registers.add(new Register(label, params));
 		}
-		
+
 		Individual indiv = new Individual();
 		indiv.registers = registers;
-		
+
 		indiv.run(rna);
-		
+
 		return indiv;
 	}
 }

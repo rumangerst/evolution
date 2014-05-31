@@ -18,18 +18,31 @@ public class Register
 	/**
 	 * Terminale Funktionen ohne Parameter
 	 */
-	public static final String[] TERMINALS = new String[] { "NUMBER",
-			"REGISTER_VALUE", "PUT_STRAIGHT", "PUT_LEFT", "PUT_RIGHT",
-			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "UNDO",
-			"ENERGY", "LENGTH", "STACK", "PREV", "NEXT", "SKIP" }; // GOTO
-																	// entfernt
+	public static final String[] TERMINAL_FUNCTIONS = new String[] { "NUMBER",
+			"REGISTER_VALUE", "COLLIDE_STRAIGHT", "COLLIDE_LEFT",
+			"COLLIDE_RIGHT", "ENERGY", "LENGTH", "STACK", "PREV", "NEXT",
+			"SKIP", "SKIP%", "LEFT", "RIGHT", "STRAIGHT", "ROUT" }; // Umstellung
+	// auf
+	// Effect-Model:
+	// Effekt
+	// ist
+	// Rückgabe
+	// vom
+	// höchsten
+	// Register,
+	// kein
+	// Seiteneffekt
+	// von PUT_x
+	// UNDO entfernt
+
 	/**
 	 * Funktionen für Variablenabfragen ...
 	 */
 	public static final String[] FUNCTIONS = new String[] { "TERMINAL",
 			"IF_LESS", "IF_GREATER", "IF_EQUALS", "ADD", "SUBTRACT",
 			"MULTIPLY", "DIVIDE", "LOOK_BACK", "LOOK_FORWARD",
-			"CALCULATE_ENERGY", "GETBOND", "PURINE", "PYRIMIDINE", "DO", "PRG5" }; // UPDATE_BONDING entfernt
+			"CALCULATE_ENERGY", "GETBOND", "PURINE", "PYRIMIDINE", "SUM",
+			"PRG5", "RETURN" }; // UPDATE_BONDING entfernt
 
 	public String label;
 	public String[] parameters;
@@ -50,8 +63,11 @@ public class Register
 	public Register(Register tocopy)
 	{
 		this.label = tocopy.label;
-		this.value = tocopy.value;
 		this.parameters = tocopy.parameters.clone();
+		this.value = 0;
+
+		// Hinweis: value nicht kopieren!
+		// Nur label und Parameter sind wichtig!
 	}
 
 	/**
@@ -67,23 +83,23 @@ public class Register
 		if (label.length() == 0)
 			return 0;
 
-		/**
-		 * PUT_X functions
-		 */
-		if (label.equals("PUT_STRAIGHT"))
-		{
-			return individual.put(RelativeDirection.STRAIGHT);
-		}
-		if (label.equals("PUT_LEFT"))
-		{
-			return individual.put(RelativeDirection.LEFT);
-
-		}
-		if (label.equals("PUT_RIGHT"))
-		{
-			return individual.put(RelativeDirection.RIGHT);
-
-		}
+		// /**
+		// * PUT_X functions
+		// */
+		// if (label.equals("PUT_STRAIGHT"))
+		// {
+		// return individual.put(RelativeDirection.STRAIGHT);
+		// }
+		// if (label.equals("PUT_LEFT"))
+		// {
+		// return individual.put(RelativeDirection.LEFT);
+		//
+		// }
+		// if (label.equals("PUT_RIGHT"))
+		// {
+		// return individual.put(RelativeDirection.RIGHT);
+		//
+		// }
 
 		/**
 		 * COLLIDE_X functions
@@ -172,11 +188,55 @@ public class Register
 		}
 
 		/**
+		 * Konstaten für LINKS, RECHTS und GERADEAUS
+		 */
+		if (label.equals("LEFT"))
+		{
+			return -1;
+		}
+		if (label.equals("STRAIGHT"))
+		{
+			return 0;
+		}
+		if (label.equals("RIGHT"))
+		{
+			return 1;
+		}
+
+		/**
+		 * ROUT, Pointer auf höchsten Register
+		 */
+		if (label.equals("ROUT"))
+		{
+			label = "R" + (individual.registers.size() - 1);
+		}
+
+		/**
 		 * No known label => must be a number or a Rx reference
 		 */
 		if (label.startsWith("R"))
 		{
-			return Integer.parseInt(label.substring(1));
+			int id = Integer.parseInt(label.substring(1));
+
+			if (id < 0 || id > individual.registers.size())
+			{
+				return -1;
+			}
+
+			return individual.registers.get(id).value;
+		}
+		else if (label.startsWith("SKIP")) //SKIPi-Funktion
+		{
+			int id = Integer.parseInt(label.substring(4));
+
+			if (id < 0)
+			{
+				return -1;
+			}
+			
+			individual.bzr+=id;
+
+			return 0;
 		}
 		else
 		{
@@ -387,7 +447,7 @@ public class Register
 			return;
 		}
 
-		if (label.equals("DO"))
+		if (label.equals("SUM"))
 		{
 			int r1 = executeTerminal(individual, parameters[0]);
 
@@ -399,7 +459,7 @@ public class Register
 			else
 			{
 				value = 0;
-				
+
 				for (int i = 0; i < r1; i++)
 				{
 					value += executeTerminal(individual, parameters[1]);
@@ -408,16 +468,33 @@ public class Register
 
 			return;
 		}
-		
-		if (label.equals("PRG5") )
+
+		if (label.equals("PRG5"))
 		{
 			value = 0;
-			
-			for(int i = 0; i < parameters.length;i++)
+
+			for (int i = 0; i < parameters.length; i++)
 			{
 				value += executeTerminal(individual, parameters[i]);
 			}
-			
+
+			return;
+		}
+
+		/**
+		 * Return setzt Wert von Ausgaberegister auf P1, dann BZR auf genügend
+		 * großen Wert; Schleife wird abbrechen und P1 wird vom Programm als
+		 * PUT-Richtung benutzt
+		 */
+		if (label.equals("RETURN"))
+		{
+			int r1 = executeTerminal(individual, parameters[0]);
+
+			value = r1;
+
+			individual.registers.get(individual.registers.size() - 1).value = r1;
+			individual.bzr = individual.registers.size();
+
 			return;
 		}
 
@@ -453,7 +530,8 @@ public class Register
 	 */
 	public static String randomTerminal(int registerCount)
 	{
-		String label = TERMINALS[RANDOM.nextInt(TERMINALS.length)];
+		String label = TERMINAL_FUNCTIONS[RANDOM
+				.nextInt(TERMINAL_FUNCTIONS.length)];
 
 		// A number
 		if (label.equals("NUMBER"))
@@ -464,6 +542,11 @@ public class Register
 		if (label.equals("REGISTER_VALUE"))
 		{
 			return ("R" + RANDOM.nextInt(registerCount));
+		}
+		// Skip x registers
+		if (label.equals("SKIP%"))
+		{
+			return ("SKIP" + RANDOM.nextInt(registerCount));
 		}
 
 		// GOTO entfernt, hat nur probleme gemacht!
@@ -584,9 +667,9 @@ public class Register
 		/**
 		 * DO P1 P2
 		 */
-		if (label.equals("DO"))
+		if (label.equals("SUM"))
 		{
-			return new Register("DO", randomTerminal(registerCount),
+			return new Register("SUM", randomTerminal(registerCount),
 					randomTerminal(registerCount));
 		}
 
@@ -600,6 +683,14 @@ public class Register
 					randomTerminal(registerCount),
 					randomTerminal(registerCount),
 					randomTerminal(registerCount));
+		}
+
+		/**
+		 * RETURN P1
+		 */
+		if (label.equals("RETURN"))
+		{
+			return new Register("RETURN", randomTerminal(registerCount));
 		}
 
 		return new Register(randomTerminal(registerCount));

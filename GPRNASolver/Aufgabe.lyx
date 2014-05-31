@@ -354,15 +354,7 @@ Keine Bindung
 \begin_inset Text
 
 \begin_layout Plain Layout
-Seltsame 
-\begin_inset Quotes eld
-\end_inset
-
-Bindung
-\begin_inset Quotes erd
-\end_inset
-
- (A-A, ...)
+Sterische Konflikte pro Nukleotid
 \end_layout
 
 \end_inset
@@ -371,7 +363,7 @@ Bindung
 \begin_inset Text
 
 \begin_layout Plain Layout
-1
+5
 \end_layout
 
 \end_inset
@@ -380,18 +372,9 @@ Bindung
 \begin_inset Text
 
 \begin_layout Plain Layout
-In der richtigen RNA sind A-A u.Ä.
- keine Bindung.
- Der Bindungsalgorithmus verbindet diese aber trotzdem, um aneinanderliegende
- Nukleotide besser zu bewerten als 
-\begin_inset Quotes eld
-\end_inset
-
-frei schwimmende
-\begin_inset Quotes erd
-\end_inset
-
-.
+Es werden die Nukleotide drumherum betrachtet.
+ Wenn eines nicht der Vorgänger, Nachfolger oder der Partner (oder dessen
+ Vorgänger/Nachfolger) ist, wird das entsprechend bewertet.
 \end_layout
 
 \end_inset
@@ -449,15 +432,24 @@ Ein Individuum hat eine vorbestimmt Anzahl an Registern
  abgebildet.
  Das Terminal wird im Tupel als Wert gespeichert.
  Also: 
-\begin_inset Formula $I(R_{x})=R_{x}'$
+\begin_inset Formula $I(R_{x})=R_{x}'\Longleftrightarrow I((l,P,v))=(l,p,v')$
 \end_inset
 
- mit veränderten Wert v.
+ .
 \end_layout
 
 \begin_layout Standard
 Beim Ablaufen des Programms werden für jedes Nukleotid in der Sequenz alle
- Register nacheinander ausgeführt:
+ Register nacheinander ausgeführt und der Wert des letzen Registers in eine
+ relative Richtung umgewandelte mit 
+\begin_inset Formula $dir(x)=\begin{cases}
+links & (x+1)\, mod\,3=0\\
+geradeaus & (x+1)\, mod\,3=1\\
+rechts & (x+1)\, mod\,3=2
+\end{cases}$
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
@@ -467,7 +459,7 @@ status open
 
 \begin_layout Plain Layout
 
-DO COUNT(Nucleotides) TIMES:
+FOR EACH nucleotide IN sequence:
 \end_layout
 
 \begin_layout Plain Layout
@@ -480,29 +472,14 @@ DO COUNT(Nucleotides) TIMES:
 		R(i) <- Interpret(R(i))
 \end_layout
 
-\end_inset
+\begin_layout Plain Layout
 
-
+	appendNucleotide(nucleotide, dir(R(x))) //R(x) ist letztes Register
 \end_layout
 
-\begin_layout Standard
-Zum Funktionsset eines Registers gehören auch die Funktionen PUT_STRAIGHT,
- PUT_LEFT, PUT_RIGHT, die das oben beschriebene Hinzufügen des Nukleotids
- an das bestehende Nukleotid durchführen.
- Wenn die Registerzahl mindestens so groß ist, wie die Sequenzlänge, dann
- reichen nur diese 3 Funktionen, um eine Sekundärstruktur aufzubauen.
- Die Registerzahl soll aber deutlich niediger sein und das Programm soll
- 
-\begin_inset Quotes eld
 \end_inset
 
-intelligent
-\begin_inset Quotes erd
-\end_inset
 
- Nukleotide hinzufügen.
- Daher gibt es noch Funktionen, die Werte vergleichen, die Energie abrufen,
- Look-Around-Funktionen, etc.
 \end_layout
 
 \begin_layout Section*
@@ -547,7 +524,7 @@ LOOK_BACK LOOK_FORWARD 5 //Funktioniert nicht!
 
 \begin_layout Plain Layout
 
-IF_EQUAL R1 R4 PUT_STRAIGHT PUT_RIGHT //Funktioniert
+IF_EQUAL R1 R4 SKIP SKIP2 //Funktioniert
 \end_layout
 
 \end_inset
@@ -573,7 +550,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -704,7 +681,7 @@ Addiert 1 zum bzr, sodass das nächste Register geskippt wird.
 \begin_inset Text
 
 \begin_layout Plain Layout
-UNDO
+ROUT
 \end_layout
 
 \end_inset
@@ -722,7 +699,71 @@ Terminal
 \begin_inset Text
 
 \begin_layout Plain Layout
-Macht letzte Aktion rückgängig
+Gibt Wert des letzten Registers zurück.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SKIPx mit x = 0 ...
+ Registerindex
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Überspringt x Register.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RETURN P1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nicht-Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Setzt letztes Register 
+\begin_inset Formula $R_{x}$
+\end_inset
+
+ auf P1 und den BZR auf die Sequenzlänge.
+ Das Programm benutzt dann P1 für die Richtung.
 \end_layout
 
 \end_inset
@@ -857,7 +898,7 @@ IF parameter == 0:
 
 \begin_layout Plain Layout
 
-	Mutate whole register
+	Register durch random Register ersetzen
 \end_layout
 
 \begin_layout Plain Layout
@@ -1034,9 +1075,10 @@ Function set
 
 \begin_layout Plain Layout
 IF_LESS, IF_GREATER, IF_EQUAL, ADD, SUBTRACT, MULTIPLY, DIVIDE, LOOK_BACK,
- LOOK_FORWARD, GETBOND,PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT, COLLIDE_STRAIGHT,
- COLLIDE_LEFT, COLLIDE_RIGHT, UNDO,ENERGY,LENGTH,STACK,R0 ...
- Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, DO, SKIP, PRG5
+ LOOK_FORWARD, GETBOND, COLLIDE_STRAIGHT, COLLIDE_LEFT, COLLIDE_RIGHT, ENERGY,LE
+NGTH,STACK,R0 ...
+ Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, DO, SKIP, SKIPi
+ (Überspringe i Register), PRG5, RETURN, LEFT, RIGHT, STRAIGHT, ROUT
 \end_layout
 
 \end_inset

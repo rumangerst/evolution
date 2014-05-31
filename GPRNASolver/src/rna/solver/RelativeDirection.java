@@ -16,4 +16,16 @@ public enum RelativeDirection
 		
 		return previousdir.rotateRight();
 	}
+	
+	public static RelativeDirection fromInteger(int i)
+	{
+		i+=1; //Shift nach Rechts
+		i = Math.abs(i) % 3;
+		
+		if(i == 0)
+			return LEFT;
+		else if(i == 1)
+			return STRAIGHT;
+		return RIGHT;
+	}
 }

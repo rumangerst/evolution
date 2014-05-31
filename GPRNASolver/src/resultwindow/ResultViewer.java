@@ -107,10 +107,11 @@ public class ResultViewer extends JFrame
 		
 		{
 			StringBuilder str = new StringBuilder();
+			String[] commands = indiv.getRegisterCommands();
 			
-			for(String w : indiv.getRegisterCommands())
+			for(int i = 0; i < commands.length;i++)
 			{
-				str.append(w + "\n");
+				str.append("R" + i + ":\t" + commands[i] + "\n");
 			}
 			
 			code.setText(str.toString());
