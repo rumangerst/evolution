@@ -924,10 +924,9 @@ Allgemeiner Ablauf
 
 \begin_layout Standard
 Das Programm beginnt mit einer Initialpopulation, die Bewertet wird.
- Es werden die 10 Besten Eltern ausgewählt und paarweise 100 mal rekombiniert
- (Also 200 Kinder pro Paarung).
- Die Kinder werden als neue Population gesetzt (vgl.
- Komma-Strategie).
+ Es werden dann 200 mal 2 Eltern mit Turnierselektion ausgewählt und dann
+ jeweils 2 Kinder erzeugt.
+ Die Elterngeneration ist nicht Teil der neuen Generation.
 \end_layout
 
 \begin_layout Standard
@@ -946,7 +945,7 @@ population <- RANDOM_POPULATION(400)
 
 \begin_layout Plain Layout
 
-DO 200 TIMES:
+DO 1000 TIMES:
 \end_layout
 
 \begin_layout Plain Layout
@@ -961,7 +960,22 @@ DO 200 TIMES:
 
 \begin_layout Plain Layout
 
-	parents <- SELECT 10 BEST FROM population
+	
+\end_layout
+
+\begin_layout Plain Layout
+
+	DO 200 TIMES:
+\end_layout
+
+\begin_layout Plain Layout
+
+		p1,p2 <- turnierSelection(n=50, q=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+		child1,child2 <- recombine(p1, p2)
 \end_layout
 
 \begin_layout Plain Layout
@@ -970,17 +984,25 @@ DO 200 TIMES:
 
 \begin_layout Plain Layout
 
-	FOR EACH PAIR IN parents: //Paarweise Kinder erzeugen
+		mutate(child1)
 \end_layout
 
 \begin_layout Plain Layout
 
-		DO 100 TIMES: //jedes Paar erzeugt 200 = 100*2 Kinder
+		mutate(child2)
 \end_layout
 
 \begin_layout Plain Layout
 
-			newpop.add(MUTATE(RECOMB(p1, p2)))
+\end_layout
+
+\begin_layout Plain Layout
+
+		newpop.add(child1, child2)
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout

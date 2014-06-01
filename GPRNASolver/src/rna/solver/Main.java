@@ -38,8 +38,8 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 10;
-		runner.mutateProbability = 1.0f / 10.0f;
+		runner.registerCount = 8;
+		runner.mutateProbability = 1.0f / 8.0f;
 		runner.recombProbability = 0.1f;
 		
 		ResultViewer.showResults(runner.evolve());
@@ -93,8 +93,9 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 100;
-		runner.mutateProbability = 1.0f / 100.0f;
+		runner.generations = 2000;
+		runner.registerCount = 200;
+		runner.mutateProbability = 1.0f / 200.0f;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -111,8 +112,9 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 40;
-		runner.mutateProbability = 1.0f / 40.0f;
+		runner.generations = 2000;
+		runner.registerCount = 200;
+		runner.mutateProbability = 1.0f / 200.0f;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -219,8 +221,8 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		//evilTopoplogyTest2();
-		pseudoKnotTest1();
+		evilTopoplogyTest2();
+		//pseudoKnotTest1();
 		//easyTopoplogyTest2();
 		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();

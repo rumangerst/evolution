@@ -230,7 +230,7 @@ public class Individual implements Comparable
 		// Ok, ready. Run registers for each character in RNA string
 		// Cancel if stack is empty
 
-		for (int run = 0; run < rna.length(); run++)
+		for (int run = 0; run < rna.length() * 10; run++)
 		{
 			if (sequence.isEmpty())
 				break;

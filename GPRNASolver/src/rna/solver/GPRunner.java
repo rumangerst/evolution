@@ -15,9 +15,15 @@ public class GPRunner
 {
 	public String rna;
 
+	public int generations;
+	
 	public int populationSize;
-	public int parents;
 	public int children;
+	
+	/**
+	 * Turniersekeltion Turniere
+	 */
+	public int tournaments;
 
 	public float recombProbability;
 	public float mutateProbability;
@@ -30,13 +36,30 @@ public class GPRunner
 	{
 		this.rna = rna;
 
+		this.generations = 1000;
+		
 		this.populationSize = 400;
-		this.children = 100;
-		this.parents = 10;
+		this.children = 200; //jeder elter erzeugt 2 Kinder	
 		this.registerCount = 40;
+		
+		this.tournaments = 50;
 
 		recombProbability = 0.2f;
 		mutateProbability = 1.0f / this.registerCount;
+	}
+	
+	public List<Individual> tournamentSelection()
+	{
+		LinkedList<Individual> results = new LinkedList<Individual>();
+		
+		for(int i = 0; i < tournaments; i++)
+		{
+			results.add(population.get(Register.RANDOM.nextInt(population.size())));
+		}
+		
+		Collections.sort(results);
+		
+		return results.subList(0, 2);
 	}
 
 	public Individual evolve()
@@ -55,7 +78,7 @@ public class GPRunner
 		/**
 		 * Evolution loop
 		 */
-		for (int generation = 0; generation < 200; generation++)
+		for (int generation = 0; generation < generations; generation++)
 		{
 			System.out.println("Generation " + (generation + 1));
 
@@ -67,19 +90,19 @@ public class GPRunner
 				indiv.run(rna);
 			}
 
-			/**
-			 * Sort population by fitness
-			 */
-			Collections.sort(population);
+//			/**
+//			 * Sort population by fitness
+//			 */
+//			Collections.sort(population);
+//
+//			// Just some text
+//			System.out
+//					.println("Best fitness: " + population.getFirst().fitness);
 
-			// Just some text
-			System.out
-					.println("Best fitness: " + population.getFirst().fitness);
-
-			/**
-			 * Select parents
-			 */
-			List<Individual> parents = population.subList(0, this.parents - 1);
+//			/**
+//			 * Select parents
+//			 */
+//			List<Individual> parents = population.subList(0, this.parents - 1);
 
 			/**
 			 * Create new population *
@@ -95,30 +118,52 @@ public class GPRunner
 			// newpop.add(new Individual(indiv));
 			// }
 
-			this.population = newpop;
-
-			/**
-			 * Make new children by pairwise recombining parents
-			 */
-			while (!parents.isEmpty())
+			
+//
+//			/**
+//			 * Make new children by pairwise recombining parents
+//			 */
+//			while (!parents.isEmpty())
+//			{
+//				Individual father = parents.remove(0);
+//
+//				for (Individual mother : parents)
+//				{
+//					for (int i = 0; i < children; i++)
+//					{
+//						Individual child1 = new Individual(father);
+//						Individual child2 = new Individual(mother);
+//
+//						Individual.recombine(child1, child2, recombProbability);
+//						child1.mutate(mutateProbability);
+//
+//						population.add(child1);
+//						population.add(child2);
+//					}
+//				}
+//			}
+			
+			for(int i = 0; i < children; i++)
 			{
-				Individual father = parents.remove(0);
-
-				for (Individual mother : parents)
-				{
-					for (int i = 0; i < children; i++)
-					{
-						Individual child1 = new Individual(father);
-						Individual child2 = new Individual(mother);
-
-						Individual.recombine(child1, child2, recombProbability);
-						child1.mutate(mutateProbability);
-
-						population.add(child1);
-						population.add(child2);
-					}
-				}
+				List<Individual> parents = tournamentSelection();
+				
+				Individual child1 = new Individual(parents.get(0));
+				Individual child2 = new Individual(parents.get(1));
+				
+				Individual.recombine(child1, child2, recombProbability);
+				
+				child1.mutate(mutateProbability);
+				child2.mutate(mutateProbability);
+				
+				newpop.add(child1);
+				newpop.add(child2);
 			}
+			
+			/**
+			 * Population aktualisieren
+			 */
+			
+			this.population = newpop;
 
 		}
 

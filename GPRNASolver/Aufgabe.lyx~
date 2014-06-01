@@ -372,7 +372,9 @@ Sterische Konflikte pro Nukleotid
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Es werden die Nukleotide drumherum betrachtet.
+ Wenn eines nicht der Vorgänger, Nachfolger oder der Partner (oder dessen
+ Vorgänger/Nachfolger) ist, wird das entsprechend bewertet.
 \end_layout
 
 \end_inset
@@ -944,7 +946,7 @@ population <- RANDOM_POPULATION(400)
 
 \begin_layout Plain Layout
 
-DO 200 TIMES:
+DO 1000 TIMES:
 \end_layout
 
 \begin_layout Plain Layout
@@ -959,7 +961,22 @@ DO 200 TIMES:
 
 \begin_layout Plain Layout
 
-	parents <- SELECT 10 BEST FROM population
+	
+\end_layout
+
+\begin_layout Plain Layout
+
+	DO 200 TIMES:
+\end_layout
+
+\begin_layout Plain Layout
+
+		p1,p2 <- turnierSelection(n=50, q=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+		child1,child2 <- recombine(p1, p2)
 \end_layout
 
 \begin_layout Plain Layout
@@ -968,17 +985,25 @@ DO 200 TIMES:
 
 \begin_layout Plain Layout
 
-	FOR EACH PAIR IN parents: //Paarweise Kinder erzeugen
+		mutate(child1)
 \end_layout
 
 \begin_layout Plain Layout
 
-		DO 100 TIMES: //jedes Paar erzeugt 200 = 100*2 Kinder
+		mutate(child2)
 \end_layout
 
 \begin_layout Plain Layout
 
-			newpop.add(MUTATE(RECOMB(p1, p2)))
+\end_layout
+
+\begin_layout Plain Layout
+
+		newpop.add(child1, child2)
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout
