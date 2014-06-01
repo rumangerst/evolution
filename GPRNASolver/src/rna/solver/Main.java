@@ -221,10 +221,10 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		evilTopoplogyTest2();
+		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
 		//easyTopoplogyTest2();
-		//easyTopoplogyTest1();
+		easyTopoplogyTest1();
 		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
