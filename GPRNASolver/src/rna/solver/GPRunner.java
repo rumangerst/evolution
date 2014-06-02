@@ -20,6 +20,8 @@ public class GPRunner
 	public int populationSize;
 	public int children;
 	
+	ProgramType type;
+	
 	/**
 	 * Turniersekeltion Turniere
 	 */
@@ -34,6 +36,7 @@ public class GPRunner
 
 	public GPRunner(String rna)
 	{
+		this.type = ProgramType.EFFECT;
 		this.rna = rna;
 
 		this.generations = 1000;
@@ -69,8 +72,8 @@ public class GPRunner
 		 */
 		for (int i = 0; i < populationSize; i++)
 		{
-			Individual indiv = new Individual();
-			indiv.createRandomRegister(registerCount);
+			Individual indiv = new Individual(type);
+			indiv.random(registerCount, 3, 3, 5);
 
 			population.add(indiv);
 		}

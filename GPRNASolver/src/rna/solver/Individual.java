@@ -13,8 +13,7 @@ public class Individual implements Comparable
 	public String rna;
 	public double fitness;
 
-	public int bzr;
-	public boolean infinite_loop;
+	public ProgramType type;
 
 	/**
 	 * Holds sequence
@@ -27,15 +26,20 @@ public class Individual implements Comparable
 	public RNAField structure;
 
 	/**
-	 * Registers, containing program
+	 * Main function
 	 */
-	public ArrayList<Register> registers;
+	public Function mainFunction;
 
-	public Individual()
+	/**
+	 * ADF functions
+	 */
+	public ArrayList<Function> adfs;
+
+	public Individual(ProgramType type)
 	{
 		sequence = new LinkedList<Integer>();
 		structure = new RNAField();
-		registers = new ArrayList<Register>();
+		this.type = type;
 	}
 
 	/**
@@ -45,26 +49,14 @@ public class Individual implements Comparable
 	 */
 	public Individual(Individual tocopy)
 	{
-		this();
+		this(tocopy.type);
 
-		for (Register reg : tocopy.registers)
+		this.mainFunction = new Function(tocopy.mainFunction);
+		this.adfs = new ArrayList<Function>();
+		for (Function reg : tocopy.adfs)
 		{
-			registers.add(new Register(reg));
+			adfs.add(new Function(reg));
 		}
-	}
-
-	/**
-	 * Return register with index, returns "0"-Register if not valid
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Register getRegister(int index)
-	{
-		if (index < 0 || index >= registers.size())
-			return new Register("0");
-
-		return registers.get(index);
 	}
 
 	/**
@@ -115,37 +107,20 @@ public class Individual implements Comparable
 		return structure.structureLength;
 	}
 
-	public void printRegisters()
-	{
-		for (Register reg : registers)
-		{
-			System.out.println(reg.toString());
-		}
-	}
-
-	public String[] getRegisterCommands()
-	{
-		String[] output = new String[registers.size()];
-
-		for (int i = 0; i < registers.size(); i++)
-		{
-			output[i] = registers.get(i).toString();
-		}
-
-		return output;
-	}
-
 	/**
 	 * Clears registers and creates a new random one
 	 */
-	public void createRandomRegister(int reg)
+	public void random(int reg, int adfs_count, int adfs_param, int adfs_reg)
 	{
-		registers.clear();
+		adfs = new ArrayList<Function>();
+		adfs.clear();
 
-		for (int i = 0; i < reg; i++)
+		for (int i = 0; i < adfs_count; i++)
 		{
-			registers.add(Register.random(reg));
+			adfs.add(new Function(type, adfs_param, adfs_reg, null));
 		}
+
+		mainFunction = new Function(type, 0, reg, adfs);
 	}
 
 	public void runBondingTest(String rna, String instructions)
@@ -235,23 +210,18 @@ public class Individual implements Comparable
 			if (sequence.isEmpty())
 				break;
 
-			bzr = 0;
-
-			while (bzr < registers.size())
-			{
-				registers.get(bzr).execute(this);
-				bzr++;
-			}
-
 			/**
-			 * Wert von Ausgaberegister ROUT wird in relative richtung
+			 * Main-Funktion wird aufgeführt und Ausgabe in Direction
 			 * umgewandelt
 			 */
 			{
-				int value = registers.get(registers.size() - 1).value;
-				RelativeDirection dir = RelativeDirection.fromInteger(value);
-
-				put(dir);
+				int value = mainFunction.execute(this, null, adfs);
+				if (type == ProgramType.EFFECT)
+				{
+					RelativeDirection dir = RelativeDirection
+							.fromInteger(value);
+					put(dir);
+				}
 			}
 		}
 
@@ -306,44 +276,17 @@ public class Individual implements Comparable
 	}
 
 	/**
-	 * Two cases of mutation: I) Parameter mutation (mutate parameter of
-	 * register) II) Register mutation (new random register)
+	 * Mutiert alle Funktionen
 	 * 
-	 * @param p1
-	 *            Register mutation - Probability to select the register *
+	 * @param p
 	 */
 	public void mutate(float p)
 	{
-		int regCount = this.registers.size();
+		mainFunction.mutate(p);
 
-		/**
-		 * Parameter mutation replace parameters by random terminals
-		 */
-		for (int i = 0; i < registers.size(); i++)
+		for (Function f : adfs)
 		{
-			Register reg = this.registers.get(i);
-
-			if (1 - Register.RANDOM.nextFloat() <= p)
-			{
-				int parameter = Register.RANDOM
-						.nextInt(reg.parameters.length + 1);
-
-				if (parameter == 0)
-				{
-					/**
-					 * Mutate whole register
-					 */
-					this.registers.set(i, Register.random(regCount));
-				}
-				else
-				{
-					/**
-					 * Mutate parameter
-					 */
-					reg.parameters[parameter - 1] = Register
-							.randomTerminal(regCount);
-				}
-			}
+			f.mutate(p);
 		}
 	}
 
@@ -357,24 +300,11 @@ public class Individual implements Comparable
 	 */
 	public static void recombine(Individual indiv1, Individual indiv2, float px)
 	{
-		int reg = indiv1.registers.size();
+		Function.recombine(indiv1.mainFunction, indiv2.mainFunction, px);
 
-		if (1 - Register.RANDOM.nextFloat() <= px)
+		for (int n = 0; n < indiv1.adfs.size(); n++)
 		{
-			int index = Register.RANDOM.nextInt(reg);
-
-			if (index == 0 || index == reg - 1)
-				return;
-
-			// X-Over
-			for (int i = 0; i < index; i++)
-			{
-				indiv1.registers.set(i, indiv2.registers.get(i));
-			}
-			for (int i = index; i < reg; i++)
-			{
-				indiv2.registers.set(i, indiv1.registers.get(i));
-			}
+			Function.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n), px);
 		}
 	}
 
@@ -396,18 +326,14 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
+		wr.write(type.name() +"\n");
 		wr.write(rna + "\n");
 
-		for (Register reg : registers)
+		mainFunction.write(wr, "MAIN");
+
+		for (int i = 0; i < adfs.size(); i++)
 		{
-			wr.write(reg.label);
-
-			for (int i = 0; i < reg.parameters.length; i++)
-			{
-				wr.write(" " + reg.parameters[i]);
-			}
-
-			wr.write("\n");
+			adfs.get(i).write(wr, "ADF" + i);
 		}
 
 		wr.close();
@@ -415,33 +341,35 @@ public class Individual implements Comparable
 
 	public static Individual load(String file) throws IOException
 	{
-		BufferedReader rd = new BufferedReader(new FileReader(file));
+		// BufferedReader rd = new BufferedReader(new FileReader(file));
+		//
+		// rd.readLine(); // ignore
+		//
+		// String rna = rd.readLine();
+		// ArrayList<Register> registers = new ArrayList<Register>();
+		//
+		// String buffer = null;
+		//
+		// while ((buffer = rd.readLine()) != null)
+		// {
+		// String[] cmd = buffer.split(" ");
+		//
+		// if (cmd.length == 0)
+		// break;
+		//
+		// String label = cmd[0];
+		// String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
+		//
+		// registers.add(new Register(label, params));
+		// }
+		//
+		// Individual indiv = new Individual();
+		// indiv.registers = registers;
+		//
+		// indiv.run(rna);
+		//
+		// return indiv;
 
-		rd.readLine(); // ignore
-
-		String rna = rd.readLine();
-		ArrayList<Register> registers = new ArrayList<Register>();
-
-		String buffer = null;
-
-		while ((buffer = rd.readLine()) != null)
-		{
-			String[] cmd = buffer.split(" ");
-
-			if (cmd.length == 0)
-				break;
-
-			String label = cmd[0];
-			String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
-
-			registers.add(new Register(label, params));
-		}
-
-		Individual indiv = new Individual();
-		indiv.registers = registers;
-
-		indiv.run(rna);
-
-		return indiv;
+		throw new RuntimeException("Funktion nicht fertig!");
 	}
 }

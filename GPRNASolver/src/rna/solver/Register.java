@@ -15,34 +15,6 @@ import java.util.Random;
 public class Register
 {
 	public static final Random RANDOM = new Random();
-	/**
-	 * Terminale Funktionen ohne Parameter
-	 */
-	public static final String[] TERMINAL_FUNCTIONS = new String[] { "NUMBER",
-			"REGISTER_VALUE", "COLLIDE_STRAIGHT", "COLLIDE_LEFT",
-			"COLLIDE_RIGHT", "ENERGY", "LENGTH", "STACK", "PREV", "NEXT",
-			"SKIP", "SKIP%", "LEFT", "RIGHT", "STRAIGHT", "ROUT" }; // Umstellung
-	// auf
-	// Effect-Model:
-	// Effekt
-	// ist
-	// Rückgabe
-	// vom
-	// höchsten
-	// Register,
-	// kein
-	// Seiteneffekt
-	// von PUT_x
-	// UNDO entfernt
-
-	/**
-	 * Funktionen für Variablenabfragen ...
-	 */
-	public static final String[] FUNCTIONS = new String[] { "TERMINAL",
-			"IF_LESS", "IF_GREATER", "IF_EQUALS", "ADD", "SUBTRACT",
-			"MULTIPLY", "DIVIDE", "LOOK_BACK", "LOOK_FORWARD",
-			"CALCULATE_ENERGY", "GETBOND", "PURINE", "PYRIMIDINE", "SUM",
-			"PRG5", "RETURN" }; // UPDATE_BONDING entfernt
 
 	public String label;
 	public String[] parameters;
@@ -78,28 +50,29 @@ public class Register
 	 * @param param
 	 * @return
 	 */
-	public int executeTerminal(Individual individual, String label)
+	public int executeTerminal(Individual individual, Function parent,
+			String label)
 	{
 		if (label.length() == 0)
 			return 0;
 
-		// /**
-		// * PUT_X functions
-		// */
-		// if (label.equals("PUT_STRAIGHT"))
-		// {
-		// return individual.put(RelativeDirection.STRAIGHT);
-		// }
-		// if (label.equals("PUT_LEFT"))
-		// {
-		// return individual.put(RelativeDirection.LEFT);
-		//
-		// }
-		// if (label.equals("PUT_RIGHT"))
-		// {
-		// return individual.put(RelativeDirection.RIGHT);
-		//
-		// }
+		/**
+		 * PUT_X functions
+		 */
+		if (label.equals("PUT_STRAIGHT"))
+		{
+			return individual.put(RelativeDirection.STRAIGHT);
+		}
+		if (label.equals("PUT_LEFT"))
+		{
+			return individual.put(RelativeDirection.LEFT);
+
+		}
+		if (label.equals("PUT_RIGHT"))
+		{
+			return individual.put(RelativeDirection.RIGHT);
+
+		}
 
 		/**
 		 * COLLIDE_X functions
@@ -183,7 +156,7 @@ public class Register
 		 */
 		if (label.equals("SKIP"))
 		{
-			individual.bzr++;
+			parent.bzr++;
 			return 0;
 		}
 
@@ -208,7 +181,29 @@ public class Register
 		 */
 		if (label.equals("ROUT"))
 		{
-			label = "R" + (individual.registers.size() - 1);
+			label = "R" + (parent.registers.size() - 1);
+		}
+
+		/**
+		 * ++ und --
+		 */
+		if (label.equals("++"))
+		{
+			value++;
+			return value - 1;
+		}
+		if (label.equals("--"))
+		{
+			value--;
+			return value + 1;
+		}
+
+		/**
+		 * SELF - Eigener wert
+		 */
+		if (label.equals("SELF"))
+		{
+			return value;
 		}
 
 		/**
@@ -218,14 +213,14 @@ public class Register
 		{
 			int id = Integer.parseInt(label.substring(1));
 
-			if (id < 0 || id > individual.registers.size())
+			if (id < 0 || id > parent.registers.size())
 			{
 				return -1;
 			}
 
-			return individual.registers.get(id).value;
+			return parent.registers.get(id).value;
 		}
-		else if (label.startsWith("SKIP")) //SKIPi-Funktion
+		else if (label.startsWith("SKIP")) // SKIPi-Funktion
 		{
 			int id = Integer.parseInt(label.substring(4));
 
@@ -233,10 +228,21 @@ public class Register
 			{
 				return -1;
 			}
-			
-			individual.bzr+=id;
+
+			parent.bzr += id;
 
 			return 0;
+		}
+		else if (label.startsWith("P")) // Zugriff auf Parameter Pi
+		{
+			int id = Integer.parseInt(label.substring(1));
+
+			if (id < 0)
+			{
+				return -1;
+			}
+
+			return parent.parameters[id];
 		}
 		else
 		{
@@ -251,20 +257,20 @@ public class Register
 	 * 
 	 * @return
 	 */
-	public void execute(Individual individual)
+	public void execute(Individual individual, Function parent)
 	{
 		if (label.equals("IF_GREATER"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			if (r1 > r2)
 			{
-				value = executeTerminal(individual, parameters[2]);
+				value = executeTerminal(individual, parent, parameters[2]);
 			}
 			else
 			{
-				value = executeTerminal(individual, parameters[3]);
+				value = executeTerminal(individual, parent, parameters[3]);
 			}
 
 			return;
@@ -272,16 +278,16 @@ public class Register
 		}
 		if (label.equals("IF_LESS"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			if (r1 < r2)
 			{
-				value = executeTerminal(individual, parameters[2]);
+				value = executeTerminal(individual, parent, parameters[2]);
 			}
 			else
 			{
-				value = executeTerminal(individual, parameters[3]);
+				value = executeTerminal(individual, parent, parameters[3]);
 			}
 
 			return;
@@ -289,16 +295,16 @@ public class Register
 		}
 		if (label.equals("IF_EQUAL"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			if (r1 == r2)
 			{
-				value = executeTerminal(individual, parameters[2]);
+				value = executeTerminal(individual, parent, parameters[2]);
 			}
 			else
 			{
-				value = executeTerminal(individual, parameters[3]);
+				value = executeTerminal(individual, parent, parameters[3]);
 			}
 
 			return;
@@ -307,8 +313,8 @@ public class Register
 
 		if (label.equals("ADD"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			value = r1 + r2;
 
@@ -317,8 +323,8 @@ public class Register
 
 		if (label.equals("SUBTRACT"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			value = r1 - r2;
 
@@ -327,8 +333,8 @@ public class Register
 
 		if (label.equals("MULTIPLY"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			value = r1 * r2;
 
@@ -337,8 +343,8 @@ public class Register
 
 		if (label.equals("DIVIDE"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			if (r2 == 0)
 			{
@@ -353,7 +359,7 @@ public class Register
 
 		if (label.equals("LOOK_FORWARD"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.sequence.size())
 				value = -1;
@@ -365,7 +371,7 @@ public class Register
 
 		if (label.equals("LOOK_BACK"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.structure.structureLength)
 				value = -1;
@@ -386,8 +392,8 @@ public class Register
 
 		if (label.equals("CALCULATE_ENERGY"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
-			int r2 = executeTerminal(individual, parameters[1]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[1]);
 
 			NucleotideType type1 = NucleotideType.fromInteger(r1);
 			NucleotideType type2 = NucleotideType.fromInteger(r2);
@@ -399,7 +405,7 @@ public class Register
 
 		if (label.equals("GETBOND"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.structure.structureLength)
 				value = 0;
@@ -421,7 +427,7 @@ public class Register
 
 		if (label.equals("PURINE"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
@@ -435,7 +441,7 @@ public class Register
 
 		if (label.equals("PYRIMIDINE"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
@@ -449,7 +455,7 @@ public class Register
 
 		if (label.equals("SUM"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 > 100)
 			{
@@ -462,7 +468,7 @@ public class Register
 
 				for (int i = 0; i < r1; i++)
 				{
-					value += executeTerminal(individual, parameters[1]);
+					value += executeTerminal(individual, parent, parameters[1]);
 				}
 			}
 
@@ -475,7 +481,7 @@ public class Register
 
 			for (int i = 0; i < parameters.length; i++)
 			{
-				value += executeTerminal(individual, parameters[i]);
+				value += executeTerminal(individual, parent, parameters[i]);
 			}
 
 			return;
@@ -488,13 +494,33 @@ public class Register
 		 */
 		if (label.equals("RETURN"))
 		{
-			int r1 = executeTerminal(individual, parameters[0]);
+			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			value = r1;
 
-			individual.registers.get(individual.registers.size() - 1).value = r1;
-			individual.bzr = individual.registers.size();
+			parent.registers.get(parent.registers.size() - 1).value = r1;
+			parent.bzr = parent.registers.size();
 
+			return;
+		}
+
+		/**
+		 * ADF-Funktion ausführen
+		 */
+		if (label.startsWith("ADF"))
+		{
+			int id = Integer.parseInt(label.substring(3));
+
+			Function adf = parent.adfs.get(id);
+
+			int[] params = new int[adf.parameterCount];
+
+			for (int i = 0; i < params.length; i++)
+			{
+				params[i] = executeTerminal(individual, parent, parameters[i]);
+			}
+
+			value = adf.execute(individual, params, null);
 			return;
 		}
 
@@ -505,7 +531,7 @@ public class Register
 		}
 
 		// Unknown Function, must be a TERMINAL
-		value = executeTerminal(individual, label);
+		value = executeTerminal(individual, parent, label);
 	}
 
 	@Override
@@ -521,179 +547,4 @@ public class Register
 
 		return output;
 	}
-
-	/**
-	 * Returns a random terminal: TERMINAL function, NUMBER or Rx-Reference
-	 * (which is a number)
-	 * 
-	 * @return
-	 */
-	public static String randomTerminal(int registerCount)
-	{
-		String label = TERMINAL_FUNCTIONS[RANDOM
-				.nextInt(TERMINAL_FUNCTIONS.length)];
-
-		// A number
-		if (label.equals("NUMBER"))
-		{
-			return ("" + RANDOM.nextInt());
-		}
-		// A register Rx reference
-		if (label.equals("REGISTER_VALUE"))
-		{
-			return ("R" + RANDOM.nextInt(registerCount));
-		}
-		// Skip x registers
-		if (label.equals("SKIP%"))
-		{
-			return ("SKIP" + RANDOM.nextInt(registerCount));
-		}
-
-		// GOTO entfernt, hat nur probleme gemacht!
-		// // A goto register command
-		// if (label.equals("GOTO"))
-		// {
-		// return ("GOTO" + RANDOM.nextInt(Individual.REGISTERS));
-		// }
-
-		return label;
-	}
-
-	public static Register random(int registerCount)
-	{
-		String label = FUNCTIONS[RANDOM.nextInt(FUNCTIONS.length)];
-
-		if (label.equals("TERMINAL"))
-		{
-			return new Register(randomTerminal(registerCount));
-		}
-
-		/**
-		 * If functions
-		 * 
-		 * IF (X,Y) in R -> T
-		 */
-		if (label.equals("IF_LESS"))
-		{
-			return new Register("IF_LESS", randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-		if (label.equals("IF_GREATER"))
-		{
-			return new Register("IF_GREATER", randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-		if (label.equals("IF_EQUAL"))
-		{
-			return new Register("IF_EQUAL", randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-
-		/**
-		 * ADD, SUBTRACT, MULTIPLY, DIVIDE
-		 */
-		if (label.equals("ADD"))
-		{
-			return new Register("ADD", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-		if (label.equals("SUBTRACT"))
-		{
-			return new Register("SUBTRACT", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-		if (label.equals("MULTIPLY"))
-		{
-			return new Register("MULTIPLY", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-		if (label.equals("DIVIDE"))
-		{
-			return new Register("DIVIDE", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-
-		/**
-		 * LOOK AROUND
-		 */
-		if (label.equals("LOOK_BACK"))
-		{
-			return new Register("LOOK_BACK", randomTerminal(registerCount));
-		}
-		if (label.equals("LOOK_FORWARD"))
-		{
-			return new Register("LOOK_FORWARD", randomTerminal(registerCount));
-		}
-
-		/**
-		 * Entfernt aus Random Generierung
-		 */
-		// /**
-		// * Energy between nucleotides
-		// */
-		// if (label.equals("CALCULATE_ENERGY"))
-		// {
-		// return new Register("CALCULATE_ENERGY",
-		// randomTerminal(registerCount),
-		// randomTerminal(registerCount));
-		// }
-
-		/**
-		 * Nucleotide, given one one is bond to
-		 */
-		if (label.equals("GETBOND"))
-		{
-			return new Register("GETBOND", randomTerminal(registerCount));
-		}
-
-		/**
-		 * PURINE, PYRIMIDINE
-		 */
-		if (label.equals("PURINE"))
-		{
-			return new Register("PURINE", randomTerminal(registerCount));
-		}
-		if (label.equals("PYRIMIDINE"))
-		{
-			return new Register("PYRIMIDINE", randomTerminal(registerCount));
-		}
-
-		/**
-		 * DO P1 P2
-		 */
-		if (label.equals("SUM"))
-		{
-			return new Register("SUM", randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-
-		/**
-		 * PRG5 P1 P2 P3 P4 P5
-		 */
-		if (label.equals("PRG5"))
-		{
-			return new Register("PRG5", randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount),
-					randomTerminal(registerCount));
-		}
-
-		/**
-		 * RETURN P1
-		 */
-		if (label.equals("RETURN"))
-		{
-			return new Register("RETURN", randomTerminal(registerCount));
-		}
-
-		return new Register(randomTerminal(registerCount));
-	}
-
 }

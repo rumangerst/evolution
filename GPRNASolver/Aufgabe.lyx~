@@ -459,7 +459,7 @@ status open
 
 \begin_layout Plain Layout
 
-FOR EACH nucleotide IN sequence:
+DO UNTIL stack.isEmpty() OR isInfinite():
 \end_layout
 
 \begin_layout Plain Layout
@@ -538,11 +538,6 @@ IF_EQUAL R1 R4 SKIP SKIP2 //Funktioniert
 \end_layout
 
 \begin_layout Standard
-Wie bereits oben beschrieben, gibt es neben PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT
- noch weitere Funktionen, von denen nun einige näher erläutert werden:
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
@@ -550,7 +545,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="13" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -799,6 +794,123 @@ Gibt Nukleotid P1 Stellen vor aktuellen zurück (in Zahlenrepräsentation)
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STRAIGHT, LEFT, RIGHT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ganzzahlige Repräsentationen von Richtungen, die das Programm zur Ausgabe
+ benutzen kann.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRG5 P1 P2 P3 P4 P5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nicht-Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Summiert P1 bis P5 auf
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STACK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Anzahl an Nukleotiden, die noch übrig sind.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LENGTH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Länge der erzeugten 2D-Struktur zum jetzigen Zeitpunkt
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -924,10 +1036,9 @@ Allgemeiner Ablauf
 
 \begin_layout Standard
 Das Programm beginnt mit einer Initialpopulation, die Bewertet wird.
- Es werden die 10 Besten Eltern ausgewählt und paarweise 100 mal rekombiniert
- (Also 200 Kinder pro Paarung).
- Die Kinder werden als neue Population gesetzt (vgl.
- Komma-Strategie).
+ Es werden dann 200 mal 2 Eltern mit Turnierselektion ausgewählt und dann
+ jeweils 2 Kinder erzeugt.
+ Die Elterngeneration ist nicht Teil der neuen Generation.
 \end_layout
 
 \begin_layout Standard
@@ -1100,8 +1211,9 @@ Function set
 IF_LESS, IF_GREATER, IF_EQUAL, ADD, SUBTRACT, MULTIPLY, DIVIDE, LOOK_BACK,
  LOOK_FORWARD, GETBOND, COLLIDE_STRAIGHT, COLLIDE_LEFT, COLLIDE_RIGHT, ENERGY,LE
 NGTH,STACK,R0 ...
- Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, DO, SKIP, SKIPi
- (Überspringe i Register), PRG5, RETURN, LEFT, RIGHT, STRAIGHT, ROUT
+ Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, SUM, SKIP,
+ SKIPi (Überspringe i Register), PRG5, RETURN, LEFT, RIGHT, STRAIGHT, ROUT,
+ PRG5
 \end_layout
 
 \end_inset

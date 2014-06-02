@@ -459,7 +459,7 @@ status open
 
 \begin_layout Plain Layout
 
-FOR EACH nucleotide IN sequence:
+DO UNTIL stack.isEmpty() OR isInfinite():
 \end_layout
 
 \begin_layout Plain Layout
@@ -538,11 +538,6 @@ IF_EQUAL R1 R4 SKIP SKIP2 //Funktioniert
 \end_layout
 
 \begin_layout Standard
-Wie bereits oben beschrieben, gibt es neben PUT_STRAIGHT, PUT_LEFT, PUT_RIGHT
- noch weitere Funktionen, von denen nun einige näher erläutert werden:
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
@@ -550,7 +545,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="3">
+<lyxtabular version="3" rows="13" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -793,6 +788,123 @@ Nicht-Terminal
 
 \begin_layout Plain Layout
 Gibt Nukleotid P1 Stellen vor aktuellen zurück (in Zahlenrepräsentation)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STRAIGHT, LEFT, RIGHT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ganzzahlige Repräsentationen von Richtungen, die das Programm zur Ausgabe
+ benutzen kann.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PRG5 P1 P2 P3 P4 P5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nicht-Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Summiert P1 bis P5 auf
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+STACK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Anzahl an Nukleotiden, die noch übrig sind.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LENGTH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Terminal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Länge der erzeugten 2D-Struktur zum jetzigen Zeitpunkt
 \end_layout
 
 \end_inset
@@ -1099,8 +1211,9 @@ Function set
 IF_LESS, IF_GREATER, IF_EQUAL, ADD, SUBTRACT, MULTIPLY, DIVIDE, LOOK_BACK,
  LOOK_FORWARD, GETBOND, COLLIDE_STRAIGHT, COLLIDE_LEFT, COLLIDE_RIGHT, ENERGY,LE
 NGTH,STACK,R0 ...
- Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, DO, SKIP, SKIPi
- (Überspringe i Register), PRG5, RETURN, LEFT, RIGHT, STRAIGHT, ROUT
+ Ri (Verweise auf Register), PURINE, PYRIMIDINE, PREV, NEXT, SUM, SKIP,
+ SKIPi (Überspringe i Register), PRG5, RETURN, LEFT, RIGHT, STRAIGHT, ROUT,
+ PRG5
 \end_layout
 
 \end_inset
@@ -1258,6 +1371,222 @@ Absolutes Energieminimum.
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part*
+Anhang
+\end_layout
+
+\begin_layout Standard
+Ein gutes Ergebnis, das das Programm bei einer sehr einfachen RNA erzeugen
+ kann:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Aufgabe/easytopology1.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Struktur
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Aufgabe/easytopology2.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Basenpaarung.
+ Das Programm verschluckt einige Nukleotide (schwarz), erzeugt aber nur
+ energetisch günstige Paare (blau)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+R0:	PRG5 LEFT ENERGY R19 COLLIDE_RIGHT RIGHT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R1:	ADD STRAIGHT LENGTH 
+\end_layout
+
+\begin_layout Plain Layout
+
+R2:	PRG5 STACK LEFT COLLIDE_STRAIGHT ENERGY LENGTH 
+\end_layout
+
+\begin_layout Plain Layout
+
+R3:	PRG5 NEXT SKIP NEXT COLLIDE_STRAIGHT RIGHT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R4:	RETURN PREV 
+\end_layout
+
+\begin_layout Plain Layout
+
+R5:	ADD LENGTH STACK 
+\end_layout
+
+\begin_layout Plain Layout
+
+R6:	PRG5 COLLIDE_STRAIGHT COLLIDE_STRAIGHT PREV LEFT COLLIDE_STRAIGHT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R7:	DIVIDE RIGHT STACK 
+\end_layout
+
+\begin_layout Plain Layout
+
+R8:	DIVIDE ROUT PREV 
+\end_layout
+
+\begin_layout Plain Layout
+
+R9:	IF_GREATER ENERGY STACK SKIP8 NEXT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R10:	RETURN STRAIGHT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R11:	PURINE STACK 
+\end_layout
+
+\begin_layout Plain Layout
+
+R12:	IF_GREATER COLLIDE_RIGHT COLLIDE_STRAIGHT COLLIDE_RIGHT SKIP 
+\end_layout
+
+\begin_layout Plain Layout
+
+R13:	PYRIMIDINE STACK 
+\end_layout
+
+\begin_layout Plain Layout
+
+R14:	IF_GREATER SKIP R2 LEFT COLLIDE_RIGHT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R15:	IF_GREATER ENERGY LEFT R13 NEXT 
+\end_layout
+
+\begin_layout Plain Layout
+
+R16:	LOOK_FORWARD -1551805551 
+\end_layout
+
+\begin_layout Plain Layout
+
+R17:	R9 
+\end_layout
+
+\begin_layout Plain Layout
+
+R18:	PRG5 COLLIDE_LEFT ROUT STACK COLLIDE_RIGHT SKIP0 
+\end_layout
+
+\begin_layout Plain Layout
+
+R19:	PRG5 NEXT R18 ENERGY -148181325 PREV 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Erzeugter Code
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 

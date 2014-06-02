@@ -192,7 +192,7 @@ public class Main
 	
 	private static void bondingTest(String rna, String instructions)
 	{
-		Individual indiv = new Individual();
+		Individual indiv = new Individual(ProgramType.EFFECT);
 		indiv.runBondingTest(rna, instructions);
 		
 		ResultViewer.showResults(indiv);
@@ -224,7 +224,7 @@ public class Main
 		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
 		//easyTopoplogyTest2();
-		easyTopoplogyTest1();
+		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
@@ -234,7 +234,7 @@ public class Main
 		//openResult("best_individual.RNASLV");
 		//test();
 		
-		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
+		bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
 		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);
 	}
 
