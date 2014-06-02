@@ -93,9 +93,9 @@ public class Register
 		}
 
 		/**
-		 * UNDO
+		 * PUT_UNDO
 		 */
-		if (label.equals("UNDO"))
+		if (label.equals("PUT_UNDO"))
 		{
 			return individual.undoPut();
 
@@ -175,6 +175,11 @@ public class Register
 		{
 			return 1;
 		}
+		if (label.equals("UNDO"))
+		{
+			return -1000000;
+		}
+
 
 		/**
 		 * ROUT, Pointer auf höchsten Register

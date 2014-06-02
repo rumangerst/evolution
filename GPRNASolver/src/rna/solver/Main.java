@@ -78,6 +78,10 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 1.0f / 40.0f;
 		
+		runner.adfCount = 5;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 20;
+		
 		ResultViewer.showResults(runner.evolve());
 	}
 	
@@ -93,9 +97,13 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.generations = 2000;
+		runner.generations = 1000;
 		runner.registerCount = 200;
 		runner.mutateProbability = 1.0f / 200.0f;
+		
+		runner.adfCount = 5;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -112,9 +120,13 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.generations = 2000;
+		runner.generations = 1000;
 		runner.registerCount = 200;
 		runner.mutateProbability = 1.0f / 200.0f;
+		
+		runner.adfCount = 5;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -134,6 +146,10 @@ public class Main
 		runner.registerCount = 40;
 		runner.mutateProbability = 2.0f / 40.0f;
 		
+		runner.adfCount = 5;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 20;
+		
 		ResultViewer.showResults(runner.evolve());
 	}
 	
@@ -150,7 +166,11 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 15;
-		runner.mutateProbability = 1.0f / 15.0f;
+		runner.mutateProbability = 1.0f / 8.0f;
+		
+		runner.adfCount = 5;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 10;
 		
 		ResultViewer.showResults(runner.evolve());
 	}
@@ -224,7 +244,7 @@ public class Main
 		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
 		//easyTopoplogyTest2();
-		//easyTopoplogyTest1();
+		easyTopoplogyTest1();
 		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
@@ -234,7 +254,7 @@ public class Main
 		//openResult("best_individual.RNASLV");
 		//test();
 		
-		bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
+		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
 		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);
 	}
 

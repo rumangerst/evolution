@@ -31,6 +31,9 @@ public class GPRunner
 	public float mutateProbability;
 
 	public int registerCount;
+	public int adfCount;
+	public int adfRegisters;
+	public int adfParameters;
 
 	public LinkedList<Individual> population = new LinkedList<>();
 
@@ -44,6 +47,9 @@ public class GPRunner
 		this.populationSize = 400;
 		this.children = 200; //jeder elter erzeugt 2 Kinder	
 		this.registerCount = 40;
+		this.adfCount = 3;
+		this.adfRegisters = registerCount / 2;
+		this.adfParameters = 5;
 		
 		this.tournaments = 50;
 
@@ -73,7 +79,7 @@ public class GPRunner
 		for (int i = 0; i < populationSize; i++)
 		{
 			Individual indiv = new Individual(type);
-			indiv.random(registerCount, 3, 3, 5);
+			indiv.random(registerCount, adfCount, adfParameters, adfRegisters);
 
 			population.add(indiv);
 		}

@@ -220,7 +220,14 @@ public class Individual implements Comparable
 				{
 					RelativeDirection dir = RelativeDirection
 							.fromInteger(value);
-					put(dir);
+					if (dir != RelativeDirection.UNDO)
+					{
+						put(dir);
+					}
+					else
+					{
+						structure.undo();						
+					}
 				}
 			}
 		}
@@ -326,50 +333,79 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
-		wr.write(type.name() +"\n");
+		wr.write(type.name() + "\n");
 		wr.write(rna + "\n");
-
-		mainFunction.write(wr, "MAIN");
 
 		for (int i = 0; i < adfs.size(); i++)
 		{
 			adfs.get(i).write(wr, "ADF" + i);
 		}
 
+		mainFunction.write(wr, "MAIN");
+
 		wr.close();
 	}
 
 	public static Individual load(String file) throws IOException
 	{
-		// BufferedReader rd = new BufferedReader(new FileReader(file));
-		//
-		// rd.readLine(); // ignore
-		//
-		// String rna = rd.readLine();
-		// ArrayList<Register> registers = new ArrayList<Register>();
-		//
-		// String buffer = null;
-		//
-		// while ((buffer = rd.readLine()) != null)
-		// {
-		// String[] cmd = buffer.split(" ");
-		//
-		// if (cmd.length == 0)
-		// break;
-		//
-		// String label = cmd[0];
-		// String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
-		//
-		// registers.add(new Register(label, params));
-		// }
-		//
-		// Individual indiv = new Individual();
-		// indiv.registers = registers;
-		//
-		// indiv.run(rna);
-		//
-		// return indiv;
+		BufferedReader rd = new BufferedReader(new FileReader(file));
 
-		throw new RuntimeException("Funktion nicht fertig!");
+		rd.readLine(); // ignore name
+
+		ProgramType type = ProgramType.valueOf(rd.readLine());
+
+		String rna = rd.readLine();
+
+		String buffer = null;
+
+		/**
+		 * Create individual
+		 */
+		Individual indiv = new Individual(type);
+
+		/**
+		 * Function reading
+		 */
+
+		Function current = null;
+
+		while ((buffer = rd.readLine()) != null)
+		{
+			String[] cmd = buffer.split(" ");
+
+			if (cmd.length == 0)
+				break;
+
+			if (buffer.startsWith("#"))
+			{
+				int registerCount = Integer.parseInt(cmd[1]);
+				int parameterCount = Integer.parseInt(cmd[2]);
+
+				if (buffer.equals("#MAIN"))
+				{
+					indiv.mainFunction = current = new Function(type,
+							parameterCount, registerCount, indiv.adfs);
+				}
+				else
+				{
+					current = new Function(type, parameterCount, registerCount,
+							indiv.adfs);
+					indiv.adfs.add(current);
+				}
+
+				current.registers.clear();
+			}
+			else
+			{
+				String label = cmd[0];
+				String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
+
+				current.registers.add(new Register(label, params));
+			}
+		}
+
+		indiv.run(rna);
+
+		return indiv;
 	}
 }

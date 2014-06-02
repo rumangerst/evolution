@@ -127,12 +127,14 @@ public class Function
 			dynamic_TerminalFunctions.add("LEFT");
 			dynamic_TerminalFunctions.add("RIGHT");
 			dynamic_TerminalFunctions.add("STRAIGHT");
+			dynamic_TerminalFunctions.add("UNDO");
 		}
 		else
 		{
 			dynamic_TerminalFunctions.add("PUT_LEFT");
 			dynamic_TerminalFunctions.add("PUT_RIGHT");
 			dynamic_TerminalFunctions.add("PUT_STRAIGHT");
+			dynamic_TerminalFunctions.add("PUT_UNDO");
 		}
 		
 		this.registers = new ArrayList<Register>();
@@ -177,6 +179,14 @@ public class Function
 		this.adfs = adfs;
 		
 		bzr = 0;
+		
+		/**
+		 * test: Wertespeicher vorher löschen
+		 */
+		for(Register reg: registers)
+		{
+			reg.value = 0;
+		}
 
 		while (bzr < registers.size())
 		{
@@ -336,7 +346,7 @@ public class Function
 	
 	public void write(FileWriter wr, String name) throws IOException
 	{
-		wr.write("#" + name + "\n");
+		wr.write(String.format("#%s %d %d",name , registers.size(), parameterCount));
 		
 		for (Register reg : registers)
 		{

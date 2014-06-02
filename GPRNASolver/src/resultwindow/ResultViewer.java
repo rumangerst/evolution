@@ -104,16 +104,19 @@ public class ResultViewer extends JFrame
 
 	private String formatCode(Function f, String name)
 	{
+		if (f == null)
+			return "";
+
 		StringBuilder str = new StringBuilder();
 		String[] commands = f.getRegisterCommands();
-		
+
 		str.append(name + "\n-----------------\n");
 
 		for (int i = 0; i < commands.length; i++)
 		{
 			str.append("R" + i + ":\t" + commands[i] + "\n");
 		}
-		
+
 		str.append("\n\n\n");
 
 		return str.toString();
@@ -128,14 +131,17 @@ public class ResultViewer extends JFrame
 		structureCanvas.setData(indiv.structure);
 
 		StringBuilder str = new StringBuilder();
-		
-		str.append(formatCode(indiv.mainFunction, "MAIN"));
-		
-		for(int i = 0; i < indiv.adfs.size(); i++)
+
+		if (indiv.mainFunction != null)
 		{
-			str.append(formatCode(indiv.adfs.get(i), "ADF" + i));
+			str.append(formatCode(indiv.mainFunction, "MAIN"));
+
+			for (int i = 0; i < indiv.adfs.size(); i++)
+			{
+				str.append(formatCode(indiv.adfs.get(i), "ADF" + i));
+			}
 		}
-		
+
 		code.setText(str.toString());
 	}
 
