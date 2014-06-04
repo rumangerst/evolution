@@ -34,6 +34,12 @@ public class Individual implements Comparable
 	 * ADF functions
 	 */
 	public ArrayList<Function> adfs;
+	
+	/**
+	 * Old energy 
+	 * @param type
+	 */
+	public int runtime_energy_old;
 
 	public Individual(ProgramType type)
 	{
@@ -75,7 +81,7 @@ public class Individual implements Comparable
 			return structure.structureLength;
 		}
 
-		return 0;
+		return Register.FALSE;
 	}
 
 	public int undoPut()
@@ -85,7 +91,7 @@ public class Individual implements Comparable
 			return structure.structureLength;
 		}
 
-		return 0;
+		return Register.FALSE;
 	}
 
 	/**
@@ -101,7 +107,7 @@ public class Individual implements Comparable
 		if (structure.append(dir,
 				NucleotideType.fromInteger(sequence.getFirst()), true))
 		{
-			return 0;
+			return Register.FALSE;
 		}
 
 		return structure.structureLength;
@@ -144,7 +150,7 @@ public class Individual implements Comparable
 			else
 				sequence.add(3);
 		}
-
+		
 		// Initialize values (set cursor, direction and initial nucleotide
 		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
 				NucleotideDirection.EAST);
@@ -279,7 +285,8 @@ public class Individual implements Comparable
 		double energy = structure.energy();
 
 		// return energy + leftover_sequence * leftover_sequence;
-		return energy + 8 * leftover_sequence;
+		//return energy + 4 * leftover_sequence;
+		return (energy - structure.structureLength) / structure.structureLength;
 	}
 
 	/**

@@ -180,26 +180,18 @@ public class Nucleotide
 		// A - U: -2
 		if (n1 == NucleotideType.A && n2 == NucleotideType.U
 				|| n1 == NucleotideType.U && n2 == NucleotideType.A)
-			return -4;
+			return -2 * 2;
 		// G - C: -3
 		if (n1 == NucleotideType.G && n2 == NucleotideType.C
 				|| n1 == NucleotideType.C && n2 == NucleotideType.G)
-			return -6;
+			return -3 * 2;
 
 		// Wobble G - U: -1
 		if (n1 == NucleotideType.G && n2 == NucleotideType.U
 				|| n1 == NucleotideType.U && n2 == NucleotideType.G)
-			return -2;
-
-		/**
-		 * Mehrere Ansätze
-		 * 
-		 * I) Return +1 Bewertet solche "Bindungen" besser als keine Bindung ->
-		 * Struktur bleibt Kompakt II) Return +5 o.Ä. Abbildung der schlechten
-		 * Eigenschaften dieser "Bindung" -> Programm weicht diesen Bindungen
-		 * aus III) Return +2 - Keine Bindung - Kein Einfluss auf Energie
-		 */
-		return 5;
+			return -1 * 2;
+	
+		return 2 * 2;
 	}
 
 	public Nucleotide getPrevious(int n)

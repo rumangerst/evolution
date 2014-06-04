@@ -51,7 +51,7 @@ public class GPRunner
 		this.adfRegisters = registerCount / 2;
 		this.adfParameters = 5;
 		
-		this.tournaments = 50;
+		this.tournaments = 5;
 
 		recombProbability = 0.2f;
 		mutateProbability = 1.0f / this.registerCount;
@@ -70,8 +70,19 @@ public class GPRunner
 		
 		return results.subList(0, 2);
 	}
+	
+	public boolean popHasOptimum(int optimum)
+	{
+		for(Individual indiv : population)
+		{
+			if(indiv.fitness <= optimum)
+				return true;
+		}
+		
+		return false;
+	}
 
-	public Individual evolve()
+	public Individual evolve(int optimum, boolean showBest)
 	{
 		/**
 		 * Create inital population
@@ -89,6 +100,12 @@ public class GPRunner
 		 */
 		for (int generation = 0; generation < generations; generation++)
 		{
+			if(popHasOptimum(optimum))
+			{
+				System.out.println("Optimum in Generation " + (generation + 1) + " erreicht");
+				break;
+			}
+			
 			System.out.println("Generation " + (generation + 1));
 
 			/**
@@ -97,6 +114,22 @@ public class GPRunner
 			for (Individual indiv : population)
 			{
 				indiv.run(rna);
+			}
+			
+			if(showBest)
+			{
+				Individual best = population.getFirst();
+				
+				for(Individual indiv : population)
+				{
+					if(indiv.fitness < best.fitness)
+					{
+						best = indiv;
+					}
+				}
+				
+				System.out.println("Best individual: " + best.fitness);
+				System.out.println("Last register of main output (" + best.mainFunction.outputRegister + "): " + best.mainFunction.registers.get(best.mainFunction.outputRegister).toString());
 			}
 
 //			/**
@@ -156,6 +189,10 @@ public class GPRunner
 			{
 				List<Individual> parents = tournamentSelection();
 				
+				//Testweise Plus-Strategie
+//				newpop.add( new Individual(parents.get(0)));
+//				newpop.add( new Individual(parents.get(1)));
+				
 				Individual child1 = new Individual(parents.get(0));
 				Individual child2 = new Individual(parents.get(1));
 				
@@ -173,7 +210,9 @@ public class GPRunner
 			 */
 			
 			this.population = newpop;
-
+			
+			
+			
 		}
 
 		System.out.println("Evolution loop finished.");

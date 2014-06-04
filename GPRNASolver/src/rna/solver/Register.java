@@ -1,5 +1,6 @@
 package rna.solver;
 
+import java.awt.Point;
 import java.util.Random;
 
 /**
@@ -15,6 +16,7 @@ import java.util.Random;
 public class Register
 {
 	public static final Random RANDOM = new Random();
+	public static final int FALSE = -1;
 
 	public String label;
 	public String[] parameters;
@@ -109,6 +111,17 @@ public class Register
 			return individual.structure.energy();
 
 		}
+		/**
+		 * ENERGY_OLD - energy without latest nucleotide
+		 */
+		if (label.equals("ENERGY_OLD"))
+		{
+			if (individual.structure.current.previous == null)
+				return Integer.MAX_VALUE;
+			return individual.structure.energy()
+					- individual.structure.current.energy(individual.structure);
+
+		}
 
 		/**
 		 * LENGTH - current structure length
@@ -131,11 +144,23 @@ public class Register
 		/**
 		 * A,C,U,G
 		 */
-		/*
-		 * if (label.equals("A")) { return 0; } if (label.equals("C")) { return
-		 * 1; } if (label.equals("U")) { return 2; } if (label.equals("G")) {
-		 * return 3; }
-		 */
+
+		if (label.equals("A"))
+		{
+			return 0;
+		}
+		if (label.equals("C"))
+		{
+			return 1;
+		}
+		if (label.equals("U"))
+		{
+			return 2;
+		}
+		if (label.equals("G"))
+		{
+			return 3;
+		}
 
 		/**
 		 * PREV (Zuletzt hinzugefügter) NEXT (neu zu hinzufügendes Nuc)
@@ -147,18 +172,18 @@ public class Register
 		if (label.equals("NEXT"))
 		{
 			if (individual.sequence.isEmpty())
-				return -1;
+				return FALSE;
 			return individual.sequence.get(0);
 		}
 
-		/**
-		 * Indicate that next register will be skipped
-		 */
-		if (label.equals("SKIP"))
-		{
-			parent.bzr++;
-			return 0;
-		}
+		// /**
+		// * Indicate that next register will be skipped
+		// */
+		// if (label.equals("SKIP"))
+		// {
+		// parent.bzr++;
+		// return 0;
+		// }
 
 		/**
 		 * Konstaten für LINKS, RECHTS und GERADEAUS
@@ -179,7 +204,6 @@ public class Register
 		{
 			return -1000000;
 		}
-
 
 		/**
 		 * ROUT, Pointer auf höchsten Register
@@ -211,6 +235,142 @@ public class Register
 			return value;
 		}
 
+		// /**
+		// * Boolesche Werte
+		// */
+		// if (label.equals("TRUE"))
+		// {
+		// return 1;
+		// }
+		// if (label.equals("FALSE"))
+		// {
+		// return 0;
+		// }
+
+		/**
+		 * Himmelsrichtungen, die zurückgeben, welches Nukleotid an POS N ist
+		 */
+		if (label.equals("NORTH"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("NORTH_EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("NORTH_WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH_EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH_WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+
+		/**
+		 * Nukleotide, relativ zu current (siehe Himmelsrichtung)
+		 */
+		if (label.equals("RLEFT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x,
+					current.y, RelativeDirection.LEFT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("RSTRAIGHT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x,
+					current.y, RelativeDirection.STRAIGHT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("RRIGHT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x,
+					current.y, RelativeDirection.RIGHT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+
 		/**
 		 * No known label => must be a number or a Rx reference
 		 */
@@ -231,12 +391,12 @@ public class Register
 
 			if (id < 0)
 			{
-				return -1;
+				return 0;
 			}
 
 			parent.bzr += id;
 
-			return 0;
+			return 1;
 		}
 		else if (label.startsWith("P")) // Zugriff auf Parameter Pi
 		{
@@ -367,7 +527,7 @@ public class Register
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.sequence.size())
-				value = -1;
+				value = FALSE;
 			else
 				value = individual.sequence.get(r1);
 
@@ -379,7 +539,7 @@ public class Register
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.structure.structureLength)
-				value = -1;
+				value = FALSE;
 			else
 			{
 				Nucleotide current = individual.structure.current;
@@ -413,7 +573,7 @@ public class Register
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			if (r1 < 0 || r1 >= individual.structure.structureLength)
-				value = 0;
+				value = FALSE;
 			else
 			{
 				Nucleotide current = individual.structure.current
@@ -439,7 +599,7 @@ public class Register
 			if (nuc == NucleotideType.A || nuc == NucleotideType.G)
 				value = individual.structure.structureLength;
 			else
-				value = -1;
+				value = FALSE;
 
 			return;
 		}
@@ -453,7 +613,7 @@ public class Register
 			if (nuc == NucleotideType.U || nuc == NucleotideType.C)
 				value = individual.structure.structureLength;
 			else
-				value = -1;
+				value = FALSE;
 
 			return;
 		}
@@ -464,7 +624,7 @@ public class Register
 
 			if (r1 < 0 || r1 > 100)
 			{
-				value = -1;
+				value = FALSE;
 				return;
 			}
 			else
@@ -529,9 +689,38 @@ public class Register
 			return;
 		}
 
-		if (label.equals("GOTO") || label.equals("UPDATE_BONDING"))
+		/**
+		 * BOOLSCHE Funktionen AND OR XOR NOT
+		 */
+		if (label.equals("AND"))
 		{
-			value = 0;
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[0]);
+
+			value = r1 & r2;
+			return;
+		}
+		if (label.equals("OR"))
+		{
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[0]);
+
+			value = r1 | r2;
+			return;
+		}
+		if (label.equals("XOR"))
+		{
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+			int r2 = executeTerminal(individual, parent, parameters[0]);
+
+			value = r1 ^ r2;
+			return;
+		}
+		if (label.equals("NOT"))
+		{
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+
+			value = ~r1;
 			return;
 		}
 

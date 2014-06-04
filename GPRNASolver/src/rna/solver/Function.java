@@ -28,35 +28,42 @@ public class Function
 	 */
 	public static final String[] STATIC_TERMINAL_FUNCTIONS = new String[] {
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "ENERGY",
-			"LENGTH", "STACK", "PREV", "NEXT", /*"LEFT", "RIGHT",
-			"STRAIGHT",*/ "ROUT", "++", "--", "SELF", "SKIP1", "SKIP2" };
+			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", "ROUT", "++",
+			"--", "SELF", "SKIP1", "SKIP2", "NORTH", "SOUTH", "EAST", "WEST",
+			"NORTH_WEST", "NORTH_EAST", "SOUTH_WEST", "SOUTH_EAST", "RLEFT",
+			"RRIGHT", "RSTRAIGHT", "A", "C", "U", "G" };
 
 	/**
 	 * Funktionen mit Parameter new RegisterFactory("",0) Statische Funktionen,
-	 * die IMMEr verfügbar sind
+	 * die IMMER verfügbar sind
 	 */
 	public static final RegisterFactory[] STATIC_FUNCTIONS = new RegisterFactory[] {
 			new RegisterFactory("IF_LESS", 4),
 			new RegisterFactory("IF_GREATER", 4),
-			new RegisterFactory("IF_EQUAL", 4), new RegisterFactory("ADD", 2),
+			new RegisterFactory("IF_EQUAL", 4),
+			new RegisterFactory("ADD", 2),
 			new RegisterFactory("SUBTRACT", 2),
 			new RegisterFactory("MULTIPLY", 2),
 			new RegisterFactory("DIVIDE", 2),
 			new RegisterFactory("LOOK_BACK", 1),
 			new RegisterFactory("LOOK_FORWARD", 1),
-			new RegisterFactory("CALCULATE_ENERGY", 2),
-			new RegisterFactory("GETBOND", 2),
+			// new RegisterFactory("CALCULATE_ENERGY", 2),
+			// new RegisterFactory("GETBOND", 2),
 			new RegisterFactory("PURINE", 1),
 			new RegisterFactory("PYRIMIDINE", 1),
-			new RegisterFactory("PRG5", 5), new RegisterFactory("RETURN", 1) }; // UPDATE_BONDING
-																				// entfernt
+			// new RegisterFactory("PRG5", 5),
+			new RegisterFactory("RETURN", 1),
+	/*
+	 * new RegisterFactory("AND", 2), new RegisterFactory("OR", 2), new
+	 * RegisterFactory("XOR", 2), new RegisterFactory("NOT", 1)
+	 */};
 
 	public ArrayList<Register> registers;
 	public int parameterCount;
 
 	public ArrayList<RegisterFactory> dynamic_Functions;
 	public ArrayList<String> dynamic_TerminalFunctions;
-	
+
 	/**
 	 * Befehlszeilenregister
 	 */
@@ -70,7 +77,12 @@ public class Function
 	/**
 	 * Speichert aktuell verwendete ADF
 	 */
-	public ArrayList<Function> adfs;	
+	public ArrayList<Function> adfs;
+
+	/*
+	 * Das Ausgaberegister
+	 */
+	public int outputRegister;
 
 	/**
 	 * Generiert neue Funktionseinheit
@@ -99,17 +111,25 @@ public class Function
 		}
 		for (int i = 0; i < registerCount; i++)
 		{
-			dynamic_TerminalFunctions.add("R" + i);			
+			dynamic_TerminalFunctions.add("R" + i);
 		}
-		/*for (int i = 1; i < registerCount / 2; i++)
-		{
-			dynamic_TerminalFunctions.add("SKIP" + i);			
-		}*/
-		
+
 		/**
 		 * nur SKIP und SKIP2 zulassen?
 		 */
-		
+		/*
+		 * for (int i = 1; i < registerCount / 2; i++) {
+		 * dynamic_TerminalFunctions.add("SKIP" + i); }
+		 */
+
+		/**
+		 * Lade Terminale mit Zahlen auf
+		 */
+		// for (int i = -registerCount; i <= registerCount; i++)
+		// {
+		// dynamic_TerminalFunctions.add("" + i);
+		// }
+
 		if (adfs != null)
 		{
 			for (int i = 0; i < adfs.size(); i++)
@@ -118,11 +138,12 @@ public class Function
 						.get(i).parameterCount));
 			}
 		}
-		
+
 		/**
-		 * Lieber Java-Irgendwas-Guru im ORACE-HQ - Bitte GIBT MIR VERDAMMT NOCHMAL PREPROCESSOREN!!!!
+		 * Lieber Java-Irgendwas-Guru im ORACE-HQ - Bitte GIBT MIR VERDAMMT
+		 * NOCHMAL PREPROCESSOREN!!!!
 		 */
-		if(type == ProgramType.EFFECT)
+		if (type == ProgramType.EFFECT)
 		{
 			dynamic_TerminalFunctions.add("LEFT");
 			dynamic_TerminalFunctions.add("RIGHT");
@@ -136,7 +157,7 @@ public class Function
 			dynamic_TerminalFunctions.add("PUT_STRAIGHT");
 			dynamic_TerminalFunctions.add("PUT_UNDO");
 		}
-		
+
 		this.registers = new ArrayList<Register>();
 
 		/**
@@ -146,6 +167,8 @@ public class Function
 		{
 			registers.add(randomRegister());
 		}
+
+		this.outputRegister = registerCount - 1;
 	}
 
 	/**
@@ -158,6 +181,7 @@ public class Function
 		this.parameterCount = toCopy.parameterCount;
 		this.dynamic_Functions = toCopy.dynamic_Functions;
 		this.dynamic_TerminalFunctions = toCopy.dynamic_TerminalFunctions;
+		this.outputRegister = toCopy.outputRegister;
 
 		this.registers = new ArrayList<Register>();
 		for (Register reg : toCopy.registers)
@@ -173,17 +197,18 @@ public class Function
 	 * @param parameters
 	 * @return
 	 */
-	public int execute(Individual individual, int[] parameters, ArrayList<Function> adfs)
+	public int execute(Individual individual, int[] parameters,
+			ArrayList<Function> adfs)
 	{
 		this.parameters = parameters;
 		this.adfs = adfs;
-		
+
 		bzr = 0;
-		
+
 		/**
 		 * test: Wertespeicher vorher löschen
 		 */
-		for(Register reg: registers)
+		for (Register reg : registers)
 		{
 			reg.value = 0;
 		}
@@ -194,7 +219,7 @@ public class Function
 			bzr++;
 		}
 
-		return registers.get(registers.size() - 1).value;
+		return registers.get(outputRegister).value;
 	}
 
 	/**
@@ -232,20 +257,23 @@ public class Function
 	 */
 	public String randomTerminal()
 	{
+		String label;
 		int rand = Register.RANDOM.nextInt(STATIC_TERMINAL_FUNCTIONS.length
 				+ dynamic_TerminalFunctions.size());
 
 		if (rand >= STATIC_TERMINAL_FUNCTIONS.length)
 		{
-			return dynamic_TerminalFunctions.get(rand
+			label = dynamic_TerminalFunctions.get(rand
 					- STATIC_TERMINAL_FUNCTIONS.length);
 		}
 		else
 		{
-			return STATIC_TERMINAL_FUNCTIONS[rand];
+			label = STATIC_TERMINAL_FUNCTIONS[rand];
 		}
+
+		return label;
 	}
-	
+
 	/**
 	 * Return register with index, returns "0"-Register if not valid
 	 * 
@@ -259,7 +287,7 @@ public class Function
 
 		return registers.get(index);
 	}
-	
+
 	/**
 	 * Two cases of mutation: I) Parameter mutation (mutate parameter of
 	 * register) II) Register mutation (new random register)
@@ -299,10 +327,18 @@ public class Function
 				}
 			}
 		}
+
+		/**
+		 * Mutate output register
+		 */
+		// if(1 - Register.RANDOM.nextFloat() <= p)
+		// {
+		// this.outputRegister = Register.RANDOM.nextInt(registers.size());
+		// }
 	}
 
 	/**
-	 * Recombine using one-point X-Over
+	 * Recombine using two-point X-Over
 	 * 
 	 * @param indiv1
 	 * @param indiv2
@@ -315,23 +351,65 @@ public class Function
 
 		if (1 - Register.RANDOM.nextFloat() <= px)
 		{
-			int index = Register.RANDOM.nextInt(reg);
+			int index1 = Register.RANDOM.nextInt(reg);
+			int index2 = Register.RANDOM.nextInt(reg);
 
-			if (index == 0 || index == reg - 1)
+			if (index1 == index2)
 				return;
+			if (index2 < index1)
+			{
+				int val1 = index1;
+				int val2 = index2;
+				index2 = val1;
+				index1 = val2;
+			}
 
 			// X-Over
-			for (int i = 0; i < index; i++)
+			for (int i = index1; i < index2; i++)
 			{
-				indiv1.registers.set(i, indiv2.registers.get(i));
-			}
-			for (int i = index; i < reg; i++)
-			{
-				indiv2.registers.set(i, indiv1.registers.get(i));
+				/**
+				 * Swappe Register innerhalb in [index1, index2)
+				 */
+				Register r1 = indiv1.registers.get(i);
+				Register r2 = indiv2.registers.get(i);
+
+				indiv1.registers.set(i, r2);
+				indiv2.registers.set(i, r1);
 			}
 		}
 	}
-	
+
+	// /**
+	// * Recombine using one-point X-Over
+	// *
+	// * @param indiv1
+	// * @param indiv2
+	// * @param px
+	// * Recombination probability
+	// */
+	// public static void recombine(Function indiv1, Function indiv2, float px)
+	// {
+	// int reg = indiv1.registers.size();
+	//
+	// if (1 - Register.RANDOM.nextFloat() <= px)
+	// {
+	// int index = Register.RANDOM.nextInt(reg);
+	//
+	// if (index == 0 || index == reg - 1)
+	// return;
+	//
+	// // X-Over
+	// for (int i = 0; i < index; i++)
+	// {
+	// indiv1.registers.set(i, indiv2.registers.get(i));
+	// }
+	// for (int i = index; i < reg; i++)
+	// {
+	// indiv2.registers.set(i, indiv1.registers.get(i));
+	// }
+	// }
+	// }
+
 	public String[] getRegisterCommands()
 	{
 		String[] output = new String[registers.size()];
@@ -343,11 +421,12 @@ public class Function
 
 		return output;
 	}
-	
+
 	public void write(FileWriter wr, String name) throws IOException
 	{
-		wr.write(String.format("#%s %d %d",name , registers.size(), parameterCount));
-		
+		wr.write(String.format("#%s %d %d", name, registers.size(),
+				parameterCount));
+
 		for (Register reg : registers)
 		{
 			wr.write(reg.label);

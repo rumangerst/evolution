@@ -23,7 +23,7 @@ public class Main
 		
 		
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -38,11 +38,17 @@ public class Main
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 8;
-		runner.mutateProbability = 1.0f / 8.0f;
+		runner.registerCount = 15;
+		runner.mutateProbability = 1.0f / 15.0f;
 		runner.recombProbability = 0.1f;
 		
-		ResultViewer.showResults(runner.evolve());
+		runner.adfCount = 3;
+		runner.adfParameters = 5;
+		runner.adfRegisters = 15;
+		
+		runner.generations = 1000;
+		
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -60,7 +66,7 @@ public class Main
 		runner.registerCount = 10;
 		runner.mutateProbability = 1.0f / 10.0f;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -82,7 +88,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -105,7 +111,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	 
 	/**
@@ -128,7 +134,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -150,7 +156,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -172,7 +178,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 10;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	/**
@@ -189,7 +195,7 @@ public class Main
 		runner.mutateProbability = mutate;
 		runner.recombProbability = recomb;
 		
-		ResultViewer.showResults(runner.evolve());
+		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 	}
 	
 	
@@ -241,10 +247,10 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		//evilTopoplogyTest2();
+		evilTopoplogyTest2();
 		//pseudoKnotTest1();
 		//easyTopoplogyTest2();
-		easyTopoplogyTest1();
+		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
