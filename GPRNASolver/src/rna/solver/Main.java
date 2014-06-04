@@ -11,7 +11,7 @@ public class Main
 	 * 
 	 * GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC
 	 */
-	private static void easyTopoplogyTest1()
+	private static void easyGCTest()
 	{
 		GPRunner runner = new GPRunner("GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC"); //6 C's fehlen am Ende
 		
@@ -23,7 +23,7 @@ public class Main
 		
 		
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve(-154, true));
 	}
 	
 	/**
@@ -31,16 +31,16 @@ public class Main
 	 * 
 	 * ACUCGGUUACGAG
 	 */
-	private static void easyTopoplogyTest2()
+	private static void easyHairPinTest()
 	{
 		GPRunner runner = new GPRunner("ACUCGGUUACGAG"); 
 		
 		/**
 		 * Settings
 		 */
-		runner.registerCount = 15;
-		runner.mutateProbability = 1.0f / 15.0f;
-		runner.recombProbability = 0.1f;
+		runner.registerCount = 20;
+		runner.mutateProbability = 1.0f / 20.0f;
+		//runner.recombProbability = 0.1f;
 		
 		runner.adfCount = 3;
 		runner.adfParameters = 5;
@@ -247,15 +247,16 @@ public class Main
 //		runner.evolve();
 		
 		//evilTopoplogyTest1();
-		evilTopoplogyTest2();
+		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
-		//easyTopoplogyTest2();
+		easyGCTest();
+		//easyHairPinTest();
 		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();
 		
 		//openResult("best_individual_0.RNASLV");
 		
-		//openResult("Results/Evil tRNA/Result5.RNASLV");
+		//openResult("Results/GC-RNA/result1.RNASLV");
 		
 		//openResult("best_individual.RNASLV");
 		//test();

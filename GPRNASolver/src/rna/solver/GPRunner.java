@@ -44,14 +44,14 @@ public class GPRunner
 
 		this.generations = 1000;
 		
-		this.populationSize = 400;
-		this.children = 200; //jeder elter erzeugt 2 Kinder	
+		this.populationSize = 800;
+		this.children = 400; //jeder elter erzeugt 2 Kinder	
 		this.registerCount = 40;
 		this.adfCount = 3;
 		this.adfRegisters = registerCount / 2;
 		this.adfParameters = 5;
 		
-		this.tournaments = 5;
+		this.tournaments = 10;
 
 		recombProbability = 0.2f;
 		mutateProbability = 1.0f / this.registerCount;
@@ -82,7 +82,7 @@ public class GPRunner
 		return false;
 	}
 
-	public Individual evolve(int optimum, boolean showBest)
+	public Individual evolve(int energy_optimum, boolean showBest)
 	{
 		/**
 		 * Create inital population
@@ -100,7 +100,7 @@ public class GPRunner
 		 */
 		for (int generation = 0; generation < generations; generation++)
 		{
-			if(popHasOptimum(optimum))
+			if(popHasOptimum(energy_optimum))
 			{
 				System.out.println("Optimum in Generation " + (generation + 1) + " erreicht");
 				break;
@@ -128,7 +128,7 @@ public class GPRunner
 					}
 				}
 				
-				System.out.println("Best individual: " + best.fitness);
+				System.out.println("Best individual: " + best.fitness + " energy: " + best.energy);
 				System.out.println("Last register of main output (" + best.mainFunction.outputRegister + "): " + best.mainFunction.registers.get(best.mainFunction.outputRegister).toString());
 			}
 

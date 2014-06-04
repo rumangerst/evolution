@@ -12,6 +12,7 @@ public class Individual implements Comparable
 {
 	public String rna;
 	public double fitness;
+	public int energy;
 
 	public ProgramType type;
 
@@ -282,11 +283,15 @@ public class Individual implements Comparable
 	public double fitness()
 	{
 		double leftover_sequence = rna.length() - structure.structureLength;
-		double energy = structure.energy();
+		energy = structure.energy();
+//		
+//		if(leftover_sequence != 0)
+//			return Double.MAX_VALUE;
 
 		// return energy + leftover_sequence * leftover_sequence;
 		//return energy + 4 * leftover_sequence;
-		return (energy - structure.structureLength) / structure.structureLength;
+		//return (energy - structure.structureLength) / structure.structureLength;
+		return ((double)energy + leftover_sequence * leftover_sequence) / structure.structureLength;
 	}
 
 	/**
@@ -369,6 +374,7 @@ public class Individual implements Comparable
 		 * Create individual
 		 */
 		Individual indiv = new Individual(type);
+		indiv.adfs = new ArrayList<Function>();
 
 		/**
 		 * Function reading
@@ -388,7 +394,7 @@ public class Individual implements Comparable
 				int registerCount = Integer.parseInt(cmd[1]);
 				int parameterCount = Integer.parseInt(cmd[2]);
 
-				if (buffer.equals("#MAIN"))
+				if (buffer.startsWith("#MAIN"))
 				{
 					indiv.mainFunction = current = new Function(type,
 							parameterCount, registerCount, indiv.adfs);

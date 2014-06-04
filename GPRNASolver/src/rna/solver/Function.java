@@ -47,12 +47,12 @@ public class Function
 			new RegisterFactory("DIVIDE", 2),
 			new RegisterFactory("LOOK_BACK", 1),
 			new RegisterFactory("LOOK_FORWARD", 1),
-			// new RegisterFactory("CALCULATE_ENERGY", 2),
-			// new RegisterFactory("GETBOND", 2),
+			 new RegisterFactory("CALCULATE_ENERGY", 2),
+			 new RegisterFactory("GETBOND", 2),
 			new RegisterFactory("PURINE", 1),
 			new RegisterFactory("PYRIMIDINE", 1),
 			// new RegisterFactory("PRG5", 5),
-			new RegisterFactory("RETURN", 1),
+			new RegisterFactory("RETURN", 1)
 	/*
 	 * new RegisterFactory("AND", 2), new RegisterFactory("OR", 2), new
 	 * RegisterFactory("XOR", 2), new RegisterFactory("NOT", 1)
@@ -424,7 +424,7 @@ public class Function
 
 	public void write(FileWriter wr, String name) throws IOException
 	{
-		wr.write(String.format("#%s %d %d", name, registers.size(),
+		wr.write(String.format("#%s %d %d\n", name, registers.size(),
 				parameterCount));
 
 		for (Register reg : registers)
