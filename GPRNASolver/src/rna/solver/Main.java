@@ -1,7 +1,11 @@
 package rna.solver;
 
 import java.io.IOException;
+
+import com.panayotis.gnuplot.JavaPlot;
+
 import resultwindow.ResultViewer;
+import resultwindow.StatPlot;
 
 public class Main
 {
@@ -19,11 +23,13 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 20;
-		runner.mutateProbability = 1.0f / 20.0f;
+		runner.mutateProbability = 2.0f / 20.0f;
+		runner.generations = 2000;
 		
 		
 		
 		ResultViewer.showResults(runner.evolve(-154, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -39,16 +45,17 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 20;
-		runner.mutateProbability = 1.0f / 20.0f;
+		runner.mutateProbability = 2.0f / 20.0f;
 		//runner.recombProbability = 0.1f;
 		
 		runner.adfCount = 3;
 		runner.adfParameters = 5;
 		runner.adfRegisters = 15;
 		
-		runner.generations = 1000;
+		runner.generations = 5000;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -67,6 +74,7 @@ public class Main
 		runner.mutateProbability = 1.0f / 10.0f;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -89,6 +97,7 @@ public class Main
 		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -112,6 +121,7 @@ public class Main
 		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	 
 	/**
@@ -135,6 +145,7 @@ public class Main
 		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -157,6 +168,7 @@ public class Main
 		runner.adfRegisters = 20;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -179,6 +191,7 @@ public class Main
 		runner.adfRegisters = 10;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	/**
@@ -196,6 +209,7 @@ public class Main
 		runner.recombProbability = recomb;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
 	
@@ -262,7 +276,7 @@ public class Main
 		//test();
 		
 		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
-		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);
+		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
 	}
 
 }

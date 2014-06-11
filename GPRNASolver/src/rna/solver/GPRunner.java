@@ -36,6 +36,12 @@ public class GPRunner
 	public int adfParameters;
 
 	public LinkedList<Individual> population = new LinkedList<>();
+	
+	/**
+	 * Data for plot
+	 * @param rna
+	 */
+	public LinkedList<Double> results_BestFitness = new LinkedList<>();
 
 	public GPRunner(String rna)
 	{
@@ -75,7 +81,7 @@ public class GPRunner
 	{
 		for(Individual indiv : population)
 		{
-			if(indiv.fitness <= optimum)
+			if(indiv.energy <= optimum)
 				return true;
 		}
 		
@@ -130,6 +136,8 @@ public class GPRunner
 				
 				System.out.println("Best individual: " + best.fitness + " energy: " + best.energy);
 				System.out.println("Last register of main output (" + best.mainFunction.outputRegister + "): " + best.mainFunction.registers.get(best.mainFunction.outputRegister).toString());
+			
+				results_BestFitness.add(best.fitness);
 			}
 
 //			/**

@@ -35,9 +35,10 @@ public class Individual implements Comparable
 	 * ADF functions
 	 */
 	public ArrayList<Function> adfs;
-	
+
 	/**
-	 * Old energy 
+	 * Old energy
+	 * 
 	 * @param type
 	 */
 	public int runtime_energy_old;
@@ -151,7 +152,7 @@ public class Individual implements Comparable
 			else
 				sequence.add(3);
 		}
-		
+
 		// Initialize values (set cursor, direction and initial nucleotide
 		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
 				NucleotideDirection.EAST);
@@ -233,7 +234,7 @@ public class Individual implements Comparable
 					}
 					else
 					{
-						structure.undo();						
+						structure.undo();
 					}
 				}
 			}
@@ -284,14 +285,16 @@ public class Individual implements Comparable
 	{
 		double leftover_sequence = rna.length() - structure.structureLength;
 		energy = structure.energy();
-//		
-//		if(leftover_sequence != 0)
-//			return Double.MAX_VALUE;
+		//
+		// if(leftover_sequence != 0)
+		// return Double.MAX_VALUE;
 
 		// return energy + leftover_sequence * leftover_sequence;
-		//return energy + 4 * leftover_sequence;
-		//return (energy - structure.structureLength) / structure.structureLength;
-		return ((double)energy + leftover_sequence * leftover_sequence) / structure.structureLength;
+		// return energy + 4 * leftover_sequence;
+		// return (energy - structure.structureLength) /
+		// structure.structureLength;
+		return ((double) energy + leftover_sequence * leftover_sequence)
+				/ structure.structureLength;
 	}
 
 	/**
@@ -301,11 +304,24 @@ public class Individual implements Comparable
 	 */
 	public void mutate(float p)
 	{
-		mainFunction.mutate(p);
+		/*
+		 * mainFunction.mutate(p);
+		 * 
+		 * for (Function f : adfs) { f.mutate(p); }
+		 */
 
-		for (Function f : adfs)
+		/**
+		 * Suche eine Funktion aus, die mutiert werden soll
+		 */
+		int adf = Register.RANDOM.nextInt(adfs.size() + 1);
+
+		if (adf >= adfs.size())
 		{
-			f.mutate(p);
+			mainFunction.mutate(p);
+		}
+		else
+		{
+			adfs.get(adf).mutate(p);
 		}
 	}
 
@@ -319,11 +335,14 @@ public class Individual implements Comparable
 	 */
 	public static void recombine(Individual indiv1, Individual indiv2, float px)
 	{
-		Function.recombine(indiv1.mainFunction, indiv2.mainFunction, px);
-
-		for (int n = 0; n < indiv1.adfs.size(); n++)
+		if (1 - Register.RANDOM.nextFloat() <= px)
 		{
-			Function.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n), px);
+			Function.recombine(indiv1.mainFunction, indiv2.mainFunction);
+
+			for (int n = 0; n < indiv1.adfs.size(); n++)
+			{
+				Function.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n));
+			}
 		}
 	}
 

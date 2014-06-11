@@ -29,9 +29,9 @@ public class Function
 	public static final String[] STATIC_TERMINAL_FUNCTIONS = new String[] {
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "ENERGY",
 			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", "ROUT", "++",
-			"--", "SELF", "SKIP1", "SKIP2", "NORTH", "SOUTH", "EAST", "WEST",
-			"NORTH_WEST", "NORTH_EAST", "SOUTH_WEST", "SOUTH_EAST", "RLEFT",
-			"RRIGHT", "RSTRAIGHT", "A", "C", "U", "G" };
+			"--", "SELF", /* "SKIP1", "SKIP2", */"NORTH", "SOUTH", "EAST",
+			"WEST", "NORTH_WEST", "NORTH_EAST", "SOUTH_WEST", "SOUTH_EAST",
+			"RLEFT", "RRIGHT", "RSTRAIGHT", "A", "C", "U", "G" };
 
 	/**
 	 * Funktionen mit Parameter new RegisterFactory("",0) Statische Funktionen,
@@ -40,15 +40,14 @@ public class Function
 	public static final RegisterFactory[] STATIC_FUNCTIONS = new RegisterFactory[] {
 			new RegisterFactory("IF_LESS", 4),
 			new RegisterFactory("IF_GREATER", 4),
-			new RegisterFactory("IF_EQUAL", 4),
-			new RegisterFactory("ADD", 2),
+			new RegisterFactory("IF_EQUAL", 4), new RegisterFactory("ADD", 2),
 			new RegisterFactory("SUBTRACT", 2),
 			new RegisterFactory("MULTIPLY", 2),
 			new RegisterFactory("DIVIDE", 2),
 			new RegisterFactory("LOOK_BACK", 1),
 			new RegisterFactory("LOOK_FORWARD", 1),
-			 new RegisterFactory("CALCULATE_ENERGY", 2),
-			 new RegisterFactory("GETBOND", 2),
+			new RegisterFactory("CALCULATE_ENERGY", 2),
+			new RegisterFactory("GETBOND", 2),
 			new RegisterFactory("PURINE", 1),
 			new RegisterFactory("PYRIMIDINE", 1),
 			// new RegisterFactory("PRG5", 5),
@@ -117,10 +116,11 @@ public class Function
 		/**
 		 * nur SKIP und SKIP2 zulassen?
 		 */
-		/*
-		 * for (int i = 1; i < registerCount / 2; i++) {
-		 * dynamic_TerminalFunctions.add("SKIP" + i); }
-		 */
+
+		for (int i = 1; i < registerCount / 2; i++)
+		{
+			dynamic_TerminalFunctions.add("SKIP" + i);
+		}
 
 		/**
 		 * Lade Terminale mit Zahlen auf
@@ -208,10 +208,10 @@ public class Function
 		/**
 		 * test: Wertespeicher vorher löschen
 		 */
-		for (Register reg : registers)
-		{
-			reg.value = 0;
-		}
+//		for (Register reg : registers)
+//		{
+//			reg.value = 0;
+//		}
 
 		while (bzr < registers.size())
 		{
@@ -308,10 +308,7 @@ public class Function
 
 			if (1 - Register.RANDOM.nextFloat() <= p)
 			{
-				int parameter = Register.RANDOM
-						.nextInt(reg.parameters.length + 1);
-
-				if (parameter == 0)
+				if (reg.parameters.length == 0)
 				{
 					/**
 					 * Mutate whole register
@@ -320,10 +317,23 @@ public class Function
 				}
 				else
 				{
-					/**
-					 * Mutate parameter
-					 */
-					reg.parameters[parameter - 1] = randomTerminal();
+					int parameter = Register.RANDOM
+							.nextInt(reg.parameters.length + 1);
+
+					if (parameter >= reg.parameters.length)
+					{
+						/**
+						 * Mutate whole register
+						 */
+						this.registers.set(i, randomRegister());
+					}
+					else
+					{
+						/**
+						 * Mutate parameter
+						 */
+						reg.parameters[parameter] = randomTerminal();
+					}
 				}
 			}
 		}
@@ -345,38 +355,36 @@ public class Function
 	 * @param px
 	 *            Recombination probability
 	 */
-	public static void recombine(Function indiv1, Function indiv2, float px)
+	public static void recombine(Function indiv1, Function indiv2)
 	{
 		int reg = indiv1.registers.size();
 
-		if (1 - Register.RANDOM.nextFloat() <= px)
+		int index1 = Register.RANDOM.nextInt(reg);
+		int index2 = Register.RANDOM.nextInt(reg);
+
+		if (index1 == index2)
+			return;
+		if (index2 < index1)
 		{
-			int index1 = Register.RANDOM.nextInt(reg);
-			int index2 = Register.RANDOM.nextInt(reg);
-
-			if (index1 == index2)
-				return;
-			if (index2 < index1)
-			{
-				int val1 = index1;
-				int val2 = index2;
-				index2 = val1;
-				index1 = val2;
-			}
-
-			// X-Over
-			for (int i = index1; i < index2; i++)
-			{
-				/**
-				 * Swappe Register innerhalb in [index1, index2)
-				 */
-				Register r1 = indiv1.registers.get(i);
-				Register r2 = indiv2.registers.get(i);
-
-				indiv1.registers.set(i, r2);
-				indiv2.registers.set(i, r1);
-			}
+			int val1 = index1;
+			int val2 = index2;
+			index2 = val1;
+			index1 = val2;
 		}
+
+		// X-Over
+		for (int i = index1; i < index2; i++)
+		{
+			/**
+			 * Swappe Register innerhalb in [index1, index2)
+			 */
+			Register r1 = indiv1.registers.get(i);
+			Register r2 = indiv2.registers.get(i);
+
+			indiv1.registers.set(i, r2);
+			indiv2.registers.set(i, r1);
+		}
+
 	}
 
 	// /**
