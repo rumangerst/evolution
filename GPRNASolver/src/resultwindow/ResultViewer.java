@@ -124,8 +124,8 @@ public class ResultViewer extends JFrame
 
 	public void refreshData(Individual indiv)
 	{
-		this.setTitle(String.format("Energy: %d, Fitness: %f, %s",
-				indiv.structure.energy(), indiv.fitness, indiv.type.name()));
+		this.setTitle(String.format("Energy: %d, Fitness: %f",
+				indiv.structure.energy(), indiv.fitness));
 
 		basePairCanvas.setData(indiv.structure, indiv.rna);
 		structureCanvas.setData(indiv.structure);

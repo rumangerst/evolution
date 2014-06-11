@@ -28,10 +28,18 @@ public class Function
 	 */
 	public static final String[] STATIC_TERMINAL_FUNCTIONS = new String[] {
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "ENERGY",
-			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", "ROUT", "++",
-			"--", "SELF", /* "SKIP1", "SKIP2", */"NORTH", "SOUTH", "EAST",
-			"WEST", "NORTH_WEST", "NORTH_EAST", "SOUTH_WEST", "SOUTH_EAST",
-			"RLEFT", "RRIGHT", "RSTRAIGHT", "A", "C", "U", "G" };
+			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", /*"ROUT",
+																	 * "++",
+																	 * "--",
+																	 * "SELF",
+																	 *//*
+																		 * "SKIP1",
+																		 * "SKIP2"
+																		 * ,
+																		 */
+			"NORTH", "SOUTH", "EAST", "WEST", "NORTH_WEST", "NORTH_EAST",
+			"SOUTH_WEST", "SOUTH_EAST", "RLEFT", "RRIGHT", "RSTRAIGHT", "A",
+			"C", "U", "G" };
 
 	/**
 	 * Funktionen mit Parameter new RegisterFactory("",0) Statische Funktionen,
@@ -51,7 +59,9 @@ public class Function
 			new RegisterFactory("PURINE", 1),
 			new RegisterFactory("PYRIMIDINE", 1),
 			// new RegisterFactory("PRG5", 5),
-			new RegisterFactory("RETURN", 1)
+			new RegisterFactory("RETURN", 1),
+			new RegisterFactory("RDIR", 1), //Wandelt Zahl in eine Richtung um
+			new RegisterFactory("NUC", 1) //Wandelt Zahl in Nucleotid um
 	/*
 	 * new RegisterFactory("AND", 2), new RegisterFactory("OR", 2), new
 	 * RegisterFactory("XOR", 2), new RegisterFactory("NOT", 1)
@@ -94,7 +104,7 @@ public class Function
 	 * @param adfCount
 	 *            Anzahl an zugreifbaren ADF; Nur für MAIN-Funktion!
 	 */
-	public Function(ProgramType type, int parameterCount, int registerCount,
+	public Function(int parameterCount, int registerCount,
 			ArrayList<Function> adfs)
 	{
 		this.parameterCount = parameterCount;
@@ -122,13 +132,13 @@ public class Function
 			dynamic_TerminalFunctions.add("SKIP" + i);
 		}
 
-		/**
-		 * Lade Terminale mit Zahlen auf
-		 */
-		// for (int i = -registerCount; i <= registerCount; i++)
-		// {
-		// dynamic_TerminalFunctions.add("" + i);
-		// }
+//		/**
+//		 * Lade Terminale mit Zahlen auf
+//		 */
+//		for (int i = -registerCount; i <= registerCount; i++)
+//		{
+//			dynamic_TerminalFunctions.add("" + i);
+//		}
 
 		if (adfs != null)
 		{
@@ -139,24 +149,12 @@ public class Function
 			}
 		}
 
-		/**
-		 * Lieber Java-Irgendwas-Guru im ORACE-HQ - Bitte GIBT MIR VERDAMMT
-		 * NOCHMAL PREPROCESSOREN!!!!
-		 */
-		if (type == ProgramType.EFFECT)
-		{
+		
 			dynamic_TerminalFunctions.add("LEFT");
 			dynamic_TerminalFunctions.add("RIGHT");
 			dynamic_TerminalFunctions.add("STRAIGHT");
 			dynamic_TerminalFunctions.add("UNDO");
-		}
-		else
-		{
-			dynamic_TerminalFunctions.add("PUT_LEFT");
-			dynamic_TerminalFunctions.add("PUT_RIGHT");
-			dynamic_TerminalFunctions.add("PUT_STRAIGHT");
-			dynamic_TerminalFunctions.add("PUT_UNDO");
-		}
+		
 
 		this.registers = new ArrayList<Register>();
 
@@ -208,10 +206,10 @@ public class Function
 		/**
 		 * test: Wertespeicher vorher löschen
 		 */
-//		for (Register reg : registers)
-//		{
-//			reg.value = 0;
-//		}
+		for (Register reg : registers)
+		{
+			reg.value = 0;
+		}
 
 		while (bzr < registers.size())
 		{

@@ -14,8 +14,6 @@ public class Individual implements Comparable
 	public double fitness;
 	public int energy;
 
-	public ProgramType type;
-
 	/**
 	 * Holds sequence
 	 */
@@ -43,11 +41,10 @@ public class Individual implements Comparable
 	 */
 	public int runtime_energy_old;
 
-	public Individual(ProgramType type)
+	public Individual()
 	{
 		sequence = new LinkedList<Integer>();
 		structure = new RNAField();
-		this.type = type;
 	}
 
 	/**
@@ -57,8 +54,8 @@ public class Individual implements Comparable
 	 */
 	public Individual(Individual tocopy)
 	{
-		this(tocopy.type);
-
+		this();
+		
 		this.mainFunction = new Function(tocopy.mainFunction);
 		this.adfs = new ArrayList<Function>();
 		for (Function reg : tocopy.adfs)
@@ -125,10 +122,10 @@ public class Individual implements Comparable
 
 		for (int i = 0; i < adfs_count; i++)
 		{
-			adfs.add(new Function(type, adfs_param, adfs_reg, null));
+			adfs.add(new Function(adfs_param, adfs_reg, null));
 		}
 
-		mainFunction = new Function(type, 0, reg, adfs);
+		mainFunction = new Function(0, reg, adfs);
 	}
 
 	public void runBondingTest(String rna, String instructions)
@@ -224,10 +221,10 @@ public class Individual implements Comparable
 			 */
 			{
 				int value = mainFunction.execute(this, null, adfs);
-				if (type == ProgramType.EFFECT)
-				{
+				
 					RelativeDirection dir = RelativeDirection
 							.fromInteger(value);
+					
 					if (dir != RelativeDirection.UNDO)
 					{
 						put(dir);
@@ -236,7 +233,6 @@ public class Individual implements Comparable
 					{
 						structure.undo();
 					}
-				}
 			}
 		}
 
@@ -284,7 +280,7 @@ public class Individual implements Comparable
 	public double fitness()
 	{
 		double leftover_sequence = rna.length() - structure.structureLength;
-		energy = structure.energy();
+		this.energy = structure.energy();
 		//
 		// if(leftover_sequence != 0)
 		// return Double.MAX_VALUE;
@@ -364,7 +360,6 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
-		wr.write(type.name() + "\n");
 		wr.write(rna + "\n");
 
 		for (int i = 0; i < adfs.size(); i++)
@@ -382,8 +377,7 @@ public class Individual implements Comparable
 		BufferedReader rd = new BufferedReader(new FileReader(file));
 
 		rd.readLine(); // ignore name
-
-		ProgramType type = ProgramType.valueOf(rd.readLine());
+		
 
 		String rna = rd.readLine();
 
@@ -392,7 +386,7 @@ public class Individual implements Comparable
 		/**
 		 * Create individual
 		 */
-		Individual indiv = new Individual(type);
+		Individual indiv = new Individual();
 		indiv.adfs = new ArrayList<Function>();
 
 		/**
@@ -415,12 +409,12 @@ public class Individual implements Comparable
 
 				if (buffer.startsWith("#MAIN"))
 				{
-					indiv.mainFunction = current = new Function(type,
+					indiv.mainFunction = current = new Function(
 							parameterCount, registerCount, indiv.adfs);
 				}
 				else
 				{
-					current = new Function(type, parameterCount, registerCount,
+					current = new Function( parameterCount, registerCount,
 							indiv.adfs);
 					indiv.adfs.add(current);
 				}

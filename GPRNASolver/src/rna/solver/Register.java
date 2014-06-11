@@ -59,24 +59,6 @@ public class Register
 			return 0;
 
 		/**
-		 * PUT_X functions
-		 */
-		if (label.equals("PUT_STRAIGHT"))
-		{
-			return individual.put(RelativeDirection.STRAIGHT);
-		}
-		if (label.equals("PUT_LEFT"))
-		{
-			return individual.put(RelativeDirection.LEFT);
-
-		}
-		if (label.equals("PUT_RIGHT"))
-		{
-			return individual.put(RelativeDirection.RIGHT);
-
-		}
-
-		/**
 		 * COLLIDE_X functions
 		 */
 		if (label.equals("COLLIDE_STRAIGHT"))
@@ -91,15 +73,6 @@ public class Register
 		if (label.equals("COLLIDE_RIGHT"))
 		{
 			return individual.checkCollision(RelativeDirection.RIGHT);
-
-		}
-
-		/**
-		 * PUT_UNDO
-		 */
-		if (label.equals("PUT_UNDO"))
-		{
-			return individual.undoPut();
 
 		}
 
@@ -202,7 +175,7 @@ public class Register
 		}
 		if (label.equals("UNDO"))
 		{
-			return -1000000;
+			return 2;
 		}
 
 		/**
@@ -721,6 +694,23 @@ public class Register
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			value = ~r1;
+			return;
+		}
+		
+		if (label.equals("RDIR"))
+		{
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+
+			value = RelativeDirection.fromInteger(r1).toInteger();
+			
+			return;
+		}
+		if (label.equals("NUC"))
+		{
+			int r1 = executeTerminal(individual, parent, parameters[0]);
+
+			value = NucleotideType.fromInteger(r1).toInteger();
+			
 			return;
 		}
 

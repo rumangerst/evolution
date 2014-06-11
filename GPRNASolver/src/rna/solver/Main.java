@@ -45,12 +45,12 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 20;
-		runner.mutateProbability = 2.0f / 20.0f;
+		runner.mutateProbability = 1.0f / 20.0f;
 		//runner.recombProbability = 0.1f;
 		
 		runner.adfCount = 3;
-		runner.adfParameters = 5;
-		runner.adfRegisters = 15;
+		runner.adfParameters = 3;
+		runner.adfRegisters = 20;
 		
 		runner.generations = 5000;
 		
@@ -184,11 +184,11 @@ public class Main
 		 * Settings
 		 */
 		runner.registerCount = 15;
-		runner.mutateProbability = 1.0f / 8.0f;
+		runner.mutateProbability = 1.0f / 15.0f;
 		
-		runner.adfCount = 5;
-		runner.adfParameters = 5;
-		runner.adfRegisters = 10;
+		runner.adfCount = 2;
+		runner.adfParameters = 3;
+		runner.adfRegisters = 15;
 		
 		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
@@ -232,7 +232,7 @@ public class Main
 	
 	private static void bondingTest(String rna, String instructions)
 	{
-		Individual indiv = new Individual(ProgramType.EFFECT);
+		Individual indiv = new Individual();
 		indiv.runBondingTest(rna, instructions);
 		
 		ResultViewer.showResults(indiv);
@@ -263,7 +263,7 @@ public class Main
 		//evilTopoplogyTest1();
 		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
-		easyGCTest();
+		//easyGCTest();
 		//easyHairPinTest();
 		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();
@@ -276,7 +276,9 @@ public class Main
 		//test();
 		
 		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
-		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
+		test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
+		
+		//openResult("Results/GC-RNA/result3.RNASLV");
 	}
 
 }
