@@ -7,10 +7,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import javax.swing.JPanel;
+
 import rna.solver.Nucleotide;
 import rna.solver.RNAField;
 
-public class StructureCanvas extends Canvas
+public class StructureCanvas extends JPanel
 {
 	private RNAField structure;
 

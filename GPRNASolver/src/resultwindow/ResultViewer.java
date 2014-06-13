@@ -6,9 +6,12 @@ import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import rna.solver.Function;
 import rna.solver.Individual;
@@ -21,12 +24,22 @@ import javax.swing.BoxLayout;
 
 import java.awt.TextArea;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
-public class ResultViewer extends JFrame
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+public class ResultViewer extends JFrame implements ActionListener
 {
 	private BasePairCanvas basePairCanvas;
 	private StructureCanvas structureCanvas;
 	private TextArea code;
+
+	private Individual currentIndividual;
 
 	/**
 	 * Launch the application.
@@ -60,6 +73,25 @@ public class ResultViewer extends JFrame
 
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
+		{
+			JMenuBar menuBar = new JMenuBar();
+			getContentPane().add(menuBar, BorderLayout.NORTH);
+			{
+				JMenu fileMenu = new JMenu("File");
+				menuBar.add(fileMenu);
+				JMenuItem fileSaveMenuButton = new JMenuItem("Save ...");
+				fileMenu.add(fileSaveMenuButton);
+				fileSaveMenuButton.setActionCommand("SAVE");
+				{
+					JMenuItem fileLoadMenuButton = new JMenuItem("Load ...");
+					fileMenu.add(fileLoadMenuButton);
+					fileLoadMenuButton.setActionCommand("LOAD");
+					fileLoadMenuButton.addActionListener(this);
+				}
+				fileSaveMenuButton.addActionListener(this);
+			}
+
+		}
 		{
 			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 			getContentPane().add(tabbedPane, BorderLayout.CENTER);
@@ -124,6 +156,8 @@ public class ResultViewer extends JFrame
 
 	public void refreshData(Individual indiv)
 	{
+		currentIndividual = indiv;
+
 		this.setTitle(String.format("Energy: %d, Fitness: %f",
 				indiv.structure.energy(), indiv.fitness));
 
@@ -145,4 +179,56 @@ public class ResultViewer extends JFrame
 		code.setText(str.toString());
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent arg0)
+	{
+		if (arg0.getActionCommand().equals("SAVE"))
+		{
+			if (currentIndividual != null)
+			{
+				JFileChooser dlg = new JFileChooser();
+				dlg.setCurrentDirectory(new File(System
+						.getProperty("user.dir")));
+				dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
+						"RNASLV"));
+				if (dlg.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+				{
+					try
+					{
+						currentIndividual.write(dlg.getSelectedFile()
+								.getAbsolutePath());
+					}
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		else if (arg0.getActionCommand().equals("LOAD"))
+		{
+
+			JFileChooser dlg = new JFileChooser();
+			dlg.setCurrentDirectory(new File(System
+					.getProperty("user.dir")));
+			dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
+					"RNASLV"));
+			if (dlg.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				try
+				{
+					Individual indiv = Individual.load(dlg.getSelectedFile()
+							.getAbsolutePath());
+					refreshData(indiv);
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+	}
 }

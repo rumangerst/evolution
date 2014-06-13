@@ -1,16 +1,16 @@
 package resultwindow;
 
-import java.awt.BasicStroke;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import javax.swing.JPanel;
+
 import rna.solver.Nucleotide;
 import rna.solver.RNAField;
 
-public class BasePairCanvas extends Canvas
+public class BasePairCanvas extends JPanel
 {
 	private RNAField structure;
 	private String rna;

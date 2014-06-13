@@ -149,15 +149,6 @@ public class Register
 			return individual.sequence.get(0);
 		}
 
-		// /**
-		// * Indicate that next register will be skipped
-		// */
-		// if (label.equals("SKIP"))
-		// {
-		// parent.bzr++;
-		// return 0;
-		// }
-
 		/**
 		 * Konstaten für LINKS, RECHTS und GERADEAUS
 		 */
@@ -173,52 +164,6 @@ public class Register
 		{
 			return 1;
 		}
-		if (label.equals("UNDO"))
-		{
-			return 2;
-		}
-
-		/**
-		 * ROUT, Pointer auf höchsten Register
-		 */
-		if (label.equals("ROUT"))
-		{
-			label = "R" + (parent.registers.size() - 1);
-		}
-
-		/**
-		 * ++ und --
-		 */
-		if (label.equals("++"))
-		{
-			value++;
-			return value - 1;
-		}
-		if (label.equals("--"))
-		{
-			value--;
-			return value + 1;
-		}
-
-		/**
-		 * SELF - Eigener wert
-		 */
-		if (label.equals("SELF"))
-		{
-			return value;
-		}
-
-		// /**
-		// * Boolesche Werte
-		// */
-		// if (label.equals("TRUE"))
-		// {
-		// return 1;
-		// }
-		// if (label.equals("FALSE"))
-		// {
-		// return 0;
-		// }
 
 		/**
 		 * Himmelsrichtungen, die zurückgeben, welches Nukleotid an POS N ist
@@ -310,8 +255,8 @@ public class Register
 		if (label.equals("RLEFT"))
 		{
 			Nucleotide current = individual.structure.current;
-			Point p = NucleotideDirection.shiftByDir(current.x,
-					current.y, RelativeDirection.LEFT.toAbsolute(current.dir));
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.LEFT.toAbsolute(current.dir));
 
 			Nucleotide nuc = individual.structure.get(p.x, p.y);
 
@@ -322,8 +267,8 @@ public class Register
 		if (label.equals("RSTRAIGHT"))
 		{
 			Nucleotide current = individual.structure.current;
-			Point p = NucleotideDirection.shiftByDir(current.x,
-					current.y, RelativeDirection.STRAIGHT.toAbsolute(current.dir));
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.STRAIGHT.toAbsolute(current.dir));
 
 			Nucleotide nuc = individual.structure.get(p.x, p.y);
 
@@ -334,8 +279,8 @@ public class Register
 		if (label.equals("RRIGHT"))
 		{
 			Nucleotide current = individual.structure.current;
-			Point p = NucleotideDirection.shiftByDir(current.x,
-					current.y, RelativeDirection.RIGHT.toAbsolute(current.dir));
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.RIGHT.toAbsolute(current.dir));
 
 			Nucleotide nuc = individual.structure.get(p.x, p.y);
 
@@ -591,40 +536,6 @@ public class Register
 			return;
 		}
 
-		if (label.equals("SUM"))
-		{
-			int r1 = executeTerminal(individual, parent, parameters[0]);
-
-			if (r1 < 0 || r1 > 100)
-			{
-				value = FALSE;
-				return;
-			}
-			else
-			{
-				value = 0;
-
-				for (int i = 0; i < r1; i++)
-				{
-					value += executeTerminal(individual, parent, parameters[1]);
-				}
-			}
-
-			return;
-		}
-
-		if (label.equals("PRG5"))
-		{
-			value = 0;
-
-			for (int i = 0; i < parameters.length; i++)
-			{
-				value += executeTerminal(individual, parent, parameters[i]);
-			}
-
-			return;
-		}
-
 		/**
 		 * Return setzt Wert von Ausgaberegister auf P1, dann BZR auf genügend
 		 * großen Wert; Schleife wird abbrechen und P1 wird vom Programm als
@@ -662,47 +573,12 @@ public class Register
 			return;
 		}
 
-		/**
-		 * BOOLSCHE Funktionen AND OR XOR NOT
-		 */
-		if (label.equals("AND"))
-		{
-			int r1 = executeTerminal(individual, parent, parameters[0]);
-			int r2 = executeTerminal(individual, parent, parameters[0]);
-
-			value = r1 & r2;
-			return;
-		}
-		if (label.equals("OR"))
-		{
-			int r1 = executeTerminal(individual, parent, parameters[0]);
-			int r2 = executeTerminal(individual, parent, parameters[0]);
-
-			value = r1 | r2;
-			return;
-		}
-		if (label.equals("XOR"))
-		{
-			int r1 = executeTerminal(individual, parent, parameters[0]);
-			int r2 = executeTerminal(individual, parent, parameters[0]);
-
-			value = r1 ^ r2;
-			return;
-		}
-		if (label.equals("NOT"))
-		{
-			int r1 = executeTerminal(individual, parent, parameters[0]);
-
-			value = ~r1;
-			return;
-		}
-		
 		if (label.equals("RDIR"))
 		{
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			value = RelativeDirection.fromInteger(r1).toInteger();
-			
+
 			return;
 		}
 		if (label.equals("NUC"))
@@ -710,7 +586,52 @@ public class Register
 			int r1 = executeTerminal(individual, parent, parameters[0]);
 
 			value = NucleotideType.fromInteger(r1).toInteger();
-			
+
+			return;
+		}
+
+		if (label.equals("MIN"))
+		{
+			value = Integer.MAX_VALUE;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = executeTerminal(individual, parent, parameters[i]);
+
+				if (r < value)
+					value = r;
+			}
+
+			return;
+		}
+
+		if (label.equals("MAX"))
+		{
+			value = Integer.MIN_VALUE;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = executeTerminal(individual, parent, parameters[i]);
+
+				if (r > value)
+					value = r;
+			}
+
+			return;
+		}
+
+		if (label.equals("AVG"))
+		{
+			value = 0;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = executeTerminal(individual, parent, parameters[i]);
+				value += r;
+			}
+
+			value = value / 5;
+
 			return;
 		}
 

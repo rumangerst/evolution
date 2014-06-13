@@ -28,18 +28,10 @@ public class Function
 	 */
 	public static final String[] STATIC_TERMINAL_FUNCTIONS = new String[] {
 			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "ENERGY",
-			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", /*"ROUT",
-																	 * "++",
-																	 * "--",
-																	 * "SELF",
-																	 *//*
-																		 * "SKIP1",
-																		 * "SKIP2"
-																		 * ,
-																		 */
+			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", 
 			"NORTH", "SOUTH", "EAST", "WEST", "NORTH_WEST", "NORTH_EAST",
 			"SOUTH_WEST", "SOUTH_EAST", "RLEFT", "RRIGHT", "RSTRAIGHT", "A",
-			"C", "U", "G" };
+			"C", "U", "G", "LEFT", "RIGHT", "STRAIGHT"};
 
 	/**
 	 * Funktionen mit Parameter new RegisterFactory("",0) Statische Funktionen,
@@ -61,7 +53,11 @@ public class Function
 			// new RegisterFactory("PRG5", 5),
 			new RegisterFactory("RETURN", 1),
 			new RegisterFactory("RDIR", 1), //Wandelt Zahl in eine Richtung um
-			new RegisterFactory("NUC", 1) //Wandelt Zahl in Nucleotid um
+			new RegisterFactory("NUC", 1), //Wandelt Zahl in Nucleotid um
+			
+			new RegisterFactory("MIN", 5),
+			new RegisterFactory("MAX", 5),
+			new RegisterFactory("AVG", 5)
 	/*
 	 * new RegisterFactory("AND", 2), new RegisterFactory("OR", 2), new
 	 * RegisterFactory("XOR", 2), new RegisterFactory("NOT", 1)
@@ -148,13 +144,6 @@ public class Function
 						.get(i).parameterCount));
 			}
 		}
-
-		
-			dynamic_TerminalFunctions.add("LEFT");
-			dynamic_TerminalFunctions.add("RIGHT");
-			dynamic_TerminalFunctions.add("STRAIGHT");
-			dynamic_TerminalFunctions.add("UNDO");
-		
 
 		this.registers = new ArrayList<Register>();
 

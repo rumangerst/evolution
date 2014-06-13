@@ -16,10 +16,10 @@ public class GPRunner
 	public String rna;
 
 	public int generations;
-	
+
 	public int populationSize;
 	public int children;
-	
+
 	/**
 	 * Turniersekeltion Turniere
 	 */
@@ -34,9 +34,10 @@ public class GPRunner
 	public int adfParameters;
 
 	public LinkedList<Individual> population = new LinkedList<>();
-	
+
 	/**
 	 * Data for plot
+	 * 
 	 * @param rna
 	 */
 	public LinkedList<Double> results_BestFitness = new LinkedList<>();
@@ -46,46 +47,36 @@ public class GPRunner
 		this.rna = rna;
 
 		this.generations = 1000;
-		
+
 		this.populationSize = 800;
-		this.children = 400; //jeder elter erzeugt 2 Kinder	
+		this.children = 400; // jeder elter erzeugt 2 Kinder
 		this.registerCount = 40;
 		this.adfCount = 3;
 		this.adfRegisters = registerCount / 2;
 		this.adfParameters = 5;
-		
+
 		this.tournaments = 10;
 
 		recombProbability = 0.2f;
 		mutateProbability = 1.0f / this.registerCount;
 	}
-	
+
 	public List<Individual> tournamentSelection()
 	{
 		LinkedList<Individual> results = new LinkedList<Individual>();
-		
-		for(int i = 0; i < tournaments; i++)
+
+		for (int i = 0; i < tournaments; i++)
 		{
-			results.add(population.get(Register.RANDOM.nextInt(population.size())));
+			results.add(population.get(Register.RANDOM.nextInt(population
+					.size())));
 		}
-		
+
 		Collections.sort(results);
-		
+
 		return results.subList(0, 2);
 	}
-	
-	public boolean popHasOptimum(int optimum)
-	{
-		for(Individual indiv : population)
-		{
-			if(indiv.energy <= optimum)
-				return true;
-		}
-		
-		return false;
-	}
 
-	public Individual evolve(int energy_optimum, boolean showBest)
+	public Individual evolve()
 	{
 		/**
 		 * Create inital population
@@ -103,12 +94,6 @@ public class GPRunner
 		 */
 		for (int generation = 0; generation < generations; generation++)
 		{
-			if(popHasOptimum(energy_optimum))
-			{
-				System.out.println("Optimum in Generation " + (generation + 1) + " erreicht");
-				break;
-			}
-			
 			System.out.println("Generation " + (generation + 1));
 
 			/**
@@ -118,38 +103,41 @@ public class GPRunner
 			{
 				indiv.run(rna);
 			}
-			
-			if(showBest)
+
+			Individual best = population.getFirst();
+
+			for (Individual indiv : population)
 			{
-				Individual best = population.getFirst();
-				
-				for(Individual indiv : population)
+				if (indiv.fitness < best.fitness)
 				{
-					if(indiv.fitness < best.fitness)
-					{
-						best = indiv;
-					}
+					best = indiv;
 				}
-				
-				System.out.println("Best individual: " + best.fitness + " energy: " + best.energy);
-				System.out.println("Last register of main output (" + best.mainFunction.outputRegister + "): " + best.mainFunction.registers.get(best.mainFunction.outputRegister).toString());
-			
-				results_BestFitness.add(best.fitness);
 			}
 
-//			/**
-//			 * Sort population by fitness
-//			 */
-//			Collections.sort(population);
-//
-//			// Just some text
-//			System.out
-//					.println("Best fitness: " + population.getFirst().fitness);
+			System.out.println("Best individual: " + best.fitness + " energy: "
+					+ best.energy);
+			System.out.println("Last register of main output ("
+					+ best.mainFunction.outputRegister
+					+ "): "
+					+ best.mainFunction.registers.get(
+							best.mainFunction.outputRegister).toString());
 
-//			/**
-//			 * Select parents
-//			 */
-//			List<Individual> parents = population.subList(0, this.parents - 1);
+			results_BestFitness.add(best.fitness);
+
+			// /**
+			// * Sort population by fitness
+			// */
+			// Collections.sort(population);
+			//
+			// // Just some text
+			// System.out
+			// .println("Best fitness: " + population.getFirst().fitness);
+
+			// /**
+			// * Select parents
+			// */
+			// List<Individual> parents = population.subList(0, this.parents -
+			// 1);
 
 			/**
 			 * Create new population *
@@ -165,59 +153,56 @@ public class GPRunner
 			// newpop.add(new Individual(indiv));
 			// }
 
-			
-//
-//			/**
-//			 * Make new children by pairwise recombining parents
-//			 */
-//			while (!parents.isEmpty())
-//			{
-//				Individual father = parents.remove(0);
-//
-//				for (Individual mother : parents)
-//				{
-//					for (int i = 0; i < children; i++)
-//					{
-//						Individual child1 = new Individual(father);
-//						Individual child2 = new Individual(mother);
-//
-//						Individual.recombine(child1, child2, recombProbability);
-//						child1.mutate(mutateProbability);
-//
-//						population.add(child1);
-//						population.add(child2);
-//					}
-//				}
-//			}
-			
-			for(int i = 0; i < children; i++)
+			//
+			// /**
+			// * Make new children by pairwise recombining parents
+			// */
+			// while (!parents.isEmpty())
+			// {
+			// Individual father = parents.remove(0);
+			//
+			// for (Individual mother : parents)
+			// {
+			// for (int i = 0; i < children; i++)
+			// {
+			// Individual child1 = new Individual(father);
+			// Individual child2 = new Individual(mother);
+			//
+			// Individual.recombine(child1, child2, recombProbability);
+			// child1.mutate(mutateProbability);
+			//
+			// population.add(child1);
+			// population.add(child2);
+			// }
+			// }
+			// }
+
+			for (int i = 0; i < children; i++)
 			{
 				List<Individual> parents = tournamentSelection();
-				
-				//Testweise Plus-Strategie
-//				newpop.add( new Individual(parents.get(0)));
-//				newpop.add( new Individual(parents.get(1)));
-				
+
+				// Testweise Plus-Strategie
+				// newpop.add( new Individual(parents.get(0)));
+				// newpop.add( new Individual(parents.get(1)));
+
 				Individual child1 = new Individual(parents.get(0));
 				Individual child2 = new Individual(parents.get(1));
-				
+
 				Individual.recombine(child1, child2, recombProbability);
-				
+
 				child1.mutate(mutateProbability);
 				child2.mutate(mutateProbability);
-				
+
 				newpop.add(child1);
 				newpop.add(child2);
 			}
-			
+
 			/**
 			 * Population aktualisieren
 			 */
-			
+
 			this.population = newpop;
-			
-			
-			
+
 		}
 
 		System.out.println("Evolution loop finished.");

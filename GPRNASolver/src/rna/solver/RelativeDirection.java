@@ -55,18 +55,17 @@ public enum RelativeDirection
 	public static RelativeDirection fromInteger(int i)
 	{
 		i += 1; // Shift nach Rechts
-		i = Math.abs(i) % 4;
+		i = Math.abs(i) % 3;
 
 		if (i == 0)
 			return LEFT;
 		else if (i == 1)
 			return STRAIGHT;
 		else if (i == 2)
-			return RIGHT;
-		else
-		{
-			return UNDO;
-		}
+			return RIGHT;	
+		
+		//throw new RuntimeException();
+		return STRAIGHT;
 	}
 
 	public int toInteger()
@@ -78,9 +77,11 @@ public enum RelativeDirection
 		case STRAIGHT:
 			return 0;
 		case RIGHT:
-			return 1;
-		default:
-			return 2;
+			return 1;		
 		}
+		
+		//throw new RuntimeException();
+		
+		return 0;
 	}
 }

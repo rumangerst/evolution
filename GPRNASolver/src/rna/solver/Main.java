@@ -1,6 +1,7 @@
 package rna.solver;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import com.panayotis.gnuplot.JavaPlot;
 
@@ -28,7 +29,7 @@ public class Main
 		
 		
 		
-		ResultViewer.showResults(runner.evolve(-154, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -54,7 +55,7 @@ public class Main
 		
 		runner.generations = 5000;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -73,7 +74,7 @@ public class Main
 		runner.registerCount = 10;
 		runner.mutateProbability = 1.0f / 10.0f;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -96,7 +97,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -120,7 +121,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	 
@@ -144,7 +145,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -167,7 +168,7 @@ public class Main
 		runner.adfParameters = 5;
 		runner.adfRegisters = 20;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -190,7 +191,7 @@ public class Main
 		runner.adfParameters = 3;
 		runner.adfRegisters = 15;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -208,7 +209,7 @@ public class Main
 		runner.mutateProbability = mutate;
 		runner.recombProbability = recomb;
 		
-		ResultViewer.showResults(runner.evolve(Integer.MIN_VALUE, true));
+		ResultViewer.showResults(runner.evolve());
 		StatPlot.plotFitnessOverGeneration(runner.results_BestFitness);
 	}
 	
@@ -236,6 +237,243 @@ public class Main
 		indiv.runBondingTest(rna, instructions);
 		
 		ResultViewer.showResults(indiv);
+	}
+	
+	public static void superTestGC()
+	{
+		LinkedList<Individual> bestindivs = new LinkedList<Individual>();
+		LinkedList<LinkedList<Double>> bestdevs = new LinkedList<LinkedList<Double>>();
+		
+		Individual bestall = null;
+		LinkedList<Double> bestevo = null;
+		
+		Individual worstall = null;
+		
+		
+		for(int i = 0; i < 10;i++)
+		{
+			GPRunner runner = new GPRunner("GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC"); //6 C's fehlen am Ende
+			
+			/**
+			 * Settings
+			 */
+			runner.registerCount = 20;
+			runner.mutateProbability = 1.0f / 20.0f;
+			runner.generations = 2000;
+			
+			runner.adfCount = 1;
+			runner.adfParameters = 5;
+			runner.adfRegisters = 20;
+			
+			Individual best = runner.evolve();
+			
+			bestindivs.add(best);
+			bestdevs.add(runner.results_BestFitness);
+			
+			if(bestall == null || best.fitness < bestall.fitness)
+			{
+				bestall = best;
+				bestevo = runner.results_BestFitness;
+			}
+			if(worstall == null || best.fitness > worstall.fitness)
+			{
+				worstall = best;
+			}
+		}
+		
+		double avg = 0;
+		
+		for(Individual indiv : bestindivs)
+		{
+			System.out.println("********FITNESS::" + indiv.fitness + " E: " + indiv.energy);
+			avg += indiv.fitness;
+		}
+		
+		avg = avg / bestindivs.size();
+		
+		System.out.println("********* AVG:" + avg);
+		
+		ResultViewer.showResults(bestall);
+		ResultViewer.showResults(worstall);
+		StatPlot.plotFitnessOverGeneration(bestevo);
+		
+	}
+	
+	public static void superTestHairPin()
+	{
+		LinkedList<Individual> bestindivs = new LinkedList<Individual>();
+		LinkedList<LinkedList<Double>> bestdevs = new LinkedList<LinkedList<Double>>();
+		
+		Individual bestall = null;
+		LinkedList<Double> bestevo = null;
+		
+		Individual worstall = null;
+		
+		for(int i = 0; i < 10;i++)
+		{
+			GPRunner runner = new GPRunner("ACUCGGUUACGAG");
+			
+			/**
+			 * Settings
+			 */
+			runner.registerCount = 20;
+			runner.mutateProbability = 1.0f / 20.0f;
+			runner.generations = 2000;
+			
+			runner.adfCount = 1;
+			runner.adfParameters = 5;
+			runner.adfRegisters = 20;
+			
+			Individual best = runner.evolve();
+			
+			bestindivs.add(best);
+			bestdevs.add(runner.results_BestFitness);
+			
+			if(bestall == null || best.fitness < bestall.fitness)
+			{
+				bestall = best;
+				bestevo = runner.results_BestFitness;
+			}
+			if(worstall == null || best.fitness > worstall.fitness)
+			{
+				worstall = best;
+			}
+		}
+		
+		double avg = 0;
+		
+		for(Individual indiv : bestindivs)
+		{
+			System.out.println("********FITNESS::" + indiv.fitness + " E: " + indiv.energy);
+			avg += indiv.fitness;
+		}
+		
+		avg = avg / bestindivs.size();
+		
+		System.out.println("********* AVG:" + avg);
+		
+		ResultViewer.showResults(bestall);
+		ResultViewer.showResults(worstall);
+		StatPlot.plotFitnessOverGeneration(bestevo);
+		
+	}
+	
+	public static void superPseudoKnotTest()
+	{
+		LinkedList<Individual> bestindivs = new LinkedList<Individual>();
+		LinkedList<LinkedList<Double>> bestdevs = new LinkedList<LinkedList<Double>>();
+		
+		Individual bestall = null;
+		LinkedList<Double> bestevo = null;
+		
+		Individual worstall = null;
+		
+		for(int i = 0; i < 10;i++)
+		{
+			GPRunner runner = new GPRunner("ACGUCCCACGUAAAAAGGGACGUUUUUACGU");
+			
+			/**
+			 * Settings
+			 */
+			runner.registerCount = 20;
+			runner.mutateProbability = 1.0f / 20.0f;
+			runner.generations = 2000;
+			
+			runner.adfCount = 1;
+			runner.adfParameters = 5;
+			runner.adfRegisters = 20;
+			
+			Individual best = runner.evolve();
+			
+			bestindivs.add(best);
+			bestdevs.add(runner.results_BestFitness);
+			
+			if(bestall == null || best.fitness < bestall.fitness)
+			{
+				bestall = best;
+				bestevo = runner.results_BestFitness;
+			}
+			if(worstall == null || best.fitness > worstall.fitness)
+			{
+				worstall = best;
+			}
+		}
+		
+		double avg = 0;
+		
+		for(Individual indiv : bestindivs)
+		{
+			System.out.println("********FITNESS::" + indiv.fitness + " E: " + indiv.energy);
+			avg += indiv.fitness;
+		}
+		
+		avg = avg / bestindivs.size();
+		
+		System.out.println("********* AVG:" + avg);
+		
+		ResultViewer.showResults(bestall);
+		ResultViewer.showResults(worstall);
+		StatPlot.plotFitnessOverGeneration(bestevo);
+		
+	}
+	
+	public static void supertRNATest()
+	{
+		LinkedList<Individual> bestindivs = new LinkedList<Individual>();
+		LinkedList<LinkedList<Double>> bestdevs = new LinkedList<LinkedList<Double>>();
+		
+		Individual bestall = null;
+		LinkedList<Double> bestevo = null;
+		
+		Individual worstall = null;
+		
+		for(int i = 0; i < 5;i++)
+		{
+			GPRunner runner = new GPRunner("GGGGGUAUAGCUCAGUUGGUAGAGCGCUGCCUUUGCACGGCAGAUGUCAGGGGUUCGAGUCCCCUUACCUCCA");
+			
+			/**
+			 * Settings
+			 */
+			runner.registerCount = 40;
+			runner.mutateProbability = 1.0f / 40.0f;
+			runner.generations = 2000;
+			
+			runner.adfCount = 4;
+			runner.adfParameters = 5;
+			runner.adfRegisters = 40;
+			
+			Individual best = runner.evolve();
+			
+			bestindivs.add(best);
+			bestdevs.add(runner.results_BestFitness);
+			
+			if(bestall == null || best.fitness < bestall.fitness)
+			{
+				bestall = best;
+				bestevo = runner.results_BestFitness;
+			}
+			if(worstall == null || best.fitness > worstall.fitness)
+			{
+				worstall = best;
+			}
+		}
+		
+		double avg = 0;
+		
+		for(Individual indiv : bestindivs)
+		{
+			System.out.println("********FITNESS::" + indiv.fitness + " E: " + indiv.energy);
+			avg += indiv.fitness;
+		}
+		
+		avg = avg / bestindivs.size();
+		
+		System.out.println("********* AVG:" + avg);
+		
+		ResultViewer.showResults(bestall);
+		ResultViewer.showResults(worstall);
+		StatPlot.plotFitnessOverGeneration(bestevo);
+		
 	}
 
 	public static void main(String[] args)
@@ -276,9 +514,14 @@ public class Main
 		//test();
 		
 		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
-		test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
+		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
 		
 		//openResult("Results/GC-RNA/result3.RNASLV");
+		
+		//superTestGC();
+		//superTestHairPin();
+		//superPseudoKnotTest();
+		supertRNATest();
 	}
 
 }
