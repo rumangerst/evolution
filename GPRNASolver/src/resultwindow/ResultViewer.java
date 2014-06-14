@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -181,7 +182,7 @@ public class ResultViewer extends JFrame implements ActionListener
 
 	@Override
 	public void actionPerformed(ActionEvent arg0)
-	{
+	{		
 		if (arg0.getActionCommand().equals("SAVE"))
 		{
 			if (currentIndividual != null)

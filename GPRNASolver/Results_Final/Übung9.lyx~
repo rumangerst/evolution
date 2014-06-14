@@ -1,0 +1,2183 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Übung 9
+\end_layout
+
+\begin_layout Author
+Ruman Gerst, 136994
+\end_layout
+
+\begin_layout Part*
+Problem
+\end_layout
+
+\begin_layout Standard
+Es soll ein Programm gesucht werden, das durch inkrementelles Aufbauen eine
+ RNA-Sekundärstruktur aus einer Sequenz herstellen soll.
+ Dabei soll das Programm auf die bereits vorhandene Struktur lesend zugreifen
+ können und auch die noch zu hinzufügenden Nukleotide benutzen können.
+\end_layout
+
+\begin_layout Part*
+Umsetzung
+\end_layout
+
+\begin_layout Section*
+Individuum
+\end_layout
+
+\begin_layout Standard
+Ein Individuum 
+\begin_inset Formula $(S,Q,g_{main},G_{adf},F)$
+\end_inset
+
+ besteht aus einer Struktur S, einem Queue Q, einer Main-Funktion 
+\begin_inset Formula $g_{main}$
+\end_inset
+
+, einer Menge an ADF 
+\begin_inset Formula $G_{adf}$
+\end_inset
+
+ und der Fitness F.
+\end_layout
+
+\begin_layout Standard
+Bei der Bewertung des Individuums wird zuerst die RNA-Sequenz in den Queue
+ gelegt und für maximal 10 mal für jedes Nukleotid in der Sequenz 
+\begin_inset Formula $g_{main}$
+\end_inset
+
+ ausgeführt.
+ Funktionen geben eine Zahl in 
+\begin_inset Formula $\mathbb{Z}$
+\end_inset
+
+ (Integer) zurück, die in eine relative Richtung (Links, Rechts, Geradeaus)
+ gewrappt wird.
+ 
+\end_layout
+
+\begin_layout Standard
+Die Funktion hierfür ist 
+\begin_inset Formula $w(x)=\begin{cases}
+LEFT & (x+1)\, mod\,3=0\\
+STRAIGHT & (x+1)\, mod\,3=1\\
+RIGHT & (x+1)\, mod\,3=2
+\end{cases}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Entsprechend dieser Richtung wird das nächste Nukleotid aus Q genommen und
+ an die bestehende Struktur angehängt (Mit Aktualisierung der Bindung, ...).
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Für die Struktur S gibt es eine Energiefunktion 
+\begin_inset Formula $E(S)=\underset{n}{\sum}e(n)$
+\end_inset
+
+, die die Summer über die Energien aller Nukleotide bildet.
+ Diese wiederum betrachtet die Bindung zu den anderen Nukleotiden 
+\begin_inset Formula $e(n)=\begin{cases}
+2 & wenn\, keine\, Bindung\\
+-6 & wenn\, G-C\\
+-4 & wenn\, A-U\\
+-2 & wenn\, G-U\\
+4 & wenn\, Konflikt
+\end{cases}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Die Bindungsfunktion stellt bevorzugt Bindungen vom Typ 
+\begin_inset Quotes eld
+\end_inset
+
+Konflikt
+\begin_inset Quotes erd
+\end_inset
+
+ her, um falsch nebeneinanderliegende Nukleotide zu verhindern.
+ Die Bewertung von +4 zur Energie ist durch Ausprobieren zustandegekommen
+ und ist so niedrig gewählt, um die Wahrscheinlichkeit zu verringern, dass
+ die Struktur in einem lokalen Minium endet.
+\end_layout
+
+\begin_layout Standard
+Die Fitness eines Individuums ist dann 
+\begin_inset Formula $F(G)=\frac{(E(S)+|Q|^{2})}{|S|}$
+\end_inset
+
+.
+ Diese Funktion bewertet die übriggelassene Sequenz in Q schlecht und teilt
+ das Ergebnis durch die Länge der Struktur, um das Ergebnis besser mit anderen
+ RNA vergleichen zu können.
+\end_layout
+
+\begin_layout Section*
+Funktion
+\end_layout
+
+\begin_layout Standard
+Eine Funktion 
+\begin_inset Formula $(R,T_{dyn},P_{dyn})$
+\end_inset
+
+ besteht aus einer Menge an Registern R und aus Mengen an dynamischen (also
+ zu dieser Funktion gehörigen) Terminalfunktionen und Parameterfunktionen.
+ Ein Register ist entweder eine Terminalfunktion oder eine Parameterfunktion,
+ die wieder Terminalfunktionen als Parameter hat (aber keine Parameterfunktionen
+!).
+\end_layout
+
+\begin_layout Standard
+Neben den dynamischen Parameterfunktionen und Terminalfunktionen gibt es
+ je eine Menge an statischen Terminal- und Parameterfunktionen, die in jeder
+ Funktion vorkommen können.
+ Wenn eine Terminal- oder Parameterfunktion zufällig gewählt wird, ist jedes
+ Element gleichwahrscheinlich.
+\end_layout
+
+\begin_layout Standard
+Beispiele für dynamische Terminalfunktionen sind P1, P2, ...
+ die Parameter, die einem ADF übergeben werden und ein Beispiel für eine
+ dynamische Parameterfunktion ADF0 <P1> <P2> - ein ADF in der Main-Funktion.
+\end_layout
+
+\begin_layout Standard
+Jede Funktion kann durch RETURN <P1> einen Wert zurückgeben oder es wird
+ das letzte Register als Ausgaberegister benutzt.
+\end_layout
+
+\begin_layout Section*
+Register
+\end_layout
+
+\begin_layout Standard
+Ein Register 
+\begin_inset Formula $(L,P,v)$
+\end_inset
+
+ besteht aus einem Label L (Name der Parameterfunktion oder eine Terminalfunktio
+n), einer Menge an Parametern (Terminalfunktionen), sowie 
+\begin_inset Formula $v\in\mathbb{Z}$
+\end_inset
+
+, dem aktuellen Wert des Registers.
+ Vor Ausführung der Funktion wird 
+\begin_inset Formula $v=0$
+\end_inset
+
+ gesetzt.
+\end_layout
+
+\begin_layout Section*
+Mutation und Rekombination
+\end_layout
+
+\begin_layout Standard
+Es werden immer zwei Individuen mit 2-Punkt-Crossover rekombiniert.
+ Wenn rekombieniert wird, werden die Register der entsprechenden Funktionen
+ rekombiniert.
+\end_layout
+
+\begin_layout Standard
+Bei der Mutation der Register wird entweder das komplette Register durch
+ ein zufälliges ausgetauscht oder ein zufälliger Parameter.
+ Dabei wird die komplette Mutation als 
+\begin_inset Quotes eld
+\end_inset
+
+zusätzlicher
+\begin_inset Quotes erd
+\end_inset
+
+ Parameter gezählt.
+ Wenn dann dieser 
+\begin_inset Quotes eld
+\end_inset
+
+Parameter
+\begin_inset Quotes erd
+\end_inset
+
+ ausgewählt wird, dann wird das komplette register mutiert.
+ Sonst wird nur ein Parameter durch eine zufällige Terminalfunktion ausgetauscht.
+\end_layout
+
+\begin_layout Part*
+Ergebnisse
+\end_layout
+
+\begin_layout Standard
+Es werden mit unterschiedlichen RNA-Sequenzen Tests durchgeführt.
+ Die Generationszahl beträgt 
+\begin_inset Formula $M=2000$
+\end_inset
+
+, mit Turnierselektion (10 Turniere) werden aus der Population von 800 Individue
+n 200 mal 2 Eltern ausgewählt.
+ Diese erzeugen dann mit Hilfe von Rekombination und Mutation zwei Kinder.
+ Die Eltern werden nicht in die neue Population übernommen.
+\end_layout
+
+\begin_layout Standard
+In den folgenden Test wurde mit der angegebenen Sequenz 10 mal ein Programm
+ evolviert.
+ Das beste und das schlechteste Ergebnis, sowie der Code werden mitangegeben.
+\end_layout
+
+\begin_layout Section*
+Einfache GC-RNA
+\end_layout
+
+\begin_layout Standard
+Folgende RNA-Sequenz wurde getestet:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Das Programm ist dazu in der Lage, eine optimale Sekundärstruktur mit -154
+ Energie zu finden.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/gc_best_structure.png
+	width 100text%
+	rotateAngle 90
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Struktur
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/gc_best_structure_gen.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Entwickung der Fitness des besten Individuums über die Generation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Bestes Ergebnis der GC-RNA
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>Individual with Fitness -3.5813953488372094
+\end_layout
+
+\begin_layout Plain Layout
+
+GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC
+\end_layout
+
+\begin_layout Plain Layout
+
+#ADF0 20 5
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER STACK STRAIGHT R7 R2
+\end_layout
+
+\begin_layout Plain Layout
+
+R7
+\end_layout
+
+\begin_layout Plain Layout
+
+P0
+\end_layout
+
+\begin_layout Plain Layout
+
+R11
+\end_layout
+
+\begin_layout Plain Layout
+
+R2
+\end_layout
+
+\begin_layout Plain Layout
+
+STACK
+\end_layout
+
+\begin_layout Plain Layout
+
+NUC SKIP3
+\end_layout
+
+\begin_layout Plain Layout
+
+PURINE P0
+\end_layout
+
+\begin_layout Plain Layout
+
+STRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+R13
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+R19
+\end_layout
+
+\begin_layout Plain Layout
+
+R6
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD SKIP5 SKIP2
+\end_layout
+
+\begin_layout Plain Layout
+
+ENERGY
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE SOUTH P1
+\end_layout
+
+\begin_layout Plain Layout
+
+RSTRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+P2
+\end_layout
+
+\begin_layout Plain Layout
+
+CALCULATE_ENERGY R15 C
+\end_layout
+
+\begin_layout Plain Layout
+
+PYRIMIDINE C
+\end_layout
+
+\begin_layout Plain Layout
+
+#MAIN 20 0
+\end_layout
+
+\begin_layout Plain Layout
+
+CALCULATE_ENERGY RRIGHT STRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER R11 R8 SKIP6 LEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+NORTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+LENGTH
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS COLLIDE_STRAIGHT SKIP3 SKIP5 SKIP2
+\end_layout
+
+\begin_layout Plain Layout
+
+R11
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD STACK SKIP1
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R8 R15 RIGHT R3
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 RSTRAIGHT PREV COLLIDE_STRAIGHT R15 A
+\end_layout
+
+\begin_layout Plain Layout
+
+R8
+\end_layout
+
+\begin_layout Plain Layout
+
+RETURN RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+R15
+\end_layout
+
+\begin_layout Plain Layout
+
+MULTIPLY SOUTH_WEST SKIP1
+\end_layout
+
+\begin_layout Plain Layout
+
+PURINE NEXT
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 A R6 COLLIDE_RIGHT SKIP1 U
+\end_layout
+
+\begin_layout Plain Layout
+
+MULTIPLY RIGHT R17
+\end_layout
+
+\begin_layout Plain Layout
+
+RSTRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+R11
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R8 R19 R7 G
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER SOUTH SKIP8 R13 RLEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Das schlechteste Ergebnis kommt daher zustande, da fehlende Nukleotide sehr
+ hart bestraft werden und es somit günstiger ist, einfach eine gerade Struktur
+ zu erzeugen, als eine, die durch eine falsche Richtung schon sehr früh
+ abbricht.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/gc_worst_structure.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Schlechtestes Ergebnis der GC-RNA
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>Individual with Fitness 2.0
+\end_layout
+
+\begin_layout Plain Layout
+
+GGGGGGGGGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCCCCC
+\end_layout
+
+\begin_layout Plain Layout
+
+#ADF0 20 5
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+RRIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+R11
+\end_layout
+
+\begin_layout Plain Layout
+
+G
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R8 STRAIGHT R0 SKIP1
+\end_layout
+
+\begin_layout Plain Layout
+
+R7
+\end_layout
+
+\begin_layout Plain Layout
+
+NUC SOUTH
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE U SKIP8
+\end_layout
+
+\begin_layout Plain Layout
+
+GETBOND PREV RRIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE SKIP9 R6
+\end_layout
+
+\begin_layout Plain Layout
+
+WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+ENERGY
+\end_layout
+
+\begin_layout Plain Layout
+
+NUC R10
+\end_layout
+
+\begin_layout Plain Layout
+
+LEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP7
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE EAST R12
+\end_layout
+
+\begin_layout Plain Layout
+
+R0
+\end_layout
+
+\begin_layout Plain Layout
+
+EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+LOOK_FORWARD R5
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD R7 NORTH
+\end_layout
+
+\begin_layout Plain Layout
+
+#MAIN 20 0
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_LEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 R2 EAST R11 R6 RSTRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+CALCULATE_ENERGY U STRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER SOUTH_EAST U R13 SOUTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 R4 RRIGHT PREV R8 R6
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_EQUAL R1 SKIP8 SOUTH_EAST SKIP6
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS SOUTH_WEST NORTH R5 SKIP8
+\end_layout
+
+\begin_layout Plain Layout
+
+NORTH_EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+RSTRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 SOUTH_EAST NORTH_EAST SKIP2 ENERGY_OLD RRIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R9 COLLIDE_STRAIGHT LENGTH R13
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R3 LENGTH NORTH R6
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 R11 G R11 R0 R3
+\end_layout
+
+\begin_layout Plain Layout
+
+GETBOND NEXT R18
+\end_layout
+
+\begin_layout Plain Layout
+
+A
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP7
+\end_layout
+
+\begin_layout Plain Layout
+
+SUBTRACT R5 RLEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+G
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP5
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Folgende Fitness- und Energiewerte wurden während des GC-RNA-Tests erreicht:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="11">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Test
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fitness
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2,47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-3,58
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1,63
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1,72
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2,84
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-3,58
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2,09
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2,0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-0,26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2,46
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Energie
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-106
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-154
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-70
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-74
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-122
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-154
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+86
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-106
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Fitness- und Energiewerte des GC-RNA-Tests, 
+\begin_inset Formula $\textrm{Ø}_{fitness}=1,86$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Lernt das Programm?
+\end_layout
+
+\begin_layout Standard
+Um zu testen, ob das Programm auch mit anderen Strukturen umgehen kann,
+ wird die RNA-Sequenz in den *.RNASLV-Dateien umgeändert und das Programm
+ ausgeführt:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename GC/Test_Extended.png
+	width 100text%
+	rotateAngle 90
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Es wurden einige G's und C's zur Sequnz hinzugefügt.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename GC/Test_AT.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+G-C wurde durch A-U ausgetauscht
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Verhalten des evolvierten Programms bei veränderter Sequenz
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Es wird sehr deutlich, das das Programm nur mit Änderungen in dem vom Programm
+ gelernten 
+\begin_inset Quotes eld
+\end_inset
+
+Schema
+\begin_inset Quotes erd
+\end_inset
+
+ umgehen kann.
+ Schon eine kleine Änderung, die aus dem Schema ausbricht, führt dazu, das
+ das Programm versagt.
+\end_layout
+
+\begin_layout Section*
+Einfacher Hairpin
+\end_layout
+
+\begin_layout Standard
+Folgende Sequenz wurde getestet:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ACUCGGUUACGAG
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Es liegt eine originale Struktur vor, die zeigt, wie das Ergebnis aussehen
+ soll:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/hairpin_original.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Originale Struktur
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Es konnte nur ein Programm gefunden werden, das wenigstens 2 der 3 Basenpaare
+ erzeugt.
+ Das letzte Nukleotid (G) wird von dem Programm verschluckt.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/hairpin_best_structure.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Struktur - es fehlt das letzte G
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/hairpin_best_structure_gen.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Entwicklung über die Generationen des besten Individuums
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Bestes Ergebnis des Hairpins
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>Individual with Fitness -0.25
+\end_layout
+
+\begin_layout Plain Layout
+
+ACUCGGUUACGAG
+\end_layout
+
+\begin_layout Plain Layout
+
+#ADF0 20 5
+\end_layout
+
+\begin_layout Plain Layout
+
+MAX SKIP1 R15 P4 NORTH P0
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN R6 R14 LEFT P1 ENERGY
+\end_layout
+
+\begin_layout Plain Layout
+
+R0
+\end_layout
+
+\begin_layout Plain Layout
+
+MULTIPLY COLLIDE_RIGHT U
+\end_layout
+
+\begin_layout Plain Layout
+
+R10
+\end_layout
+
+\begin_layout Plain Layout
+
+SUBTRACT R5 U
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER R19 SKIP7 SKIP4 R18
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP6
+\end_layout
+
+\begin_layout Plain Layout
+
+RDIR R3
+\end_layout
+
+\begin_layout Plain Layout
+
+GETBOND R3 SKIP1
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS EAST R11 SKIP6 C
+\end_layout
+
+\begin_layout Plain Layout
+
+MAX P4 RLEFT R10 C RLEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+R4
+\end_layout
+
+\begin_layout Plain Layout
+
+P4
+\end_layout
+
+\begin_layout Plain Layout
+
+SUBTRACT NORTH_EAST R16
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_EQUAL R18 COLLIDE_LEFT R13 SKIP6
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+P1
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER STRAIGHT R16 SOUTH_EAST RRIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+RLEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+#MAIN 20 0
+\end_layout
+
+\begin_layout Plain Layout
+
+NUC G
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE R18 LENGTH
+\end_layout
+
+\begin_layout Plain Layout
+
+R1
+\end_layout
+
+\begin_layout Plain Layout
+
+LOOK_FORWARD NORTH
+\end_layout
+
+\begin_layout Plain Layout
+
+AVG SKIP3 R2 SKIP2 SKIP9 R10
+\end_layout
+
+\begin_layout Plain Layout
+
+NORTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+STACK
+\end_layout
+
+\begin_layout Plain Layout
+
+R9
+\end_layout
+
+\begin_layout Plain Layout
+
+GETBOND SKIP9 ENERGY_OLD
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R10 SKIP4 SKIP4 STACK
+\end_layout
+
+\begin_layout Plain Layout
+
+R16
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN R12 SOUTH ENERGY SOUTH_EAST SOUTH_EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+PREV
+\end_layout
+
+\begin_layout Plain Layout
+
+AVG R17 SOUTH COLLIDE_LEFT R8 R4
+\end_layout
+
+\begin_layout Plain Layout
+
+CALCULATE_ENERGY R3 R12
+\end_layout
+
+\begin_layout Plain Layout
+
+MAX A SOUTH_EAST R3 R14 NORTH_EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP4
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE C NORTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+LOOK_FORWARD R8
+\end_layout
+
+\begin_layout Plain Layout
+
+MAX R3 SKIP4 SKIP8 RSTRAIGHT C
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Die schlechteste Struktur hat sich in einem lokalen Minimum verfangen, außerdem
+ wurde das 'aneinanderliegen' der zwei Adenosine nicht negativ bewertet.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Lyx/hairpin_worst_structure.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Schlechtestes Ergebnis des Hairpins
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+>Individual with Fitness 1.0769230769230769
+\end_layout
+
+\begin_layout Plain Layout
+
+ACUCGGUUACGAG
+\end_layout
+
+\begin_layout Plain Layout
+
+#ADF0 20 5
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD ENERGY SOUTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+NORTH_WEST
+\end_layout
+
+\begin_layout Plain Layout
+
+SUBTRACT COLLIDE_STRAIGHT SOUTH_EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+PURINE R17
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN RSTRAIGHT R13 WEST SKIP4 SKIP5
+\end_layout
+
+\begin_layout Plain Layout
+
+AVG R13 SKIP5 SOUTH_WEST COLLIDE_LEFT SKIP8
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN SKIP4 SOUTH_WEST P3 RSTRAIGHT SKIP7
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD NORTH RSTRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+LOOK_BACK R6
+\end_layout
+
+\begin_layout Plain Layout
+
+R16
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN ENERGY STACK STRAIGHT R4 R10
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS R16 U ENERGY_OLD C
+\end_layout
+
+\begin_layout Plain Layout
+
+P3
+\end_layout
+
+\begin_layout Plain Layout
+
+RDIR R18
+\end_layout
+
+\begin_layout Plain Layout
+
+AVG R0 R10 R0 P0 STRAIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_EQUAL R17 NORTH_WEST ENERGY R13
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_EQUAL R18 R2 SOUTH R16
+\end_layout
+
+\begin_layout Plain Layout
+
+DIVIDE SKIP8 SKIP4
+\end_layout
+
+\begin_layout Plain Layout
+
+R13
+\end_layout
+
+\begin_layout Plain Layout
+
+R1
+\end_layout
+
+\begin_layout Plain Layout
+
+#MAIN 20 0
+\end_layout
+
+\begin_layout Plain Layout
+
+U
+\end_layout
+
+\begin_layout Plain Layout
+
+ADF0 SKIP8 SKIP8 RSTRAIGHT RLEFT ENERGY
+\end_layout
+
+\begin_layout Plain Layout
+
+AVG SOUTH_EAST R2 SKIP6 R13 SKIP7
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN ENERGY_OLD COLLIDE_STRAIGHT SKIP9 STACK SKIP9
+\end_layout
+
+\begin_layout Plain Layout
+
+R11
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP9
+\end_layout
+
+\begin_layout Plain Layout
+
+R1
+\end_layout
+
+\begin_layout Plain Layout
+
+LEFT
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER R0 SOUTH R17 R9
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_LESS SOUTH R13 RIGHT R18
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP6
+\end_layout
+
+\begin_layout Plain Layout
+
+NORTH
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP4
+\end_layout
+
+\begin_layout Plain Layout
+
+EAST
+\end_layout
+
+\begin_layout Plain Layout
+
+MIN R12 SKIP1 R4 R13 R9
+\end_layout
+
+\begin_layout Plain Layout
+
+R1
+\end_layout
+
+\begin_layout Plain Layout
+
+COLLIDE_RIGHT
+\end_layout
+
+\begin_layout Plain Layout
+
+SKIP3
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_EQUAL SOUTH_EAST RLEFT R13 SKIP8
+\end_layout
+
+\begin_layout Plain Layout
+
+IF_GREATER SKIP8 PREV NORTH SKIP7
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Lernt das Programm?
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Hairpin/Test_Extended.png
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Verhalten auf Hinzufügen eines weiteren G-C-Stacks (G nach der 3., C nach
+ der 12.
+ Base)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part*
+Conclusion
+\end_layout
+
+\begin_layout Standard
+Wie man an den Ergebnissen sehen kann, wird selbst bei einfachen Strukturen
+ selbst nach 2000 Generationen nicht immer ein Optimum gefunden (Beim GC-Test
+ sind nur zwei der besten Individuen nach 2000 Generationen im Optimum von
+ -154 Energie!), obwohl zumindest 
+\end_layout
+
+\end_body
+\end_document
