@@ -205,6 +205,8 @@ public class Function
 			registers.get(bzr).execute(individual, this);
 			bzr++;
 		}
+		
+		//System.out.println("Returned " + registers.get(outputRegister).value);
 
 		return registers.get(outputRegister).value;
 	}

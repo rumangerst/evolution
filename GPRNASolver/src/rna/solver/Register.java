@@ -549,6 +549,8 @@ public class Register
 
 			parent.registers.get(parent.registers.size() - 1).value = r1;
 			parent.bzr = parent.registers.size();
+			
+			//System.out.println("Return set to " + r1);
 
 			return;
 		}
