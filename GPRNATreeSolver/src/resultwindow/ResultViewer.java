@@ -141,14 +141,10 @@ public class ResultViewer extends JFrame implements ActionListener
 			return "";
 
 		StringBuilder str = new StringBuilder();
-		String[] commands = f.getRegisterCommands();
 
 		str.append(name + "\n-----------------\n");
 
-		for (int i = 0; i < commands.length; i++)
-		{
-			str.append("R" + i + ":\t" + commands[i] + "\n");
-		}
+		str.append(f.toString());
 
 		str.append("\n\n\n");
 

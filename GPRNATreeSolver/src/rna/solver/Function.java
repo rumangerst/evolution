@@ -1,9 +1,11 @@
 package rna.solver;
 
+import java.awt.Point;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * Klasse, die Funktionen behandelt
@@ -22,158 +24,114 @@ import java.util.LinkedList;
  */
 public class Function
 {
-	/**
-	 * Terminale Funktionen ohne Parameter Statische Terminal-Funktionen, die
-	 * IMMER verfügbar sind
-	 */
-	public static final String[] STATIC_TERMINAL_FUNCTIONS = new String[] {
-			"COLLIDE_STRAIGHT", "COLLIDE_LEFT", "COLLIDE_RIGHT", "ENERGY",
-			"ENERGY_OLD", "LENGTH", "STACK", "PREV", "NEXT", 
-			"NORTH", "SOUTH", "EAST", "WEST", "NORTH_WEST", "NORTH_EAST",
-			"SOUTH_WEST", "SOUTH_EAST", "RLEFT", "RRIGHT", "RSTRAIGHT", "A",
-			"C", "U", "G", "LEFT", "RIGHT", "STRAIGHT"};
+	public static final Random RANDOM = new Random();
+	public static final int FALSE = -1;
 
 	/**
-	 * Funktionen mit Parameter new RegisterFactory("",0) Statische Funktionen,
-	 * die IMMER verfügbar sind
+	 * Alle Funktionen
 	 */
-	public static final RegisterFactory[] STATIC_FUNCTIONS = new RegisterFactory[] {
-			new RegisterFactory("IF_LESS", 4),
-			new RegisterFactory("IF_GREATER", 4),
-			new RegisterFactory("IF_EQUAL", 4), new RegisterFactory("ADD", 2),
-			new RegisterFactory("SUBTRACT", 2),
-			new RegisterFactory("MULTIPLY", 2),
-			new RegisterFactory("DIVIDE", 2),
-			new RegisterFactory("LOOK_BACK", 1),
-			new RegisterFactory("LOOK_FORWARD", 1),
-			new RegisterFactory("CALCULATE_ENERGY", 2),
-			new RegisterFactory("GETBOND", 2),
-			new RegisterFactory("PURINE", 1),
-			new RegisterFactory("PYRIMIDINE", 1),
-			// new RegisterFactory("PRG5", 5),
-			new RegisterFactory("RETURN", 1),
-			new RegisterFactory("RDIR", 1), //Wandelt Zahl in eine Richtung um
-			new RegisterFactory("NUC", 1), //Wandelt Zahl in Nucleotid um
-			
-			new RegisterFactory("MIN", 5),
-			new RegisterFactory("MAX", 5),
-			new RegisterFactory("AVG", 5)
-	/*
-	 * new RegisterFactory("AND", 2), new RegisterFactory("OR", 2), new
-	 * RegisterFactory("XOR", 2), new RegisterFactory("NOT", 1)
-	 */};
+	public static final FunctionFactory[] STATIC_FUNCTIONS = new FunctionFactory[] {
 
-	public ArrayList<Register> registers;
-	public int parameterCount;
+	new FunctionFactory("COLLIDE_STRAIGHT"),
+			new FunctionFactory("COLLIDE_LEFT"),
+			new FunctionFactory("COLLIDE_RIGHT"),
+			new FunctionFactory("ENERGY"), new FunctionFactory("ENERGY_OLD"),
+			new FunctionFactory("LENGTH"), new FunctionFactory("STACK"),
+			new FunctionFactory("PREV"), new FunctionFactory("NEXT"),
+			new FunctionFactory("NORTH"), new FunctionFactory("SOUTH"),
+			new FunctionFactory("EAST"), new FunctionFactory("WEST"),
+			new FunctionFactory("NORTH_WEST"),
+			new FunctionFactory("NORTH_EAST"),
+			new FunctionFactory("SOUTH_WEST"),
+			new FunctionFactory("SOUTH_EAST"), new FunctionFactory("RLEFT"),
+			new FunctionFactory("RRIGHT"), new FunctionFactory("RSTRAIGHT"),
+			new FunctionFactory("A"), new FunctionFactory("C"),
+			new FunctionFactory("U"), new FunctionFactory("G"),
+			new FunctionFactory("LEFT"), new FunctionFactory("RIGHT"),
+			new FunctionFactory("STRAIGHT"), new FunctionFactory("IF_LESS", 4),
+			new FunctionFactory("IF_GREATER", 4),
+			new FunctionFactory("IF_EQUAL", 4),
+			new FunctionFactory("ADD", 2),
+			new FunctionFactory("SUBTRACT", 2),
+			new FunctionFactory("MULTIPLY", 2),
+			new FunctionFactory("DIVIDE", 2),
+			new FunctionFactory("LOOK_BACK", 1),
+			new FunctionFactory("LOOK_FORWARD", 1),
+			new FunctionFactory("CALCULATE_ENERGY", 2),
+			new FunctionFactory("GETBOND", 2),
+			new FunctionFactory("PURINE", 1),
+			new FunctionFactory("PYRIMIDINE", 1),
+			new FunctionFactory("RDIR", 1), // Wandelt Zahl in eine Richtung um
+			new FunctionFactory("NUC", 1), // Wandelt Zahl in Nucleotid um
 
-	public ArrayList<RegisterFactory> dynamic_Functions;
-	public ArrayList<String> dynamic_TerminalFunctions;
+			new FunctionFactory("MIN", 5), new FunctionFactory("MAX", 5),
+			new FunctionFactory("AVG", 5),
+			new FunctionFactory("ACC", 0),
+			new FunctionFactory("STOR", 1)};
 
-	/**
-	 * Befehlszeilenregister
-	 */
-	public int bzr;
+	public Function parent;
 
-	/**
-	 * Speichert aktuell verwendete Parameter, die vom execute übergeben wurden
-	 */
-	public int[] parameters;
+	public ArrayList<Function> parameters;
+	public String label;
+	public int inputCount;
+
+	public ArrayList<FunctionFactory> dynamic_Functions;
 
 	/**
 	 * Speichert aktuell verwendete ADF
 	 */
-	public ArrayList<Function> adfs;
+	public ArrayList<TopLevelFunction> adfs;
+	
+	
 
-	/*
-	 * Das Ausgaberegister
-	 */
-	public int outputRegister;
-
-	/**
-	 * Generiert neue Funktionseinheit
-	 * 
-	 * @param parameterCount
-	 *            Anzahl an parametern, die diese Funktion akzeptiert; Bei MAIN
-	 *            0
-	 * @param registerCount
-	 *            Anzahl an Registern, die diese Funktion hat
-	 * @param adfCount
-	 *            Anzahl an zugreifbaren ADF; Nur für MAIN-Funktion!
-	 */
-	public Function(int parameterCount, int registerCount,
-			ArrayList<Function> adfs)
+	
+	public Function(String label, int inputs, ArrayList<TopLevelFunction> adfs)
 	{
-		this.parameterCount = parameterCount;
-		this.dynamic_TerminalFunctions = new ArrayList<String>();
-		this.dynamic_Functions = new ArrayList<RegisterFactory>();
+        this.dynamic_Functions = new ArrayList<>();
+        this.parameters = new ArrayList<>();
 
-		/**
-		 * Generiere dynamische Terminalfunktionen für Parameter, etc.
-		 */
-		for (int i = 0; i < parameterCount; i++)
+        this.label = label;
+		this.inputCount = inputs;
+		this.adfs = adfs;
+		this.parent = null;
+		
+		for (int i = 0; i < adfs.size(); i++)
 		{
-			dynamic_TerminalFunctions.add("P" + i);
-		}
-		for (int i = 0; i < registerCount; i++)
-		{
-			dynamic_TerminalFunctions.add("R" + i);
+			dynamic_Functions.add(new FunctionFactory("ADF" + i,
+					adfs.get(i).inputCount));
 		}
 
-		/**
-		 * nur SKIP und SKIP2 zulassen?
-		 */
-
-		for (int i = 1; i < registerCount / 2; i++)
+		for (int i = 0; i < inputCount; i++)
 		{
-			dynamic_TerminalFunctions.add("SKIP" + i);
+			dynamic_Functions.add(new FunctionFactory("P" + i));
 		}
+	}
 
-//		/**
-//		 * Lade Terminale mit Zahlen auf
-//		 */
-//		for (int i = -registerCount; i <= registerCount; i++)
-//		{
-//			dynamic_TerminalFunctions.add("" + i);
-//		}
-
-		if (adfs != null)
-		{
-			for (int i = 0; i < adfs.size(); i++)
-			{
-				dynamic_Functions.add(new RegisterFactory("ADF" + i, adfs
-						.get(i).parameterCount));
-			}
-		}
-
-		this.registers = new ArrayList<Register>();
-
-		/**
-		 * Generiere zufällige Register
-		 */
-		for (int i = 0; i < registerCount; i++)
-		{
-			registers.add(randomRegister());
-		}
-
-		this.outputRegister = registerCount - 1;
+	public Function(String label, Function parent)
+	{
+		this(label, parent.inputCount, parent.adfs);
+		this.parent = parent;
 	}
 
 	/**
-	 * Kopiert die Funktion
+	 * Kopiert die Funktion Es genügt, die Elternfunktion zu kopieren.
 	 * 
 	 * @param toCopy
 	 */
 	public Function(Function toCopy)
 	{
-		this.parameterCount = toCopy.parameterCount;
+		this.label = toCopy.label;
 		this.dynamic_Functions = toCopy.dynamic_Functions;
-		this.dynamic_TerminalFunctions = toCopy.dynamic_TerminalFunctions;
-		this.outputRegister = toCopy.outputRegister;
+		this.inputCount = toCopy.inputCount;
 
-		this.registers = new ArrayList<Register>();
-		for (Register reg : toCopy.registers)
+		this.parameters = new ArrayList<Function>();
+		this.adfs = toCopy.adfs;
+		
+		for (Function f : toCopy.parameters)
 		{
-			this.registers.add(new Register(reg));
+			Function c = new Function(f);
+			c.parent = this;
+			this.parameters.add(c);
 		}
 	}
 
@@ -181,260 +139,604 @@ public class Function
 	 * Führt Funktion aus und gibt den Wert des letzten registers
 	 * (Ausgaberegister) zurück
 	 * 
-	 * @param parameters
+	 *
 	 * @return
 	 */
-	public int execute(Individual individual, int[] parameters,
-			ArrayList<Function> adfs)
+	public int execute(Individual individual, int[] args)
 	{
-		this.parameters = parameters;
-		this.adfs = adfs;
+		/**
+		 * Execute terminals
+		 */
+		/**
+		 * COLLIDE_X functions
+		 */
+		if (label.equals("COLLIDE_STRAIGHT"))
+		{
+			return individual.checkCollision(RelativeDirection.STRAIGHT);
 
-		bzr = 0;
+		}
+		if (label.equals("COLLIDE_LEFT"))
+		{
+			return individual.checkCollision(RelativeDirection.LEFT);
+		}
+		if (label.equals("COLLIDE_RIGHT"))
+		{
+			return individual.checkCollision(RelativeDirection.RIGHT);
+
+		}
 
 		/**
-		 * test: Wertespeicher vorher löschen
+		 * ENERGY current energy level
 		 */
-		for (Register reg : registers)
+		if (label.equals("ENERGY"))
 		{
-			reg.value = 0;
+			return individual.structure.energy();
+
+		}
+		/**
+		 * ENERGY_OLD - energy without latest nucleotide
+		 */
+		if (label.equals("ENERGY_OLD"))
+		{
+			if (individual.structure.current.previous == null)
+				return Integer.MAX_VALUE;
+			return individual.structure.energy()
+					- individual.structure.current.energy(individual.structure);
+
 		}
 
-		while (bzr < registers.size())
+		/**
+		 * LENGTH - current structure length
+		 */
+		if (label.equals("LENGTH"))
 		{
-			registers.get(bzr).execute(individual, this);
-			bzr++;
+			return individual.structure.structureLength;
+
+		}
+
+		/**
+		 * STACK - nucleotides to put
+		 */
+		if (label.equals("STACK"))
+		{
+			return individual.sequence.size();
+
+		}
+
+		/**
+		 * A,C,U,G
+		 */
+
+		if (label.equals("A"))
+		{
+			return 0;
+		}
+		if (label.equals("C"))
+		{
+			return 1;
+		}
+		if (label.equals("U"))
+		{
+			return 2;
+		}
+		if (label.equals("G"))
+		{
+			return 3;
+		}
+
+		/**
+		 * PREV (Zuletzt hinzugefügter) NEXT (neu zu hinzufügendes Nuc)
+		 */
+		if (label.equals("PREV"))
+		{
+			return individual.structure.current.type.toInteger();
+		}
+		if (label.equals("NEXT"))
+		{
+			if (individual.sequence.isEmpty())
+				return FALSE;
+			return individual.sequence.get(0);
+		}
+
+		/**
+		 * Konstaten für LINKS, RECHTS und GERADEAUS
+		 */
+		if (label.equals("LEFT"))
+		{
+			return -1;
+		}
+		if (label.equals("STRAIGHT"))
+		{
+			return 0;
+		}
+		if (label.equals("RIGHT"))
+		{
+			return 1;
+		}
+
+		/**
+		 * Himmelsrichtungen, die zurückgeben, welches Nukleotid an POS N ist
+		 */
+		if (label.equals("NORTH"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("NORTH_EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("NORTH_WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y - 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH_EAST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x + 1,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("SOUTH_WEST"))
+		{
+			Nucleotide nuc = individual.structure.get(
+					individual.structure.current.x - 1,
+					individual.structure.current.y + 1);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+
+		/**
+		 * Nukleotide, relativ zu current (siehe Himmelsrichtung)
+		 */
+		if (label.equals("RLEFT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.LEFT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("RSTRAIGHT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.STRAIGHT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+		if (label.equals("RRIGHT"))
+		{
+			Nucleotide current = individual.structure.current;
+			Point p = NucleotideDirection.shiftByDir(current.x, current.y,
+					RelativeDirection.RIGHT.toAbsolute(current.dir));
+
+			Nucleotide nuc = individual.structure.get(p.x, p.y);
+
+			if (nuc == null)
+				return FALSE;
+			return nuc.type.toInteger();
+		}
+
+		/**
+		 * Execute parameter functions
+		 */
+		if (label.equals("IF_GREATER"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			if (r1 > r2)
+			{
+				return parameters.get(2).execute(individual, args);
+			}
+			else
+			{
+				return parameters.get(3).execute(individual, args);
+			}
+
+		}
+		if (label.equals("IF_LESS"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			if (r1 < r2)
+			{
+				return parameters.get(2).execute(individual, args);
+			}
+			else
+			{
+				return parameters.get(3).execute(individual, args);
+			}
+		}
+		if (label.equals("IF_EQUAL"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			if (r1 == r2)
+			{
+				return parameters.get(2).execute(individual, args);
+			}
+			else
+			{
+				return parameters.get(3).execute(individual, args);
+			}
+		}
+
+		if (label.equals("ADD"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			return r1 + r2;
+		}
+
+		if (label.equals("SUBTRACT"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			return r1 - r2;
+		}
+
+		if (label.equals("MULTIPLY"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			return r1 * r2;
+		}
+
+		if (label.equals("DIVIDE"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			if (r2 == 0)
+			{
+				return 0;
+			}
+
+			return r1 / r2;
+		}
+
+		if (label.equals("LOOK_FORWARD"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			if (r1 < 0 || r1 >= individual.sequence.size())
+				return FALSE;
+			else
+				return individual.sequence.get(r1);
+		}
+
+		if (label.equals("LOOK_BACK"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			if (r1 < 0 || r1 >= individual.structure.structureLength)
+				return FALSE;
+			else
+			{
+				Nucleotide current = individual.structure.current;
+
+				for (int i = 0; i < r1; i++)
+				{
+					current = current.previous;
+				}
+
+				return current.type.toInteger();
+			}
+		}
+
+		if (label.equals("CALCULATE_ENERGY"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			int r2 = parameters.get(1).execute(individual, args);
+
+			NucleotideType type1 = NucleotideType.fromInteger(r1);
+			NucleotideType type2 = NucleotideType.fromInteger(r2);
+
+			return Nucleotide.calculateEnergy(type1, type2);
+		}
+
+		if (label.equals("GETBOND"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			if (r1 < 0 || r1 >= individual.structure.structureLength)
+				return FALSE;
+			else
+			{
+				Nucleotide current = individual.structure.current
+						.getPrevious(r1);
+
+				if (!current.isBond())
+					return 0;
+				else
+				{
+					return current.getIndex() - current.bond.getIndex();
+				}
+			}
+		}
+
+		if (label.equals("PURINE"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			NucleotideType nuc = NucleotideType.fromInteger(r1);
+
+			if (nuc == NucleotideType.A || nuc == NucleotideType.G)
+				return individual.structure.structureLength;
+			else
+				return FALSE;
+		}
+
+		if (label.equals("PYRIMIDINE"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			NucleotideType nuc = NucleotideType.fromInteger(r1);
+
+			if (nuc == NucleotideType.U || nuc == NucleotideType.C)
+				return individual.structure.structureLength;
+			else
+				return FALSE;
+		}
+
+		/**
+		 * ADF-Funktion ausführen
+		 */
+		if (label.startsWith("ADF"))
+		{
+			int id = Integer.parseInt(label.substring(3));
+
+			Function adf = adfs.get(id);
+
+			int[] params = new int[adf.inputCount];
+
+			for (int i = 0; i < params.length; i++)
+			{
+				params[i] = parameters.get(i).execute(individual, args);
+			}
+
+			return adf.execute(individual, params);
+		}
+
+		if (label.equals("RDIR"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			return RelativeDirection.fromInteger(r1).toInteger();
+		}
+		if (label.equals("NUC"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+
+			return NucleotideType.fromInteger(r1).toInteger();
+		}
+
+		if (label.equals("MIN"))
+		{
+			int value = Integer.MAX_VALUE;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = parameters.get(i).execute(individual, args);
+
+				if (r < value)
+					value = r;
+			}
+
+			return value;
+		}
+
+		if (label.equals("MAX"))
+		{
+			int value = Integer.MIN_VALUE;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = parameters.get(i).execute(individual, args);
+
+				if (r > value)
+					value = r;
+			}
+
+			return value;
+		}
+
+		if (label.equals("AVG"))
+		{
+			int value = 0;
+
+			for (int i = 0; i < 5; i++)
+			{
+				int r = parameters.get(i).execute(individual, args);
+				value += r;
+			}
+
+			value = value / 5;
+
+			return value;
 		}
 		
-		//System.out.println("Returned " + registers.get(outputRegister).value);
+		/**
+		 * Akkumulator/Store
+		 */
+		if (label.equals("STOR"))
+		{
+			int r1 = parameters.get(0).execute(individual, args);
+			
+			individual.accumulator = r1;
 
-		return registers.get(outputRegister).value;
+			return r1;
+		}
+		if(label.equals("ACC"))
+		{
+			return individual.accumulator;
+		}
+
+		/**
+		 * Parameterterminale
+		 */
+		if (label.startsWith("P"))
+		{
+			return args[Integer.parseInt(label.substring(1))];
+
+		}
+
+		throw new RuntimeException("Invalid function: " + label);
 	}
 
+  
 	/**
 	 * Generiert ein zufälliges Register ALLE Funktionen und Terminalfunktionen
 	 * sind gleichwahrscheinlich
 	 * 
 	 * @return
 	 */
-	public Register randomRegister()
+	public Function randomFunction(int depth)
 	{
-		int rand = Register.RANDOM.nextInt(STATIC_FUNCTIONS.length
-				+ dynamic_Functions.size() + STATIC_TERMINAL_FUNCTIONS.length
-				+ dynamic_TerminalFunctions.size());
-
-		if (rand < STATIC_FUNCTIONS.length)
+		int rand = RANDOM.nextInt(STATIC_FUNCTIONS.length + dynamic_Functions.size());
+		
+		int i = 0;
+		
+		while(true)
 		{
-			return STATIC_FUNCTIONS[rand].createRegister(this);
-		}
-		else if (rand < STATIC_FUNCTIONS.length + dynamic_Functions.size())
-		{
-			return dynamic_Functions.get(rand - STATIC_FUNCTIONS.length)
-					.createRegister(this);
-		}
-		else
-		{
-			return new Register(randomTerminal());
-		}
-	}
-
-	/**
-	 * Gibt eine zufällige Terminalfunktion zurück Es wird nur das Label
-	 * benötigt, da Terminalfunktion
-	 * 
-	 * @return
-	 */
-	public String randomTerminal()
-	{
-		String label;
-		int rand = Register.RANDOM.nextInt(STATIC_TERMINAL_FUNCTIONS.length
-				+ dynamic_TerminalFunctions.size());
-
-		if (rand >= STATIC_TERMINAL_FUNCTIONS.length)
-		{
-			label = dynamic_TerminalFunctions.get(rand
-					- STATIC_TERMINAL_FUNCTIONS.length);
-		}
-		else
-		{
-			label = STATIC_TERMINAL_FUNCTIONS[rand];
-		}
-
-		return label;
-	}
-
-	/**
-	 * Return register with index, returns "0"-Register if not valid
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Register getRegister(int index)
-	{
-		if (index < 0 || index >= registers.size())
-			return new Register("0");
-
-		return registers.get(index);
-	}
-
-	/**
-	 * Two cases of mutation: I) Parameter mutation (mutate parameter of
-	 * register) II) Register mutation (new random register)
-	 * 
-	 * @param p1
-	 *            Register mutation - Probability to select the register *
-	 */
-	public void mutate(float p)
-	{
-		int regCount = this.registers.size();
-
-		/**
-		 * Parameter mutation replace parameters by random terminals
-		 */
-		for (int i = 0; i < registers.size(); i++)
-		{
-			Register reg = this.registers.get(i);
-
-			if (1 - Register.RANDOM.nextFloat() <= p)
+			FunctionFactory fac;
+			
+			if( i < STATIC_FUNCTIONS.length)
+				fac = STATIC_FUNCTIONS[i];
+			else
+				fac = dynamic_Functions.get(i - STATIC_FUNCTIONS.length);
+			
+			if(depth < 6 && fac.parameters > 0)
 			{
-				if (reg.parameters.length == 0)
+				if(rand == 0)
 				{
-					/**
-					 * Mutate whole register
-					 */
-					this.registers.set(i, randomRegister());
+					return fac.createFunction(this, depth);
 				}
 				else
 				{
-					int parameter = Register.RANDOM
-							.nextInt(reg.parameters.length + 1);
-
-					if (parameter >= reg.parameters.length)
-					{
-						/**
-						 * Mutate whole register
-						 */
-						this.registers.set(i, randomRegister());
-					}
-					else
-					{
-						/**
-						 * Mutate parameter
-						 */
-						reg.parameters[parameter] = randomTerminal();
-					}
+					rand--;
 				}
 			}
+			
+			if(fac.parameters == 0)
+			{
+				if(rand == 0)
+				{
+					return fac.createFunction(this, depth);
+				}
+				else
+				{
+					rand--;
+				}
+			}
+			
+			i++;
+			
+			if(i >= STATIC_FUNCTIONS.length + dynamic_Functions.size())
+				i = 0;
 		}
-
-		/**
-		 * Mutate output register
-		 */
-		// if(1 - Register.RANDOM.nextFloat() <= p)
-		// {
-		// this.outputRegister = Register.RANDOM.nextInt(registers.size());
-		// }
 	}
 
 	/**
-	 * Recombine using two-point X-Over
+	 * Traverse through all functions
 	 * 
-	 * @param indiv1
-	 * @param indiv2
-	 * @param px
-	 *            Recombination probability
+	 * @return
 	 */
-	public static void recombine(Function indiv1, Function indiv2)
-	{
-		int reg = indiv1.registers.size();
+	public LinkedList<Function> traverse(LinkedList<Function> container)
+	{		
+		container.add(this);
 
-		int index1 = Register.RANDOM.nextInt(reg);
-		int index2 = Register.RANDOM.nextInt(reg);
-
-		if (index1 == index2)
-			return;
-		if (index2 < index1)
+		for (Function f : parameters)
 		{
-			int val1 = index1;
-			int val2 = index2;
-			index2 = val1;
-			index1 = val2;
+			// subfunctions.add(f);
+			f.traverse(container);
 		}
 
-		// X-Over
-		for (int i = index1; i < index2; i++)
-		{
-			/**
-			 * Swappe Register innerhalb in [index1, index2)
-			 */
-			Register r1 = indiv1.registers.get(i);
-			Register r2 = indiv2.registers.get(i);
-
-			indiv1.registers.set(i, r2);
-			indiv2.registers.set(i, r1);
-		}
-
+		return container;
 	}
 
-	// /**
-	// * Recombine using one-point X-Over
-	// *
-	// * @param indiv1
-	// * @param indiv2
-	// * @param px
-	// * Recombination probability
-	// */
-	// public static void recombine(Function indiv1, Function indiv2, float px)
-	// {
-	// int reg = indiv1.registers.size();
-	//
-	// if (1 - Register.RANDOM.nextFloat() <= px)
-	// {
-	// int index = Register.RANDOM.nextInt(reg);
-	//
-	// if (index == 0 || index == reg - 1)
-	// return;
-	//
-	// // X-Over
-	// for (int i = 0; i < index; i++)
-	// {
-	// indiv1.registers.set(i, indiv2.registers.get(i));
-	// }
-	// for (int i = index; i < reg; i++)
-	// {
-	// indiv2.registers.set(i, indiv1.registers.get(i));
-	// }
-	// }
-	// }
+	
 
-	public String[] getRegisterCommands()
+	@Override
+	public String toString()
 	{
-		String[] output = new String[registers.size()];
+		String b = "(";
+		b += (label + " ");
 
-		for (int i = 0; i < registers.size(); i++)
+		for (Function parameter : parameters)
 		{
-			output[i] = registers.get(i).toString();
+			b += (parameter.toString() + " ");
 		}
 
-		return output;
-	}
+		b = b.trim();
 
-	public void write(FileWriter wr, String name) throws IOException
-	{
-		wr.write(String.format("#%s %d %d\n", name, registers.size(),
-				parameterCount));
-
-		for (Register reg : registers)
-		{
-			wr.write(reg.label);
-
-			for (int i = 0; i < reg.parameters.length; i++)
-			{
-				wr.write(" " + reg.parameters[i]);
-			}
-
-			wr.write("\n");
-		}
-
+		return b + ")";
 	}
 }

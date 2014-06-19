@@ -67,7 +67,7 @@ public class GPRunner
 
 		for (int i = 0; i < tournaments; i++)
 		{
-			results.add(population.get(Register.RANDOM.nextInt(population
+			results.add(population.get(Function.RANDOM.nextInt(population
 					.size())));
 		}
 
@@ -84,7 +84,7 @@ public class GPRunner
 		for (int i = 0; i < populationSize; i++)
 		{
 			Individual indiv = new Individual();
-			indiv.random(registerCount, adfCount, adfParameters, adfRegisters);
+			indiv.random(adfCount, adfParameters);
 
 			population.add(indiv);
 		}
@@ -116,11 +116,8 @@ public class GPRunner
 
 			System.out.println("Best individual: " + best.fitness + " energy: "
 					+ best.energy);
-			System.out.println("Last register of main output ("
-					+ best.mainFunction.outputRegister
-					+ "): "
-					+ best.mainFunction.registers.get(
-							best.mainFunction.outputRegister).toString());
+			System.out.println( "Main:"
+					+ best.mainFunction.toString());
 
 			results_BestFitness.add(best.fitness);
 

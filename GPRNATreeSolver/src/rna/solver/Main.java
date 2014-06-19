@@ -501,7 +501,7 @@ public class Main
 		//evilTopoplogyTest1();
 		//evilTopoplogyTest2();
 		//pseudoKnotTest1();
-		//easyGCTest();
+		easyGCTest();
 		//easyHairPinTest();
 		//easyTopoplogyTest1();
 		//easyTopoplogyTest1();
@@ -516,7 +516,7 @@ public class Main
 		//bondingTest("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", "SSSSSSSSLRRRRRRLSSSSSSSS");
 		//test("AAAAAAAAAAAAAUUUUUUUUUUUUUUUUU", 7, 1.0f / 7.0f, 0.1f);		
 		
-		openResult("Results/GC-RNA/result3.RNASLV");
+		//openResult("Results/GC-RNA/result3.RNASLV");
 		
 		//superTestGC();
 		//superTestHairPin();

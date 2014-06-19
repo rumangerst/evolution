@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/GPRNASolver/GPRNASolver.iml" filepath="$PROJECT_DIR$/GPRNASolver/GPRNASolver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPRNATreeSolver/GPRNATreeSolver.iml" filepath="$PROJECT_DIR$/GPRNATreeSolver/GPRNATreeSolver.iml" />
+    </modules>
+  </component>
+</project>
+

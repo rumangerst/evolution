@@ -27,12 +27,17 @@ public class Individual implements Comparable
 	/**
 	 * Main function
 	 */
-	public Function mainFunction;
+	public TopLevelFunction mainFunction;
 
 	/**
 	 * ADF functions
 	 */
-	public ArrayList<Function> adfs;
+	public ArrayList<TopLevelFunction> adfs;
+	
+	/**
+	 * Memory of invididual
+	 */
+	public int accumulator;
 
 	/**
 	 * Old energy
@@ -56,11 +61,11 @@ public class Individual implements Comparable
 	{
 		this();
 		
-		this.mainFunction = new Function(tocopy.mainFunction);
-		this.adfs = new ArrayList<Function>();
-		for (Function reg : tocopy.adfs)
+		this.mainFunction = new TopLevelFunction(tocopy.mainFunction);
+		this.adfs = new ArrayList<TopLevelFunction>();
+		for (TopLevelFunction reg : tocopy.adfs)
 		{
-			adfs.add(new Function(reg));
+			adfs.add(new TopLevelFunction(reg));
 		}
 	}
 
@@ -80,7 +85,7 @@ public class Individual implements Comparable
 			return structure.structureLength;
 		}
 
-		return Register.FALSE;
+		return Function.FALSE;
 	}
 
 	public int undoPut()
@@ -90,7 +95,7 @@ public class Individual implements Comparable
 			return structure.structureLength;
 		}
 
-		return Register.FALSE;
+		return Function.FALSE;
 	}
 
 	/**
@@ -106,7 +111,7 @@ public class Individual implements Comparable
 		if (structure.append(dir,
 				NucleotideType.fromInteger(sequence.getFirst()), true))
 		{
-			return Register.FALSE;
+			return Function.FALSE;
 		}
 
 		return structure.structureLength;
@@ -115,17 +120,23 @@ public class Individual implements Comparable
 	/**
 	 * Clears registers and creates a new random one
 	 */
-	public void random(int reg, int adfs_count, int adfs_param, int adfs_reg)
+	public void random(int adfs_count, int adfs_param)
 	{
-		adfs = new ArrayList<Function>();
+		adfs = new ArrayList<TopLevelFunction>();
 		adfs.clear();
 
 		for (int i = 0; i < adfs_count; i++)
 		{
-			adfs.add(new Function(adfs_param, adfs_reg, null));
+			TopLevelFunction adf = new TopLevelFunction("ADF" + i, adfs_param, new ArrayList<TopLevelFunction>());			
+			adfs.add(adf);
 		}
 
-		mainFunction = new Function(0, reg, adfs);
+		mainFunction = new TopLevelFunction("MAIN", 0, adfs);
+		mainFunction.adfs = adfs;
+
+        System.out.println(mainFunction.toString());
+        this.toString();
+
 	}
 
 	public void runBondingTest(String rna, String instructions)
@@ -209,6 +220,7 @@ public class Individual implements Comparable
 
 		// Ok, ready. Run registers for each character in RNA string
 		// Cancel if stack is empty
+		accumulator = 0;
 
 		for (int run = 0; run < rna.length() * 10; run++)
 		{
@@ -220,7 +232,7 @@ public class Individual implements Comparable
 			 * umgewandelt
 			 */
 			{
-				int value = mainFunction.execute(this, null, adfs);
+				int value = mainFunction.execute(this, new int[0]);
 				
 					RelativeDirection dir = RelativeDirection
 							.fromInteger(value);
@@ -309,7 +321,7 @@ public class Individual implements Comparable
 		/**
 		 * Suche eine Funktion aus, die mutiert werden soll
 		 */
-		int adf = Register.RANDOM.nextInt(adfs.size() + 1);
+		int adf = Function.RANDOM.nextInt(adfs.size() + 1);
 
 		if (adf >= adfs.size())
 		{
@@ -331,13 +343,13 @@ public class Individual implements Comparable
 	 */
 	public static void recombine(Individual indiv1, Individual indiv2, float px)
 	{
-		if (1 - Register.RANDOM.nextFloat() <= px)
+		if (1 - Function.RANDOM.nextFloat() <= px)
 		{
-			Function.recombine(indiv1.mainFunction, indiv2.mainFunction);
+			TopLevelFunction.recombine(indiv1.mainFunction, indiv2.mainFunction);
 
 			for (int n = 0; n < indiv1.adfs.size(); n++)
 			{
-				Function.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n));
+				TopLevelFunction.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n));
 			}
 		}
 	}
@@ -364,10 +376,10 @@ public class Individual implements Comparable
 
 		for (int i = 0; i < adfs.size(); i++)
 		{
-			adfs.get(i).write(wr, "ADF" + i);
+            wr.write("ADF" + i + ":" + adfs.get(i).toString() + "\n");
 		}
 
-		mainFunction.write(wr, "MAIN");
+        wr.write("MAIN:" + mainFunction.toString());
 
 		wr.close();
 	}
@@ -387,7 +399,7 @@ public class Individual implements Comparable
 		 * Create individual
 		 */
 		Individual indiv = new Individual();
-		indiv.adfs = new ArrayList<Function>();
+		indiv.adfs = new ArrayList<TopLevelFunction>();
 
 		/**
 		 * Function reading
@@ -395,40 +407,40 @@ public class Individual implements Comparable
 
 		Function current = null;
 
-		while ((buffer = rd.readLine()) != null)
-		{
-			String[] cmd = buffer.split(" ");
-
-			if (cmd.length == 0)
-				break;
-
-			if (buffer.startsWith("#"))
-			{
-				int registerCount = Integer.parseInt(cmd[1]);
-				int parameterCount = Integer.parseInt(cmd[2]);
-
-				if (buffer.startsWith("#MAIN"))
-				{
-					indiv.mainFunction = current = new Function(
-							parameterCount, registerCount, indiv.adfs);
-				}
-				else
-				{
-					current = new Function( parameterCount, registerCount,
-							indiv.adfs);
-					indiv.adfs.add(current);
-				}
-
-				current.registers.clear();
-			}
-			else
-			{
-				String label = cmd[0];
-				String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
-
-				current.registers.add(new Register(label, params));
-			}
-		}
+//		while ((buffer = rd.readLine()) != null)
+//		{
+//			String[] cmd = buffer.split(" ");
+//
+//			if (cmd.length == 0)
+//				break;
+//
+//			if (buffer.startsWith("#"))
+//			{
+//				int registerCount = Integer.parseInt(cmd[1]);
+//				int parameterCount = Integer.parseInt(cmd[2]);
+//
+//				if (buffer.startsWith("#MAIN"))
+//				{
+//					indiv.mainFunction = current = new Function(
+//							parameterCount, registerCount, indiv.adfs);
+//				}
+//				else
+//				{
+//					current = new Function( parameterCount, registerCount,
+//							indiv.adfs);
+//					indiv.adfs.add(current);
+//				}
+//
+//				current.registers.clear();
+//			}
+//			else
+//			{
+//				String label = cmd[0];
+//				String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
+//
+//				current.registers.add(new Register(label, params));
+//			}
+//		}
 
 		indiv.run(rna);
 

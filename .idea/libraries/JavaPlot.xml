@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="JavaPlot">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/GPRNASolver/lib/JavaPlot/JavaPlot.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
