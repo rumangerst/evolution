@@ -26,6 +26,7 @@ public class Function
 {
 	public static final Random RANDOM = new Random();
 	public static final int FALSE = -1;
+	public static final int TRUE = 1;
 
 	/**
 	 * Alle Funktionen
@@ -65,9 +66,10 @@ public class Function
 			new FunctionFactory("NUC", 1), // Wandelt Zahl in Nucleotid um
 
 			new FunctionFactory("MIN", 5), new FunctionFactory("MAX", 5),
-			new FunctionFactory("AVG", 5),
+			new FunctionFactory("AVG", 5)/*,
 			new FunctionFactory("ACC", 0),
-			new FunctionFactory("STOR", 1)};
+			new FunctionFactory("STOR", 1)*/
+	};
 
 	public Function parent;
 
@@ -529,7 +531,7 @@ public class Function
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
 			if (nuc == NucleotideType.A || nuc == NucleotideType.G)
-				return individual.structure.structureLength;
+				return TRUE;
 			else
 				return FALSE;
 		}
@@ -541,7 +543,7 @@ public class Function
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
 			if (nuc == NucleotideType.U || nuc == NucleotideType.C)
-				return individual.structure.structureLength;
+				return TRUE;
 			else
 				return FALSE;
 		}
@@ -673,7 +675,7 @@ public class Function
 			else
 				fac = dynamic_Functions.get(i - STATIC_FUNCTIONS.length);
 			
-			if(depth < 6 && fac.parameters > 0)
+			if(depth < 7 && fac.parameters > 0)
 			{
 				if(rand == 0)
 				{

@@ -10,7 +10,7 @@ import java.util.LinkedList;
 
 public class Individual implements Comparable
 {
-	public String rna;
+	public ArrayList<String> sequences;
 	public double fitness;
 	public int energy;
 
@@ -44,7 +44,6 @@ public class Individual implements Comparable
 	public Individual()
 	{
 		sequence = new LinkedList<Integer>();
-		structure = new RNAField();
 	}
 
 	/**
@@ -109,7 +108,7 @@ public class Individual implements Comparable
 			return Register.FALSE;
 		}
 
-		return structure.structureLength;
+		return Register.TRUE;
 	}
 
 	/**
@@ -135,7 +134,7 @@ public class Individual implements Comparable
 				Math.min(rna.length(), instructions.length()) - 1);
 
 		// Prepare RNA data representation
-		this.rna = rna = rna.toUpperCase();
+		rna = rna.toUpperCase();
 
 		// Fill stack with A=0, C=1, U=2, G=3
 		for (char c : rna.toCharArray())
@@ -176,8 +175,6 @@ public class Individual implements Comparable
 
 			put(dir);
 		}
-
-		this.fitness = fitness();
 	}
 
 	/**
@@ -185,10 +182,14 @@ public class Individual implements Comparable
 	 * 
 	 * @param rna
 	 */
-	public void run(String rna)
+	public double run(String rna)
 	{
+		//clear structure
+		structure = new RNAField(rna);
+		sequence.clear();
+		
 		// Prepare RNA data representation
-		this.rna = rna = rna.toUpperCase();
+		rna = rna.toUpperCase();
 
 		// Fill stack with A=0, C=1, U=2, G=3
 		for (char c : rna.toCharArray())
@@ -236,40 +237,8 @@ public class Individual implements Comparable
 			}
 		}
 
-		this.fitness = fitness();
+		return structure.fitness();
 	}
-
-	// /**
-	// * Bewertet lange gerade Strecken negativ, außer wenn eine Bindung besteht
-	// *
-	// *
-	// * @return
-	// */
-	// public double compactness()
-	// {
-	// double score = 0;
-	//
-	// for(Nucleotide nuc : structure.structure.values())
-	// {
-	// if(nuc.previous != null && !nuc.isBond())
-	// {
-	// if(nuc.dir == nuc.previous.dir)
-	// {
-	// score += 1.5;
-	// }
-	// /**
-	// * Update 1 - prevent diagonal straight lines
-	// */
-	// // else if(nuc.previous.previous != null &&
-	// !nuc.previous.previous.isBond() && nuc.previous.previous.dir == nuc.dir)
-	// // {
-	// // score += 1;
-	// // }
-	// }
-	// }
-	//
-	// return score;
-	// }
 
 	/**
 	 * Calculates fitness of this object
@@ -277,20 +246,19 @@ public class Individual implements Comparable
 	 * 
 	 * @return
 	 */
-	public double fitness()
+	public double fitness(ArrayList<String> rnas)
 	{
-		double leftover_sequence = rna.length() - structure.structureLength;
-		this.energy = structure.energy();
-		//
-		// if(leftover_sequence != 0)
-		// return Double.MAX_VALUE;
-
-		// return energy + leftover_sequence * leftover_sequence;
-		// return energy + 4 * leftover_sequence;
-		// return (energy - structure.structureLength) /
-		// structure.structureLength;
-		return ((double) energy + leftover_sequence * leftover_sequence)
-				/ structure.structureLength;
+		this.sequences = rnas;
+		
+		fitness = 0;
+		
+		for(String rna : rnas)
+		{
+			double f =  run(rna);
+			fitness += f;
+		}
+		
+		return fitness;
 	}
 
 	/**
@@ -360,7 +328,10 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
-		wr.write(rna + "\n");
+		for(String rna : sequences)
+		{
+			wr.write("~" + rna + "\n");
+		}
 
 		for (int i = 0; i < adfs.size(); i++)
 		{

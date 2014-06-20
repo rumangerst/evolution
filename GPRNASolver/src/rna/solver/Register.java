@@ -17,6 +17,7 @@ public class Register
 {
 	public static final Random RANDOM = new Random();
 	public static final int FALSE = -1;
+	public static final int TRUE = 1;
 
 	public String label;
 	public String[] parameters;
@@ -515,7 +516,7 @@ public class Register
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
 			if (nuc == NucleotideType.A || nuc == NucleotideType.G)
-				value = individual.structure.structureLength;
+				value = TRUE;
 			else
 				value = FALSE;
 
@@ -529,7 +530,7 @@ public class Register
 			NucleotideType nuc = NucleotideType.fromInteger(r1);
 
 			if (nuc == NucleotideType.U || nuc == NucleotideType.C)
-				value = individual.structure.structureLength;
+				value = TRUE;
 			else
 				value = FALSE;
 

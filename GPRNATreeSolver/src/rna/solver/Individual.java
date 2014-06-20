@@ -10,9 +10,8 @@ import java.util.LinkedList;
 
 public class Individual implements Comparable
 {
-	public String rna;
+	public ArrayList<String> sequences;
 	public double fitness;
-	public int energy;
 
 	/**
 	 * Holds sequence
@@ -33,7 +32,7 @@ public class Individual implements Comparable
 	 * ADF functions
 	 */
 	public ArrayList<TopLevelFunction> adfs;
-	
+
 	/**
 	 * Memory of invididual
 	 */
@@ -49,7 +48,6 @@ public class Individual implements Comparable
 	public Individual()
 	{
 		sequence = new LinkedList<Integer>();
-		structure = new RNAField();
 	}
 
 	/**
@@ -60,7 +58,7 @@ public class Individual implements Comparable
 	public Individual(Individual tocopy)
 	{
 		this();
-		
+
 		this.mainFunction = new TopLevelFunction(tocopy.mainFunction);
 		this.adfs = new ArrayList<TopLevelFunction>();
 		for (TopLevelFunction reg : tocopy.adfs)
@@ -114,7 +112,7 @@ public class Individual implements Comparable
 			return Function.FALSE;
 		}
 
-		return structure.structureLength;
+		return Function.TRUE;
 	}
 
 	/**
@@ -127,15 +125,16 @@ public class Individual implements Comparable
 
 		for (int i = 0; i < adfs_count; i++)
 		{
-			TopLevelFunction adf = new TopLevelFunction("ADF" + i, adfs_param, new ArrayList<TopLevelFunction>());			
+			TopLevelFunction adf = new TopLevelFunction("ADF" + i, adfs_param,
+					new ArrayList<TopLevelFunction>());
 			adfs.add(adf);
 		}
 
 		mainFunction = new TopLevelFunction("MAIN", 0, adfs);
 		mainFunction.adfs = adfs;
 
-        System.out.println(mainFunction.toString());
-        this.toString();
+		System.out.println(mainFunction.toString());
+		this.toString();
 
 	}
 
@@ -146,7 +145,7 @@ public class Individual implements Comparable
 				Math.min(rna.length(), instructions.length()) - 1);
 
 		// Prepare RNA data representation
-		this.rna = rna = rna.toUpperCase();
+		rna = rna.toUpperCase();
 
 		// Fill stack with A=0, C=1, U=2, G=3
 		for (char c : rna.toCharArray())
@@ -187,8 +186,6 @@ public class Individual implements Comparable
 
 			put(dir);
 		}
-
-		this.fitness = fitness();
 	}
 
 	/**
@@ -196,10 +193,14 @@ public class Individual implements Comparable
 	 * 
 	 * @param rna
 	 */
-	public void run(String rna)
+	public double run(String rna)
 	{
+		// clear structure
+		structure = new RNAField(rna);
+		sequence.clear();
+
 		// Prepare RNA data representation
-		this.rna = rna = rna.toUpperCase();
+		rna = rna.toUpperCase();
 
 		// Fill stack with A=0, C=1, U=2, G=3
 		for (char c : rna.toCharArray())
@@ -233,55 +234,22 @@ public class Individual implements Comparable
 			 */
 			{
 				int value = mainFunction.execute(this, new int[0]);
-				
-					RelativeDirection dir = RelativeDirection
-							.fromInteger(value);
-					
-					if (dir != RelativeDirection.UNDO)
-					{
-						put(dir);
-					}
-					else
-					{
-						structure.undo();
-					}
+
+				RelativeDirection dir = RelativeDirection.fromInteger(value);
+
+				if (dir != RelativeDirection.UNDO)
+				{
+					put(dir);
+				}
+				else
+				{
+					structure.undo();
+				}
 			}
 		}
-
-		this.fitness = fitness();
+		
+		return structure.fitness();
 	}
-
-	// /**
-	// * Bewertet lange gerade Strecken negativ, außer wenn eine Bindung besteht
-	// *
-	// *
-	// * @return
-	// */
-	// public double compactness()
-	// {
-	// double score = 0;
-	//
-	// for(Nucleotide nuc : structure.structure.values())
-	// {
-	// if(nuc.previous != null && !nuc.isBond())
-	// {
-	// if(nuc.dir == nuc.previous.dir)
-	// {
-	// score += 1.5;
-	// }
-	// /**
-	// * Update 1 - prevent diagonal straight lines
-	// */
-	// // else if(nuc.previous.previous != null &&
-	// !nuc.previous.previous.isBond() && nuc.previous.previous.dir == nuc.dir)
-	// // {
-	// // score += 1;
-	// // }
-	// }
-	// }
-	//
-	// return score;
-	// }
 
 	/**
 	 * Calculates fitness of this object
@@ -289,20 +257,19 @@ public class Individual implements Comparable
 	 * 
 	 * @return
 	 */
-	public double fitness()
+	public double fitness(ArrayList<String> rnas)
 	{
-		double leftover_sequence = rna.length() - structure.structureLength;
-		this.energy = structure.energy();
-		//
-		// if(leftover_sequence != 0)
-		// return Double.MAX_VALUE;
-
-		// return energy + leftover_sequence * leftover_sequence;
-		// return energy + 4 * leftover_sequence;
-		// return (energy - structure.structureLength) /
-		// structure.structureLength;
-		return ((double) energy + leftover_sequence * leftover_sequence)
-				/ structure.structureLength;
+		this.sequences = rnas;
+		
+		fitness = 0;
+		
+		for(String rna : rnas)
+		{
+			double f =  run(rna);
+			fitness += f;
+		}
+		
+		return fitness;
 	}
 
 	/**
@@ -345,11 +312,13 @@ public class Individual implements Comparable
 	{
 		if (1 - Function.RANDOM.nextFloat() <= px)
 		{
-			TopLevelFunction.recombine(indiv1.mainFunction, indiv2.mainFunction);
+			TopLevelFunction
+					.recombine(indiv1.mainFunction, indiv2.mainFunction);
 
 			for (int n = 0; n < indiv1.adfs.size(); n++)
 			{
-				TopLevelFunction.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n));
+				TopLevelFunction.recombine(indiv1.adfs.get(n),
+						indiv2.adfs.get(n));
 			}
 		}
 	}
@@ -372,78 +341,48 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
-		wr.write(rna + "\n");
+		for(String rna : sequences)
+		{
+			wr.write("~" + rna + "\n");
+		}
 
 		for (int i = 0; i < adfs.size(); i++)
 		{
-            wr.write("ADF" + i + ":" + adfs.get(i).toString() + "\n");
+			wr.write("ADF" + i + ":" + adfs.get(i).toString() + "\n");
 		}
 
-        wr.write("MAIN:" + mainFunction.toString());
+		wr.write("MAIN:" + mainFunction.toString());
 
 		wr.close();
 	}
 
 	public static Individual load(String file) throws IOException
 	{
-		BufferedReader rd = new BufferedReader(new FileReader(file));
-
-		rd.readLine(); // ignore name
+		throw new RuntimeException("Not implemented!");
 		
-
-		String rna = rd.readLine();
-
-		String buffer = null;
-
-		/**
-		 * Create individual
-		 */
-		Individual indiv = new Individual();
-		indiv.adfs = new ArrayList<TopLevelFunction>();
-
-		/**
-		 * Function reading
-		 */
-
-		Function current = null;
-
-//		while ((buffer = rd.readLine()) != null)
-//		{
-//			String[] cmd = buffer.split(" ");
+//		BufferedReader rd = new BufferedReader(new FileReader(file));
 //
-//			if (cmd.length == 0)
-//				break;
+//		rd.readLine(); // ignore name
 //
-//			if (buffer.startsWith("#"))
-//			{
-//				int registerCount = Integer.parseInt(cmd[1]);
-//				int parameterCount = Integer.parseInt(cmd[2]);
+//		String rna = rd.readLine();
 //
-//				if (buffer.startsWith("#MAIN"))
-//				{
-//					indiv.mainFunction = current = new Function(
-//							parameterCount, registerCount, indiv.adfs);
-//				}
-//				else
-//				{
-//					current = new Function( parameterCount, registerCount,
-//							indiv.adfs);
-//					indiv.adfs.add(current);
-//				}
+//		String buffer = null;
 //
-//				current.registers.clear();
-//			}
-//			else
-//			{
-//				String label = cmd[0];
-//				String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
+//		/**
+//		 * Create individual
+//		 */
+//		Individual indiv = new Individual();
+//		indiv.adfs = new ArrayList<TopLevelFunction>();
 //
-//				current.registers.add(new Register(label, params));
-//			}
-//		}
-
-		indiv.run(rna);
-
-		return indiv;
+//		/**
+//		 * Function reading
+//		 */
+//
+//		Function current = null;
+//
+//		
+//		indiv.run(rna);
+//
+//		return indiv;
 	}
 }

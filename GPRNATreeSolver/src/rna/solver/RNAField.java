@@ -6,13 +6,15 @@ import java.util.LinkedList;
 
 public class RNAField
 {
+	public String sequence;
 	public HashMap<Point, Nucleotide> structure;
 	public int structureLength;
 	public Nucleotide current;
 	public Nucleotide initial;
 
-	public RNAField()
+	public RNAField(String sequence)
 	{
+		this.sequence = sequence;
 		structure = new HashMap<>();
 		structureLength = 0;
 	}
@@ -854,6 +856,14 @@ public class RNAField
 		}
 
 		return e;
+	}
+	
+	public double fitness()
+	{
+		double leftover_sequence = sequence.length() - structureLength;
+				
+		return ((double) energy() + leftover_sequence * leftover_sequence)
+				/ sequence.length();
 	}
 
 	public Nucleotide getByIndex(int index)

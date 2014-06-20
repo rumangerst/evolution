@@ -49,14 +49,17 @@ public class ResultViewer extends JFrame implements ActionListener
 	{
 		try
 		{
-			ResultViewer dialog = new ResultViewer();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
+			for (String rna : indiv.sequences)
+			{
+				ResultViewer dialog = new ResultViewer();
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setVisible(true);
 
-			dialog.refreshData(indiv);
+				dialog.refreshData(indiv, rna);
 
-			dialog.setExtendedState(dialog.getExtendedState()
-					| JFrame.MAXIMIZED_BOTH);
+				dialog.setExtendedState(dialog.getExtendedState()
+						| JFrame.MAXIMIZED_BOTH);
+			}
 		}
 		catch (Exception e)
 		{
@@ -151,14 +154,21 @@ public class ResultViewer extends JFrame implements ActionListener
 		return str.toString();
 	}
 
-	public void refreshData(Individual indiv)
+	public void refreshData(Individual indiv, String rna)
 	{
 		currentIndividual = indiv;
 
+		/**
+		 * Create structure
+		 * 
+		 */
+		indiv.run(rna);
+		
 		this.setTitle(String.format("Energy: %d, Fitness: %f",
-				indiv.structure.energy(), indiv.fitness));
+				indiv.structure.energy(), indiv.fitness));		
+		
 
-		basePairCanvas.setData(indiv.structure, indiv.rna);
+		basePairCanvas.setData(indiv.structure, rna);
 		structureCanvas.setData(indiv.structure);
 
 		StringBuilder str = new StringBuilder();
@@ -178,14 +188,13 @@ public class ResultViewer extends JFrame implements ActionListener
 
 	@Override
 	public void actionPerformed(ActionEvent arg0)
-	{		
+	{
 		if (arg0.getActionCommand().equals("SAVE"))
 		{
 			if (currentIndividual != null)
 			{
 				JFileChooser dlg = new JFileChooser();
-				dlg.setCurrentDirectory(new File(System
-						.getProperty("user.dir")));
+				dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
 						"RNASLV"));
 				if (dlg.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
@@ -207,23 +216,22 @@ public class ResultViewer extends JFrame implements ActionListener
 		{
 
 			JFileChooser dlg = new JFileChooser();
-			dlg.setCurrentDirectory(new File(System
-					.getProperty("user.dir")));
+			dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
 			dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
 					"RNASLV"));
 			if (dlg.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
-				try
-				{
-					Individual indiv = Individual.load(dlg.getSelectedFile()
-							.getAbsolutePath());
-					refreshData(indiv);
-				}
-				catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				// try
+				// {
+				// Individual indiv = Individual.load(dlg.getSelectedFile()
+				// .getAbsolutePath());
+				// refreshData(indiv);
+				// }
+				// catch (IOException e)
+				// {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// }
 			}
 
 		}

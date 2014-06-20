@@ -1,6 +1,7 @@
 package rna.solver;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +14,6 @@ import java.util.List;
  */
 public class GPRunner
 {
-	public String rna;
-
 	public int generations;
 
 	public int populationSize;
@@ -34,6 +33,8 @@ public class GPRunner
 	public int adfParameters;
 
 	public LinkedList<Individual> population = new LinkedList<>();
+	
+	public ArrayList<String> sequences;
 
 	/**
 	 * Data for plot
@@ -42,9 +43,9 @@ public class GPRunner
 	 */
 	public LinkedList<Double> results_BestFitness = new LinkedList<>();
 
-	public GPRunner(String rna)
+	public GPRunner(ArrayList<String> sequences)
 	{
-		this.rna = rna;
+		this.sequences = sequences;
 
 		this.generations = 1000;
 
@@ -101,7 +102,7 @@ public class GPRunner
 			 */
 			for (Individual indiv : population)
 			{
-				indiv.run(rna);
+				indiv.fitness(sequences);
 			}
 
 			Individual best = population.getFirst();
@@ -114,8 +115,7 @@ public class GPRunner
 				}
 			}
 
-			System.out.println("Best individual: " + best.fitness + " energy: "
-					+ best.energy);
+			System.out.println("Best individual: " + best.fitness );
 			System.out.println( "Main:"
 					+ best.mainFunction.toString());
 
@@ -176,11 +176,7 @@ public class GPRunner
 
 			for (int i = 0; i < children; i++)
 			{
-				List<Individual> parents = tournamentSelection();
-
-				// Testweise Plus-Strategie
-				// newpop.add( new Individual(parents.get(0)));
-				// newpop.add( new Individual(parents.get(1)));
+				List<Individual> parents = tournamentSelection();				
 
 				Individual child1 = new Individual(parents.get(0));
 				Individual child2 = new Individual(parents.get(1));
@@ -213,7 +209,7 @@ public class GPRunner
 		 */
 		for (Individual indiv : population)
 		{
-			indiv.run(rna);
+			indiv.fitness(sequences);
 		}
 
 		/**
