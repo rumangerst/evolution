@@ -190,7 +190,7 @@ public abstract class Individual implements Comparable
             fitness += f;
         }
 
-        return fitness;
+        return fitness / rnas.size();
     }
 
     /**

@@ -30,11 +30,11 @@ public class Main
     private static void optimize(ArrayList<String> sequences)
     {
         GPRunner runner = new GPRunner(sequences);
-        runner.generations = 2000;
+        runner.generations = 4000;
         runner.mutateProbability = 1.0f / 20.0f;
 
-        runner.createInitialTreePopulation(3, 3);
-        //runner.createInitialLinearPopulation(20, 3, 20, 3);
+        //runner.createInitialTreePopulation(3, 3);
+        runner.createInitialLinearPopulation(20, 3, 20, 3);
         
         Individual best = runner.evolve();
 
@@ -49,7 +49,12 @@ public class Main
 
 //		sequences.add("GGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCC");
 //		sequences.add("AAAAAAAAAAAAAAAAAUAUAUUUUUUUUUUUU");
-        sequences.add("ACUCGGUUACGAG");
+                
+                sequences.add("GGGGGGGGGGGGGGGCGCGCCCCCCCCCCCC");
+		sequences.add("AAAAAAAAAAAAAAAUAUAUUUUUUUUUUUU");
+//        sequences.add("ACUCGGUUACGAG");
+//        sequences.add("ACUGCGGUUACGCAG");
+                
 //		sequences.add("GAUGCAUACCCAAGUGCCUGA");
 
                // sequences.add("GGGGGGGGGGGGGGGGGCGCGCCCCCCCCCCCC");

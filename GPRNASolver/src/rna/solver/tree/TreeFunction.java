@@ -31,6 +31,7 @@ public class TreeFunction
 {
 	public static final int FALSE = -1;
 	public static final int TRUE = 1;
+        public static final int TREE_MAX_DEPTH = 7;
 
 	/**
 	 * Alle Funktionen
@@ -677,7 +678,7 @@ public class TreeFunction
 			else
 				fac = dynamic_Functions.get(i - STATIC_FUNCTIONS.length);
 			
-			if(depth < 7 && fac.parameters > 0)
+			if(depth < TREE_MAX_DEPTH && fac.parameters > 0)
 			{
 				if(rand == 0)
 				{

@@ -735,13 +735,7 @@ Bäume haben also weniger Redundanzen als lineare Programme und können zusätzl
  erste Optimierung auszuwürfeln.
  Auch ein Baum-GP kann in einem lokalen Minimum gefangen sein, wobei dies
  bei den Tests etwas weniger auftrat als beim linearen GP.
-\end_layout
-
-\begin_layout Standard
-Es ist für dieses Problem also eher sinnvoll ein Baum-GP zu verwenden, besonders
-, da durch die theoretisch nicht vorhandene Größenbeschränkung der Baum
- sehr groß werden kann.
- Gleichzeitig kann dieser aber auch bei kleinen Problemen sehr klein bleiben.
+ Zusätzlich hat das Baum-GP einen klein
 \end_layout
 
 \end_body
