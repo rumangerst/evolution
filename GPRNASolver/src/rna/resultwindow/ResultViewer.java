@@ -1,38 +1,33 @@
-package resultwindow;
+package rna.resultwindow;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import rna.solver.Function;
-import rna.solver.Individual;
-
-import javax.swing.JTabbedPane;
-
-import java.awt.ScrollPane;
-
-import javax.swing.BoxLayout;
-
-import java.awt.TextArea;
 import java.awt.Font;
+import java.awt.ScrollPane;
+import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import javax.swing.BoxLayout;
 
-import javax.swing.JMenuBar;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import rna.solver.Individual;
+import rna.solver.linear.LinearFunction;
+import rna.solver.linear.LinearIndividual;
 
 public class ResultViewer extends JFrame implements ActionListener
 {
@@ -138,7 +133,7 @@ public class ResultViewer extends JFrame implements ActionListener
 		}
 	}
 
-	private String formatCode(Function f, String name)
+	private String formatCode(LinearFunction f, String name)
 	{
 		if (f == null)
 			return "";
@@ -171,20 +166,8 @@ public class ResultViewer extends JFrame implements ActionListener
 
 		basePairCanvas.setData(indiv.structure, rna);
 		structureCanvas.setData(indiv.structure);
-
-		StringBuilder str = new StringBuilder();
-
-		if (indiv.mainFunction != null)
-		{
-			str.append(formatCode(indiv.mainFunction, "MAIN"));
-
-			for (int i = 0; i < indiv.adfs.size(); i++)
-			{
-				str.append(formatCode(indiv.adfs.get(i), "ADF" + i));
-			}
-		}
-
-		code.setText(str.toString());
+		
+		code.setText(indiv.toString());
 	}
 
 	@Override

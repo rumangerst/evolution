@@ -1,408 +1,226 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package rna.solver;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
+import rna.solver.linear.LinearRegister;
 
-public class Individual implements Comparable
+public abstract class Individual implements Comparable
 {
-	public ArrayList<String> sequences;
-	public double fitness;
-	public int energy;
 
-	/**
-	 * Holds sequence
-	 */
-	public LinkedList<Integer> sequence;
+    public ArrayList<String> sequences;
+    public double fitness;
+    public int energy;
 
-	/**
-	 * Holds geometric representation of secondary structure
-	 */
-	public RNAField structure;
+    /**
+     * Holds sequence
+     */
+    public LinkedList<Integer> sequence;
 
-	/**
-	 * Main function
-	 */
-	public Function mainFunction;
+    /**
+     * Holds geometric representation of secondary structure
+     */
+    public RNAField structure;
 
-	/**
-	 * ADF functions
-	 */
-	public ArrayList<Function> adfs;
+    /**
+     * Old energy
+     *
+     * @param type
+     */
+    public int runtime_energy_old;
 
-	/**
-	 * Old energy
-	 * 
-	 * @param type
-	 */
-	public int runtime_energy_old;
+    public Individual()
+    {
+        sequence = new LinkedList<Integer>();
+    }
 
-	public Individual()
-	{
-		sequence = new LinkedList<Integer>();
-	}
+    /**
+     * Copy-Konstruktor
+     *
+     * @param tocopy
+     */
+    public Individual(Individual tocopy)
+    {
+        this();
+    }
 
-	/**
-	 * Copy-Konstruktor
-	 * 
-	 * @param tocopy
-	 */
-	public Individual(Individual tocopy)
-	{
-		this();
-		
-		this.mainFunction = new Function(tocopy.mainFunction);
-		this.adfs = new ArrayList<Function>();
-		for (Function reg : tocopy.adfs)
-		{
-			adfs.add(new Function(reg));
-		}
-	}
+    /**
+     * Put next nucleotide onto
+     *
+     * @param dir
+     */
+    public int put(RelativeDirection dir)
+    {
+        if (sequence.isEmpty())
+        {
+            return 0;
+        }
 
-	/**
-	 * Put next nucleotide onto
-	 * 
-	 * @param dir
-	 */
-	public int put(RelativeDirection dir)
-	{
-		if (sequence.isEmpty())
-			return 0;
+        if (structure.append(dir,
+                NucleotideType.fromInteger(sequence.remove()), false))
+        {
+            return structure.structureLength;
+        }
 
-		if (structure.append(dir,
-				NucleotideType.fromInteger(sequence.remove()), false))
-		{
-			return structure.structureLength;
-		}
+        return LinearRegister.FALSE;
+    }
 
-		return Register.FALSE;
-	}
+    public int undoPut()
+    {
+        if (structure.undo())
+        {
+            return structure.structureLength;
+        }
 
-	public int undoPut()
-	{
-		if (structure.undo())
-		{
-			return structure.structureLength;
-		}
+        return LinearRegister.FALSE;
+    }
 
-		return Register.FALSE;
-	}
+    /**
+     * Checks if put would collide or otherwise not possible
+     *
+     * @param dir
+     */
+    public int checkCollision(RelativeDirection dir)
+    {
+        if (sequence.isEmpty())
+        {
+            return 0;
+        }
 
-	/**
-	 * Checks if put would collide or otherwise not possible
-	 * 
-	 * @param dir
-	 */
-	public int checkCollision(RelativeDirection dir)
-	{
-		if (sequence.isEmpty())
-			return 0;
+        if (structure.append(dir,
+                NucleotideType.fromInteger(sequence.getFirst()), true))
+        {
+            return LinearRegister.FALSE;
+        }
 
-		if (structure.append(dir,
-				NucleotideType.fromInteger(sequence.getFirst()), true))
-		{
-			return Register.FALSE;
-		}
+        return LinearRegister.TRUE;
+    }
 
-		return Register.TRUE;
-	}
+    /**
+     * Clears registers and creates a new random one
+     *
+     * @param settings
+     */
+    public abstract void random(int... settings);
 
-	/**
-	 * Clears registers and creates a new random one
-	 */
-	public void random(int reg, int adfs_count, int adfs_param, int adfs_reg)
-	{
-		adfs = new ArrayList<Function>();
-		adfs.clear();
+    public void runBondingTest(String rna, String instructions)
+    {
+        // Truncate
+        rna = rna.substring(0,
+                Math.min(rna.length(), instructions.length()) - 1);
 
-		for (int i = 0; i < adfs_count; i++)
-		{
-			adfs.add(new Function(adfs_param, adfs_reg, null));
-		}
+        // Prepare RNA data representation
+        rna = rna.toUpperCase();
 
-		mainFunction = new Function(0, reg, adfs);
-	}
+        // Fill stack with A=0, C=1, U=2, G=3
+        for (char c : rna.toCharArray())
+        {
+            if (c == 'A')
+            {
+                sequence.add(0);
+            }
+            else if (c == 'C')
+            {
+                sequence.add(1);
+            }
+            else if (c == 'U')
+            {
+                sequence.add(2);
+            }
+            else
+            {
+                sequence.add(3);
+            }
+        }
 
-	public void runBondingTest(String rna, String instructions)
-	{
-		// Truncate
-		rna = rna.substring(0,
-				Math.min(rna.length(), instructions.length()) - 1);
-
-		// Prepare RNA data representation
-		rna = rna.toUpperCase();
-
-		// Fill stack with A=0, C=1, U=2, G=3
-		for (char c : rna.toCharArray())
-		{
-			if (c == 'A')
-				sequence.add(0);
-			else if (c == 'C')
-				sequence.add(1);
-			else if (c == 'U')
-				sequence.add(2);
-			else
-				sequence.add(3);
-		}
-
-		// Initialize values (set cursor, direction and initial nucleotide
-		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
-				NucleotideDirection.EAST);
+        // Initialize values (set cursor, direction and initial nucleotide
+        structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
+                NucleotideDirection.EAST);
 
 		// Ok, ready. Run registers for each character in RNA string
-		// Cancel if stack is empty
+        // Cancel if stack is empty
+        for (int ins = 0; ins < Math.min(rna.length(), instructions.length()); ins++)
+        {
+            RelativeDirection dir = RelativeDirection.STRAIGHT;
 
-		for (int ins = 0; ins < Math.min(rna.length(), instructions.length()); ins++)
-		{
-			RelativeDirection dir = RelativeDirection.STRAIGHT;
+            if (instructions.charAt(ins) == 'L')
+            {
+                dir = RelativeDirection.LEFT;
+            }
+            else if (instructions.charAt(ins) == 'S')
+            {
+                dir = RelativeDirection.STRAIGHT;
+            }
+            else
+            {
+                dir = RelativeDirection.RIGHT;
+            }
 
-			if (instructions.charAt(ins) == 'L')
-			{
-				dir = RelativeDirection.LEFT;
-			}
-			else if (instructions.charAt(ins) == 'S')
-			{
-				dir = RelativeDirection.STRAIGHT;
-			}
-			else
-			{
-				dir = RelativeDirection.RIGHT;
-			}
+            put(dir);
+        }
+    }
 
-			put(dir);
-		}
-	}
+    /**
+     * Run program, using given RNA string
+     *
+     * @param rna
+     */
+    public abstract double run(String rna);
 
-	/**
-	 * Run program, using given RNA string
-	 * 
-	 * @param rna
-	 */
-	public double run(String rna)
-	{
-		//clear structure
-		structure = new RNAField(rna);
-		sequence.clear();
-		
-		// Prepare RNA data representation
-		rna = rna.toUpperCase();
+    /**
+     * Calculates fitness of this object
+     *
+     *
+     * @return
+     */
+    public double fitness(ArrayList<String> rnas)
+    {
+        this.sequences = rnas;
 
-		// Fill stack with A=0, C=1, U=2, G=3
-		for (char c : rna.toCharArray())
-		{
-			if (c == 'A')
-				sequence.add(0);
-			else if (c == 'C')
-				sequence.add(1);
-			else if (c == 'U')
-				sequence.add(2);
-			else
-				sequence.add(3);
-		}
+        fitness = 0;
 
-		// Initialize values (set cursor, direction and initial nucleotide
-		structure.initial(0, 0, NucleotideType.fromInteger(sequence.remove()),
-				NucleotideDirection.EAST);
+        for (String rna : rnas)
+        {
+            double f = run(rna);
+            fitness += f;
+        }
 
-		// Ok, ready. Run registers for each character in RNA string
-		// Cancel if stack is empty
+        return fitness;
+    }
 
-		for (int run = 0; run < rna.length() * 10; run++)
-		{
-			if (sequence.isEmpty())
-				break;
+    /**
+     * Mutiert alle Funktionen
+     *
+     * @param p
+     */
+    public abstract void mutate(float p);
+    
+    public abstract void recombine(Individual indiv2, float px);
 
-			/**
-			 * Main-Funktion wird aufgeführt und Ausgabe in Direction
-			 * umgewandelt
-			 */
-			{
-				int value = mainFunction.execute(this, null, adfs);
-				
-					RelativeDirection dir = RelativeDirection
-							.fromInteger(value);
-					
-					if (dir != RelativeDirection.UNDO)
-					{
-						put(dir);
-					}
-					else
-					{
-						structure.undo();
-					}
-			}
-		}
+    @Override
+    public int compareTo(Object arg0)
+    {
+        Individual other = (Individual) arg0;
 
-		return structure.fitness();
-	}
+        if (other.fitness < fitness)
+        {
+            return 1;
+        }
+        if (fitness < other.fitness)
+        {
+            return -1;
+        }
 
-	/**
-	 * Calculates fitness of this object
-	 * 
-	 * 
-	 * @return
-	 */
-	public double fitness(ArrayList<String> rnas)
-	{
-		this.sequences = rnas;
-		
-		fitness = 0;
-		
-		for(String rna : rnas)
-		{
-			double f =  run(rna);
-			fitness += f;
-		}
-		
-		return fitness;
-	}
+        return 0;
+    }
 
-	/**
-	 * Mutiert alle Funktionen
-	 * 
-	 * @param p
-	 */
-	public void mutate(float p)
-	{
-		/*
-		 * mainFunction.mutate(p);
-		 * 
-		 * for (Function f : adfs) { f.mutate(p); }
-		 */
+    public abstract void write(String file) throws IOException;
 
-		/**
-		 * Suche eine Funktion aus, die mutiert werden soll
-		 */
-		int adf = Register.RANDOM.nextInt(adfs.size() + 1);
+    public abstract Individual copy();
 
-		if (adf >= adfs.size())
-		{
-			mainFunction.mutate(p);
-		}
-		else
-		{
-			adfs.get(adf).mutate(p);
-		}
-	}
-
-	/**
-	 * Recombine using one-point X-Over
-	 * 
-	 * @param indiv1
-	 * @param indiv2
-	 * @param px
-	 *            Recombination probability
-	 */
-	public static void recombine(Individual indiv1, Individual indiv2, float px)
-	{
-		if (1 - Register.RANDOM.nextFloat() <= px)
-		{
-			Function.recombine(indiv1.mainFunction, indiv2.mainFunction);
-
-			for (int n = 0; n < indiv1.adfs.size(); n++)
-			{
-				Function.recombine(indiv1.adfs.get(n), indiv2.adfs.get(n));
-			}
-		}
-	}
-
-	@Override
-	public int compareTo(Object arg0)
-	{
-		Individual other = (Individual) arg0;
-
-		if (other.fitness < fitness)
-			return 1;
-		if (fitness < other.fitness)
-			return -1;
-
-		return 0;
-	}
-
-	public void write(String file) throws IOException
-	{
-		FileWriter wr = new FileWriter(file);
-
-		wr.write(">Individual with Fitness " + fitness + "\n");
-		for(String rna : sequences)
-		{
-			wr.write("~" + rna + "\n");
-		}
-
-		for (int i = 0; i < adfs.size(); i++)
-		{
-			adfs.get(i).write(wr, "ADF" + i);
-		}
-
-		mainFunction.write(wr, "MAIN");
-
-		wr.close();
-	}
-
-	public static Individual load(String file) throws IOException
-	{
-		BufferedReader rd = new BufferedReader(new FileReader(file));
-
-		rd.readLine(); // ignore name
-		
-
-		String rna = rd.readLine();
-
-		String buffer = null;
-
-		/**
-		 * Create individual
-		 */
-		Individual indiv = new Individual();
-		indiv.adfs = new ArrayList<Function>();
-
-		/**
-		 * Function reading
-		 */
-
-		Function current = null;
-
-		while ((buffer = rd.readLine()) != null)
-		{
-			String[] cmd = buffer.split(" ");
-
-			if (cmd.length == 0)
-				break;
-
-			if (buffer.startsWith("#"))
-			{
-				int registerCount = Integer.parseInt(cmd[1]);
-				int parameterCount = Integer.parseInt(cmd[2]);
-
-				if (buffer.startsWith("#MAIN"))
-				{
-					indiv.mainFunction = current = new Function(
-							parameterCount, registerCount, indiv.adfs);
-				}
-				else
-				{
-					current = new Function( parameterCount, registerCount,
-							indiv.adfs);
-					indiv.adfs.add(current);
-				}
-
-				current.registers.clear();
-			}
-			else
-			{
-				String label = cmd[0];
-				String[] params = Arrays.copyOfRange(cmd, 1, cmd.length);
-
-				current.registers.add(new Register(label, params));
-			}
-		}
-
-		indiv.run(rna);
-
-		return indiv;
-	}
 }

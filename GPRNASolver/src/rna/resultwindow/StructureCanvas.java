@@ -1,4 +1,4 @@
-package resultwindow;
+package rna.resultwindow;
 
 import java.awt.BasicStroke;
 import java.awt.Canvas;

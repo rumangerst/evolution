@@ -1,7 +1,11 @@
-package rna.solver;
+package rna.solver.linear;
 
 import java.awt.Point;
 import java.util.Random;
+import rna.solver.Nucleotide;
+import rna.solver.NucleotideDirection;
+import rna.solver.NucleotideType;
+import rna.solver.RelativeDirection;
 
 /**
  * Register class, returns a value
@@ -13,9 +17,8 @@ import java.util.Random;
  * @author ruman
  * 
  */
-public class Register
-{
-	public static final Random RANDOM = new Random();
+public class LinearRegister
+{	
 	public static final int FALSE = -1;
 	public static final int TRUE = 1;
 
@@ -27,7 +30,7 @@ public class Register
 	 */
 	public int value;
 
-	public Register(String label, String... parameters)
+	public LinearRegister(String label, String... parameters)
 	{
 		this.label = label;
 		this.parameters = parameters;
@@ -35,7 +38,7 @@ public class Register
 		this.value = 0;
 	}
 
-	public Register(Register tocopy)
+	public LinearRegister(LinearRegister tocopy)
 	{
 		this.label = tocopy.label;
 		this.parameters = tocopy.parameters.clone();
@@ -53,7 +56,7 @@ public class Register
 	 * @param param
 	 * @return
 	 */
-	public int executeTerminal(Individual individual, Function parent,
+	public int executeTerminal(LinearIndividual individual, LinearFunction parent,
 			String label)
 	{
 		if (label.length() == 0)
@@ -341,7 +344,7 @@ public class Register
 	 * 
 	 * @return
 	 */
-	public void execute(Individual individual, Function parent)
+	public void execute(LinearIndividual individual, LinearFunction parent)
 	{
 		if (label.equals("IF_GREATER"))
 		{
@@ -563,7 +566,7 @@ public class Register
 		{
 			int id = Integer.parseInt(label.substring(3));
 
-			Function adf = parent.adfs.get(id);
+			LinearFunction adf = parent.adfs.get(id);
 
 			int[] params = new int[adf.parameterCount];
 

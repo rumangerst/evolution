@@ -1,5 +1,8 @@
 package rna.solver;
 
+import rna.solver.linear.LinearRegister;
+import rna.solver.linear.LinearFunction;
+
 /**
  * Ein Factory, das Register herstellt
  * @author ruman
@@ -21,7 +24,7 @@ public class RegisterFactory
 	 * @param parent
 	 * @return
 	 */
-	public Register createRegister(Function parent)
+	public LinearRegister createRegister(LinearFunction parent)
 	{
 		String[] params = new String[parameters];
 		
@@ -30,6 +33,6 @@ public class RegisterFactory
 			params[i] = parent.randomTerminal();
 		}
 		
-		return new Register(label, params);
+		return new LinearRegister(label, params);
 	}
 }

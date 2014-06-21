@@ -36,204 +36,210 @@ import javax.swing.JMenuItem;
 
 public class ResultViewer extends JFrame implements ActionListener
 {
-	private BasePairCanvas basePairCanvas;
-	private StructureCanvas structureCanvas;
-	private TextArea code;
 
-	private Individual currentIndividual;
+    private BasePairCanvas basePairCanvas;
+    private StructureCanvas structureCanvas;
+    private TextArea code;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void showResults(Individual indiv)
-	{
-		try
-		{
-			for (String rna : indiv.sequences)
-			{
-				ResultViewer dialog = new ResultViewer();
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setVisible(true);
+    private Individual currentIndividual;
 
-				dialog.refreshData(indiv, rna);
+    /**
+     * Launch the application.
+     */
+    public static void showResults(Individual indiv)
+    {
+        try
+        {
+            for (String rna : indiv.sequences)
+            {
+                ResultViewer dialog = new ResultViewer();
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setVisible(true);
 
-				dialog.setExtendedState(dialog.getExtendedState()
-						| JFrame.MAXIMIZED_BOTH);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+                dialog.refreshData(indiv, rna);
 
-	/**
-	 * Create the dialog.
-	 */
-	public ResultViewer()
-	{
-		this.basePairCanvas = new BasePairCanvas();
-		this.structureCanvas = new StructureCanvas();
+                dialog.setExtendedState(dialog.getExtendedState()
+                        | JFrame.MAXIMIZED_BOTH);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
-		setBounds(100, 100, 450, 300);
-		getContentPane().setLayout(new BorderLayout());
-		{
-			JMenuBar menuBar = new JMenuBar();
-			getContentPane().add(menuBar, BorderLayout.NORTH);
-			{
-				JMenu fileMenu = new JMenu("File");
-				menuBar.add(fileMenu);
-				JMenuItem fileSaveMenuButton = new JMenuItem("Save ...");
-				fileMenu.add(fileSaveMenuButton);
-				fileSaveMenuButton.setActionCommand("SAVE");
-				{
-					JMenuItem fileLoadMenuButton = new JMenuItem("Load ...");
-					fileMenu.add(fileLoadMenuButton);
-					fileLoadMenuButton.setActionCommand("LOAD");
-					fileLoadMenuButton.addActionListener(this);
-				}
-				fileSaveMenuButton.addActionListener(this);
-			}
+    /**
+     * Create the dialog.
+     */
+    public ResultViewer()
+    {
+        this.basePairCanvas = new BasePairCanvas();
+        this.structureCanvas = new StructureCanvas();
 
-		}
-		{
-			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-			getContentPane().add(tabbedPane, BorderLayout.CENTER);
-			{
-				JPanel structurePanel = new JPanel();
-				tabbedPane.addTab("Structure", null, structurePanel, null);
-				structurePanel.setLayout(new BoxLayout(structurePanel,
-						BoxLayout.X_AXIS));
-				{
-					ScrollPane scrollPane = new ScrollPane();
+        setBounds(100, 100, 450, 300);
+        getContentPane().setLayout(new BorderLayout());
+        {
+            JMenuBar menuBar = new JMenuBar();
+            getContentPane().add(menuBar, BorderLayout.NORTH);
+            {
+                JMenu fileMenu = new JMenu("File");
+                menuBar.add(fileMenu);
+                JMenuItem fileSaveMenuButton = new JMenuItem("Save ...");
+                fileMenu.add(fileSaveMenuButton);
+                fileSaveMenuButton.setActionCommand("SAVE");
+                {
+                    JMenuItem fileLoadMenuButton = new JMenuItem("Load ...");
+                    fileMenu.add(fileLoadMenuButton);
+                    fileLoadMenuButton.setActionCommand("LOAD");
+                    fileLoadMenuButton.addActionListener(this);
+                }
+                fileSaveMenuButton.addActionListener(this);
+            }
 
-					scrollPane.add(structureCanvas);
+        }
+        {
+            JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+            getContentPane().add(tabbedPane, BorderLayout.CENTER);
+            {
+                JPanel structurePanel = new JPanel();
+                tabbedPane.addTab("Structure", null, structurePanel, null);
+                structurePanel.setLayout(new BoxLayout(structurePanel,
+                        BoxLayout.X_AXIS));
+                {
+                    ScrollPane scrollPane = new ScrollPane();
 
-					structurePanel.add(scrollPane);
-				}
-			}
-			{
-				JPanel basePairPanel = new JPanel();
-				tabbedPane.addTab("Base Pairs", null, basePairPanel, null);
-				basePairPanel.setLayout(new BoxLayout(basePairPanel,
-						BoxLayout.X_AXIS));
-				{
-					ScrollPane scrollPane = new ScrollPane();
+                    scrollPane.add(structureCanvas);
 
-					scrollPane.add(basePairCanvas);
+                    structurePanel.add(scrollPane);
+                }
+            }
+            {
+                JPanel basePairPanel = new JPanel();
+                tabbedPane.addTab("Base Pairs", null, basePairPanel, null);
+                basePairPanel.setLayout(new BoxLayout(basePairPanel,
+                        BoxLayout.X_AXIS));
+                {
+                    ScrollPane scrollPane = new ScrollPane();
 
-					basePairPanel.add(scrollPane);
-				}
-			}
-			{
-				JPanel codePanel = new JPanel();
-				tabbedPane.addTab("Code", null, codePanel, null);
-				codePanel.setLayout(new BoxLayout(codePanel, BoxLayout.X_AXIS));
-				{
-					code = new TextArea();
-					code.setFont(new Font("Courier New", Font.PLAIN, 12));
-					codePanel.add(code);
-				}
-			}
-		}
-	}
+                    scrollPane.add(basePairCanvas);
 
-	private String formatCode(Function f, String name)
-	{
-		if (f == null)
-			return "";
+                    basePairPanel.add(scrollPane);
+                }
+            }
+            {
+                JPanel codePanel = new JPanel();
+                tabbedPane.addTab("Code", null, codePanel, null);
+                codePanel.setLayout(new BoxLayout(codePanel, BoxLayout.X_AXIS));
+                {
+                    code = new TextArea();
+                    code.setFont(new Font("Courier New", Font.PLAIN, 12));
+                    codePanel.add(code);
+                }
+            }
+        }
+    }
 
-		StringBuilder str = new StringBuilder();
+    private String formatCode(Function f, String name)
+    {
+        if (f == null)
+        {
+            return "";
+        }
 
-		str.append(name + "\n-----------------\n");
+        StringBuilder str = new StringBuilder();
 
-		str.append(f.toString());
+        str.append(name + "\n-----------------\n");
 
-		str.append("\n\n\n");
+        str.append(f.toString());
 
-		return str.toString();
-	}
+        str.append("\n\n\n");
 
-	public void refreshData(Individual indiv, String rna)
-	{
-		currentIndividual = indiv;
+        return str.toString();
+    }
 
-		/**
-		 * Create structure
-		 * 
-		 */
-		indiv.run(rna);
-		
-		this.setTitle(String.format("Energy: %d, Fitness: %f",
-				indiv.structure.energy(), indiv.fitness));		
-		
+    public void refreshData(Individual indiv, String rna)
+    {
 
-		basePairCanvas.setData(indiv.structure, rna);
-		structureCanvas.setData(indiv.structure);
+        currentIndividual = indiv;
 
-		StringBuilder str = new StringBuilder();
+        /**
+         * Create structure
+         *
+         */
+        if (indiv.sequences.size() > 1 || indiv.structure == null || indiv.structure.structureLength == 0)
+        {
+            indiv.run(rna);
+        }
 
-		if (indiv.mainFunction != null)
-		{
-			str.append(formatCode(indiv.mainFunction, "MAIN"));
+        this.setTitle(String.format("Energy: %d, Fitness: %f",
+                indiv.structure.energy(), indiv.fitness));
 
-			for (int i = 0; i < indiv.adfs.size(); i++)
-			{
-				str.append(formatCode(indiv.adfs.get(i), "ADF" + i));
-			}
-		}
+        basePairCanvas.setData(indiv.structure, rna);
+        structureCanvas.setData(indiv.structure);
 
-		code.setText(str.toString());
-	}
+        StringBuilder str = new StringBuilder();
 
-	@Override
-	public void actionPerformed(ActionEvent arg0)
-	{
-		if (arg0.getActionCommand().equals("SAVE"))
-		{
-			if (currentIndividual != null)
-			{
-				JFileChooser dlg = new JFileChooser();
-				dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
-				dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
-						"RNASLV"));
-				if (dlg.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
-				{
-					try
-					{
-						currentIndividual.write(dlg.getSelectedFile()
-								.getAbsolutePath());
-					}
-					catch (IOException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		else if (arg0.getActionCommand().equals("LOAD"))
-		{
+        if (indiv.mainFunction != null)
+        {
+            str.append(formatCode(indiv.mainFunction, "MAIN"));
 
-			JFileChooser dlg = new JFileChooser();
-			dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
-			dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
-					"RNASLV"));
-			if (dlg.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-			{
+            for (int i = 0; i < indiv.adfs.size(); i++)
+            {
+                str.append(formatCode(indiv.adfs.get(i), "ADF" + i));
+            }
+        }
+
+        code.setText(str.toString());
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent arg0)
+    {
+        if (arg0.getActionCommand().equals("SAVE"))
+        {
+            if (currentIndividual != null)
+            {
+                JFileChooser dlg = new JFileChooser();
+                dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
+                        "RNASLV"));
+                if (dlg.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+                {
+                    try
+                    {
+                        currentIndividual.write(dlg.getSelectedFile()
+                                .getAbsolutePath());
+                    }
+                    catch (IOException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        else if (arg0.getActionCommand().equals("LOAD"))
+        {
+
+            JFileChooser dlg = new JFileChooser();
+            dlg.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            dlg.setFileFilter(new FileNameExtensionFilter("RNASLV file",
+                    "RNASLV"));
+            if (dlg.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+            {
 				// try
-				// {
-				// Individual indiv = Individual.load(dlg.getSelectedFile()
-				// .getAbsolutePath());
-				// refreshData(indiv);
-				// }
-				// catch (IOException e)
-				// {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-			}
+                // {
+                // Individual indiv = Individual.load(dlg.getSelectedFile()
+                // .getAbsolutePath());
+                // refreshData(indiv);
+                // }
+                // catch (IOException e)
+                // {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+                // }
+            }
 
-		}
-	}
+        }
+    }
 }

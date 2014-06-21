@@ -142,10 +142,14 @@ public class Individual implements Comparable
 	{
 		// Truncate
 		rna = rna.substring(0,
-				Math.min(rna.length(), instructions.length()) - 1);
+				Math.min(rna.length(), instructions.length() + 1));
 
 		// Prepare RNA data representation
 		rna = rna.toUpperCase();
+                
+                sequences = new ArrayList<String>();
+                sequences.add(rna);
+                structure = new RNAField(rna);
 
 		// Fill stack with A=0, C=1, U=2, G=3
 		for (char c : rna.toCharArray())
@@ -247,12 +251,14 @@ public class Individual implements Comparable
 				}
 			}
 		}
-		
+
 		return structure.fitness();
 	}
 
 	/**
 	 * Calculates fitness of this object
+	 * 
+	 * Method 1: Sum Method 2: use max (worst) fitness [schlecht]
 	 * 
 	 * 
 	 * @return
@@ -260,16 +266,17 @@ public class Individual implements Comparable
 	public double fitness(ArrayList<String> rnas)
 	{
 		this.sequences = rnas;
-		
+
 		fitness = 0;
-		
-		for(String rna : rnas)
+
+		for (String rna : rnas)
 		{
-			double f =  run(rna);
+			double f = run(rna);
+
 			fitness += f;
 		}
-		
-		return fitness;
+
+		return fitness / rnas.size();
 	}
 
 	/**
@@ -341,7 +348,7 @@ public class Individual implements Comparable
 		FileWriter wr = new FileWriter(file);
 
 		wr.write(">Individual with Fitness " + fitness + "\n");
-		for(String rna : sequences)
+		for (String rna : sequences)
 		{
 			wr.write("~" + rna + "\n");
 		}
@@ -359,30 +366,30 @@ public class Individual implements Comparable
 	public static Individual load(String file) throws IOException
 	{
 		throw new RuntimeException("Not implemented!");
-		
-//		BufferedReader rd = new BufferedReader(new FileReader(file));
-//
-//		rd.readLine(); // ignore name
-//
-//		String rna = rd.readLine();
-//
-//		String buffer = null;
-//
-//		/**
-//		 * Create individual
-//		 */
-//		Individual indiv = new Individual();
-//		indiv.adfs = new ArrayList<TopLevelFunction>();
-//
-//		/**
-//		 * Function reading
-//		 */
-//
-//		Function current = null;
-//
-//		
-//		indiv.run(rna);
-//
-//		return indiv;
+
+		// BufferedReader rd = new BufferedReader(new FileReader(file));
+		//
+		// rd.readLine(); // ignore name
+		//
+		// String rna = rd.readLine();
+		//
+		// String buffer = null;
+		//
+		// /**
+		// * Create individual
+		// */
+		// Individual indiv = new Individual();
+		// indiv.adfs = new ArrayList<TopLevelFunction>();
+		//
+		// /**
+		// * Function reading
+		// */
+		//
+		// Function current = null;
+		//
+		//
+		// indiv.run(rna);
+		//
+		// return indiv;
 	}
 }

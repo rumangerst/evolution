@@ -53,6 +53,14 @@ public class Nucleotide
 	{
 		return bond != null;
 	}
+        
+        public boolean isBondStraight()
+        {
+            if(!isBond())
+                return false;
+            
+            return bond.x == x || bond.y == y;
+        }
 
 	public void bondTo(Nucleotide nuc)
 	{

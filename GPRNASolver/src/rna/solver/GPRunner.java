@@ -1,233 +1,247 @@
 package rna.solver;
 
+import rna.solver.linear.LinearRegister;
+import rna.solver.linear.LinearIndividual;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import rna.solver.tree.TreeIndividual;
 
 /**
  * Main GP handling class
- * 
+ *
  * @author ruman
- * 
+ *
  */
 public class GPRunner
 {
-	public int generations;
+    public static final Random RANDOM = new Random();
 
-	public int populationSize;
-	public int children;
+    public int generations;
 
-	/**
-	 * Turniersekeltion Turniere
-	 */
-	public int tournaments;
+    public int populationSize;
+    public int children;
 
-	public float recombProbability;
-	public float mutateProbability;
+    /**
+     * Turniersekeltion Turniere
+     */
+    public int tournaments;
 
-	public int registerCount;
-	public int adfCount;
-	public int adfRegisters;
-	public int adfParameters;
+    public float recombProbability;
+    public float mutateProbability;
 
-	public LinkedList<Individual> population = new LinkedList<>();
-	
-	public ArrayList<String> sequences;
+    public LinkedList<Individual> population = new LinkedList<>();
 
-	/**
-	 * Data for plot
-	 * 
-	 * @param rna
-	 */
-	public LinkedList<Double> results_BestFitness = new LinkedList<>();
+    public ArrayList<String> sequences;
 
-	public GPRunner(ArrayList<String> sequences)
-	{
-		this.sequences = sequences;
+    /**
+     * Data for plot
+     *
+     * @param rna
+     */
+    public LinkedList<Double> results_BestFitness = new LinkedList<>();
 
-		this.generations = 1000;
+    public GPRunner(ArrayList<String> sequences)
+    {
+        this.sequences = sequences;
 
-		this.populationSize = 800;
-		this.children = 400; // jeder elter erzeugt 2 Kinder
-		this.registerCount = 40;
-		this.adfCount = 3;
-		this.adfRegisters = registerCount / 2;
-		this.adfParameters = 5;
+        this.generations = 1000;
 
-		this.tournaments = 10;
+        this.populationSize = 800;
+        this.children = 400; // jeder elter erzeugt 2 Kinder
 
-		recombProbability = 0.2f;
-		mutateProbability = 1.0f / this.registerCount;
-	}
+        this.tournaments = 10;
 
-	public List<Individual> tournamentSelection()
-	{
-		LinkedList<Individual> results = new LinkedList<Individual>();
+        recombProbability = 0.2f;
+        mutateProbability = 0.05f;
+    }
 
-		for (int i = 0; i < tournaments; i++)
-		{
-			results.add(population.get(Register.RANDOM.nextInt(population
-					.size())));
-		}
+    public List<Individual> tournamentSelection()
+    {
+        LinkedList<Individual> results = new LinkedList<>();
 
-		Collections.sort(results);
+        for (int i = 0; i < tournaments; i++)
+        {
+            results.add(population.get(GPRunner.RANDOM.nextInt(population
+                    .size())));
+        }
 
-		return results.subList(0, 2);
-	}
+        Collections.sort(results);
 
-	public Individual evolve()
-	{
-		/**
-		 * Create inital population
-		 */
-		for (int i = 0; i < populationSize; i++)
-		{
-			Individual indiv = new Individual();
-			indiv.random(registerCount, adfCount, adfParameters, adfRegisters);
+        return results.subList(0, 2);
+    }
 
-			population.add(indiv);
-		}
+    public void createInitialLinearPopulation(int registerCount,
+            int adfCount,
+            int adfRegisters,
+            int adfParameters)
+    {
+        /**
+         * Create inital population
+         */
+        for (int i = 0; i < populationSize; i++)
+        {
+            LinearIndividual indiv = new LinearIndividual();
+            indiv.random(registerCount, adfCount, adfParameters, adfRegisters);
 
-		/**
-		 * Evolution loop
-		 */
-		for (int generation = 0; generation < generations; generation++)
-		{
-			System.out.println("Generation " + (generation + 1));
+            population.add(indiv);
+        }
+    }
+    
+    public void createInitialTreePopulation(
+            int adfCount,            
+            int adfParameters)
+    {
+        /**
+         * Create inital population
+         */
+        for (int i = 0; i < populationSize; i++)
+        {
+            TreeIndividual indiv = new TreeIndividual();
+            indiv.random(adfCount, adfParameters);
 
-			/**
-			 * Run programs (will also calculate fitness)
-			 */
-			for (Individual indiv : population)
-			{
-				indiv.fitness(sequences);
-			}
+            population.add(indiv);
+        }
+    }
 
-			Individual best = population.getFirst();
+    public Individual evolve()
+    {
+        if(population.size() == 0)
+            throw new RuntimeException("Initialize Population, first!");
 
-			for (Individual indiv : population)
-			{
-				if (indiv.fitness < best.fitness)
-				{
-					best = indiv;
-				}
-			}
+        /**
+         * Evolution loop
+         */
+        for (int generation = 0; generation < generations; generation++)
+        {
+            System.out.println("Generation " + (generation + 1));
 
-			System.out.println("Best individual: " + best.fitness );
-			System.out.println( "Main:"
-					+ best.mainFunction.toString());
+            /**
+             * Run programs (will also calculate fitness)
+             */
+            for (Individual indiv : population)
+            {
+                indiv.fitness(sequences);
+            }
 
-			results_BestFitness.add(best.fitness);
+            Individual best = population.getFirst();
+
+            for (Individual indiv : population)
+            {
+                if (indiv.fitness < best.fitness)
+                {
+                    best = indiv;
+                }
+            }
+
+            System.out.println("Best individual: " + best.fitness);
+
+            results_BestFitness.add(best.fitness);
 
 			// /**
-			// * Sort population by fitness
-			// */
-			// Collections.sort(population);
-			//
-			// // Just some text
-			// System.out
-			// .println("Best fitness: " + population.getFirst().fitness);
-
+            // * Sort population by fitness
+            // */
+            // Collections.sort(population);
+            //
+            // // Just some text
+            // System.out
+            // .println("Best fitness: " + population.getFirst().fitness);
 			// /**
-			// * Select parents
-			// */
-			// List<Individual> parents = population.subList(0, this.parents -
-			// 1);
+            // * Select parents
+            // */
+            // List<Individual> parents = population.subList(0, this.parents -
+            // 1);
+            /**
+             * Create new population *
+             */
+            LinkedList<Individual> newpop = new LinkedList<Individual>();
 
-			/**
-			 * Create new population *
-			 */
-			LinkedList<Individual> newpop = new LinkedList<Individual>();
-
-			/**
-			 * OPTINAL: Plus strat selection type
-			 * 
-			 */
+            /**
+             * OPTINAL: Plus strat selection type
+             *
+             */
 			// for(Individual indiv : parents)
-			// {
-			// newpop.add(new Individual(indiv));
-			// }
-
+            // {
+            // newpop.add(new Individual(indiv));
+            // }
 			//
-			// /**
-			// * Make new children by pairwise recombining parents
-			// */
-			// while (!parents.isEmpty())
-			// {
-			// Individual father = parents.remove(0);
-			//
-			// for (Individual mother : parents)
-			// {
-			// for (int i = 0; i < children; i++)
-			// {
-			// Individual child1 = new Individual(father);
-			// Individual child2 = new Individual(mother);
-			//
-			// Individual.recombine(child1, child2, recombProbability);
-			// child1.mutate(mutateProbability);
-			//
-			// population.add(child1);
-			// population.add(child2);
-			// }
-			// }
-			// }
+            // /**
+            // * Make new children by pairwise recombining parents
+            // */
+            // while (!parents.isEmpty())
+            // {
+            // Individual father = parents.remove(0);
+            //
+            // for (Individual mother : parents)
+            // {
+            // for (int i = 0; i < children; i++)
+            // {
+            // Individual child1 = new Individual(father);
+            // Individual child2 = new Individual(mother);
+            //
+            // Individual.recombine(child1, child2, recombProbability);
+            // child1.mutate(mutateProbability);
+            //
+            // population.add(child1);
+            // population.add(child2);
+            // }
+            // }
+            // }
+            for (int i = 0; i < children; i++)
+            {
+                List<Individual> parents = tournamentSelection();
 
-			for (int i = 0; i < children; i++)
-			{
-				List<Individual> parents = tournamentSelection();				
+                Individual child1 =parents.get(0).copy();
+                Individual child2 = parents.get(1).copy();
 
-				Individual child1 = new Individual(parents.get(0));
-				Individual child2 = new Individual(parents.get(1));
+                child1.recombine(child2, recombProbability);
 
-				Individual.recombine(child1, child2, recombProbability);
+                child1.mutate(mutateProbability);
+                child2.mutate(mutateProbability);
 
-				child1.mutate(mutateProbability);
-				child2.mutate(mutateProbability);
+                newpop.add(child1);
+                newpop.add(child2);
+            }
 
-				newpop.add(child1);
-				newpop.add(child2);
-			}
+            /**
+             * Population aktualisieren
+             */
+            this.population = newpop;
 
-			/**
-			 * Population aktualisieren
-			 */
+        }
 
-			this.population = newpop;
+        System.out.println("Evolution loop finished.");
 
-		}
+        /**
+         * Auswertung
+         */
+        /**
+         * Run programs (will also calculate fitness)
+         */
+        for (Individual indiv : population)
+        {
+            indiv.fitness(sequences);
+        }
 
-		System.out.println("Evolution loop finished.");
+        /**
+         * Sort population by fitness
+         */
+        Collections.sort(population);
 
-		/**
-		 * Auswertung
-		 */
+        try
+        {
+            population.getFirst().write("best_individual.RNASLV");
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		/**
-		 * Run programs (will also calculate fitness)
-		 */
-		for (Individual indiv : population)
-		{
-			indiv.fitness(sequences);
-		}
+        return population.getFirst();
 
-		/**
-		 * Sort population by fitness
-		 */
-		Collections.sort(population);
-
-		try
-		{
-			population.getFirst().write("best_individual.RNASLV");
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return population.getFirst();
-
-	}
+    }
 }
